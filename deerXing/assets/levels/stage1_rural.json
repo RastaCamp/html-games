@@ -1,0 +1,41 @@
+{
+  "levelId": 1,
+  "name": "Stage 1 - Rural",
+  "theme": "rural",
+  "background": {
+    "skyColor": "#87CEEB",
+    "groundColor": "#3CB371",
+    "weather": "clear",
+    "timeOfDay": "day"
+  },
+  "lanes": [
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.25,
+      "carTypes": [
+        "sedan"
+      ],
+      "speedVariation": 0.1
+    },
+    {
+      "type": "road",
+      "direction": "left",
+      "carDensity": 0.3,
+      "carTypes": [
+        "sedan",
+        "truck"
+      ],
+      "speedVariation": 0.15
+    }
+  ],
+  "startPosition": {
+    "x": 10,
+    "y": 18
+  },
+  "exitPosition": {
+    "x": 10,
+    "y": 2
+  },
+  "obstacles": []
+}

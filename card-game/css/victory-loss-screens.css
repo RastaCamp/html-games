@@ -1,0 +1,97 @@
+/**
+ * =====================================================
+ * VICTORY/LOSS SCREENS
+ * =====================================================
+ */
+
+/* =====================================================
+   VICTORY SCREEN
+   ===================================================== */
+
+.victory-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10004;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.victory-screen-content {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 3px solid gold;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    min-width: 400px;
+}
+
+.victory-screen-content h1 {
+    font-size: 4rem;
+    color: gold;
+    margin-bottom: 20px;
+    text-shadow: 0 0 30px gold;
+}
+
+.victory-screen-content h2 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 30px;
+}
+
+.victory-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* =====================================================
+   LOSS SCREEN
+   ===================================================== */
+
+.loss-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10004;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loss-screen-content {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 3px solid #ff6b6b;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    min-width: 400px;
+}
+
+.loss-screen-content h1 {
+    font-size: 4rem;
+    color: #ff6b6b;
+    margin-bottom: 20px;
+    text-shadow: 0 0 30px #ff6b6b;
+}
+
+.loss-screen-content p {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 30px;
+}
+
+.loss-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}

@@ -1,0 +1,360 @@
+---
+description: Complete tutorial design document with step-by-step beats, visual specifications, and implementation guidelines
+globs: js/tutorial.js,js/ui.js,js/campaign.js
+---
+
+# FUM: Shatterlayers - Tutorial Design Document
+
+## Core Philosophy
+
+**"Show, Don't Tell. Play, Don't Read."**
+
+The tutorial should feel like playing, not like studying. Players should finish thinking "That was fun!" not "Thank god that's over."
+
+## Tutorial Structure Overview
+
+```
+FUM TUTORIAL - 5 MINUTES TO BATTLE
+
+┌─────────────────────────────────────┐
+│  CHAPTER 1: Your First Cards   1 min │
+│  CHAPTER 2: Your First Battle 1 min │
+│  CHAPTER 3: Meet the Layers   1 min │
+│  CHAPTER 4: Trust Your Gut    1 min │
+│  CHAPTER 5: Win Your First Game 1 min│
+└─────────────────────────────────────┘
+
+TOTAL: 5 MINUTES TO FIRST VICTORY
+```
+
+## Tutorial Overview Table
+
+| Chapter | Name | Duration | Goal |
+|---------|------|----------|------|
+| 1 | Your First Cards | 60 sec | Place 3 cards in grid |
+| 2 | Your First Battle | 60 sec | Win first combat |
+| 3 | Meet the Layers | 60 sec | Shift layers, see effects |
+| 4 | Trust Your Gut | 60 sec | Pass intuition check |
+| 5 | Win Your First Game | 60 sec | Defeat opponent |
+
+## CHAPTER 1: YOUR FIRST CARDS
+
+**Screen State:**
+- Empty 3×3 grid for player
+- Pre-set 3 cards in opponent's grid (so player sees what to do)
+- Hand of 3 simple cards for player
+- Slots labeled: S (Self), A (Action), O (Outcome)
+
+**Narrator (Luna):** "Welcome to FUM. See those empty slots? That's where your power lives. Your opponent already placed cards. Your turn."
+
+### Beat-by-Beat Breakdown
+
+| Beat | Action | Visual Feedback | Voice/Text |
+|------|--------|-----------------|------------|
+| 1 | Card glows | Pulsing green outline | "This card wants to be played." |
+| 2 | Drag to empty slot | Smooth motion, satisfying thud | "Drop it in any empty SELF slot." |
+| 3 | Card locks in | Gentle glow, border appears | "Perfect. That's your first card." |
+| 4 | Second card glows | Different card pulses | "Now place your second card." |
+| 5 | Place in ACTION slot | Slot highlights when hover | "ACTION slots are for attacking." |
+| 6 | Third card | Final slot pulses | "One more for OUTCOME." |
+
+**Reward Moment:**
+- "Look at that. You built your first grid. Feels good, right?"
+- Confetti pop when grid is full
+- Simple satisfaction
+
+## CHAPTER 2: YOUR FIRST BATTLE
+
+**Current State:**
+- Player's grid: 3 cards placed
+- Opponent's grid: 3 cards showing
+- Cards aligned for combat
+
+**Narrator:** "Here's the magic part. Watch what happens when your cards meet theirs."
+
+### Visual Teaching Flow
+
+```
+YOUR CARD: 5♥  (Strength 5)
+     ↓
+OPPONENT: 3♠  (Strength 3)
+     ↓
+💥 5 beats 3!
+     ↓
+OPPONENT CARD DESTROYED
+     ↓
+EXTRA DAMAGE: 2 goes to opponent HP
+```
+
+### Beat-by-Beat Breakdown
+
+| Beat | Action | Visual | Text |
+|------|--------|--------|------|
+| 1 | Click "FIGHT" button | Cards pulse | "Click FIGHT to start the battle." |
+| 2 | Cards compare | Strength numbers pop | "Your 5 is stronger than their 3." |
+| 3 | Loser destroys | Shatter animation | "Their card is gone." |
+| 4 | Damage transfers | HP bar decreases | "Extra damage hits them directly!" |
+| 5 | Repeat for all rows | Chain animations | "That's all 3 fights." |
+
+**Reward Moment:**
+- Opponent HP drops visibly
+- "You just hurt them. And it felt awesome."
+
+## CHAPTER 3: MEET THE LAYERS
+
+**Visual:** Three giant glowing buttons appear:
+```
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│   LAYER 1   │ │   LAYER 2   │ │   LAYER 3   │
+│   PHYSICAL  │ │  EMOTIONAL  │ │   FRACTAL   │
+│  Earth tone │ │  Pink glow  │ │ Cyan pattern│
+└─────────────┘ └─────────────┘ └─────────────┘
+```
+
+**Narrator:** "Here's where FUM gets wild. You can shift reality. Try clicking Layer 2."
+
+### Layer Shift Demonstration
+
+| Step | Action | Visual Change | Text |
+|------|--------|---------------|------|
+| 1 | Click Layer 2 | WHOLE BOARD shifts pink | "Welcome to the Emotional layer." |
+| 2 | Hearts card glows | ♥ cards pulse brighter | "See how your Hearts card glows?" |
+| 3 | Hover over card | Tooltip appears | "In Emotional layer, Hearts heal double." |
+| 4 | Click Layer 3 | Board shifts cyan/geometric | "Now try Fractal layer." |
+| 5 | Show attack split | Visual arrows | "Here, attacks can split to neighbors." |
+| 6 | Click back to Layer 1 | Returns to normal | "You can shift anytime. It's YOUR reality." |
+
+**Fun Element:** Screen literally "shifts" with a satisfying warp effect, like changing dimensions in a sci-fi show.
+
+## CHAPTER 4: TRUST YOUR GUT
+
+**Setup:** Screen dims slightly. Three facedown cards appear.
+
+**Narrator (whispering tone):** "Sometimes, you have to FEEL the right choice. No logic. Just gut."
+
+### Intuition Tutorial Display
+
+```
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│   ❓  ❓  ❓                                      │
+│                                                 │
+│   "Which one has the highest power?"            │
+│                                                 │
+│   ┌─────┐ ┌─────┐ ┌─────┐                      │
+│   │  1  │ │  2  │ │  3  │                      │
+│   └─────┘ └─────┘ └─────┘                      │
+│                                                 │
+└─────────────────────────────────────────────────┘
+```
+
+### Beat-by-Beat Breakdown
+
+| Beat | Action | Feedback | Text |
+|------|--------|----------|------|
+| 1 | Hover over cards | Soft pulse | "Don't overthink. Which one feels right?" |
+| 2 | Click card 2 | Dramatic pause | "Let's see..." |
+| 3 | Reveal animation | Cards flip dramatically | "It WAS the highest! You guessed it!" |
+| 4 | Bonus triggers | Golden explosion | "Intuition success! Double power this turn!" |
+
+**If player guesses wrong:**
+- "Not this time. But trust us - that feeling gets stronger with practice."
+
+**Fun Element:** Screen literally vibrates slightly during guess. Heartbeat sound. When correct, triumphant music swell.
+
+## CHAPTER 5: WIN YOUR FIRST GAME
+
+**Setup:**
+- Opponent at 5 HP (almost dead)
+- Player has full grid, good cards
+- All mechanics now active
+
+**Narrator:** "They're almost done. Finish them. You know what to do."
+
+### Minimal Guidance
+
+- No hand-holding
+- Subtle glow on best attacking card
+- Player must remember:
+  - Play cards
+  - Shift layers if wanted
+  - Fight
+  - Use intuition if appears
+
+**When player wins:**
+```
+🎉🎉🎉 VICTORY! 🎉🎉🎉
+
+You just won your first FUM battle!
+
+UNLOCKED: Practice Mode
+UNLOCKED: Layer 2 Cards
+UNLOCKED: New Opponent
+
+Play again?
+[QUICK MATCH] [CAMPAIGN] [DECK BUILDER]
+```
+
+**Narrator:** "That's it. You're a Layer Walker now. The realms are yours to explore."
+
+## POST-TUTORIAL REWARDS
+
+### Immediate Unlocks
+
+| Unlock | Why |
+|--------|-----|
+| Practice Mode | Keep playing immediately |
+| Layer 2 cards | More strategic options |
+| New opponent | Fresh challenge |
+| Bronze trophy | Visual成就感 |
+
+### "First Win" Package
+
+- 100 in-game currency
+- 1 booster pack
+- Exclusive card back: "Tutorial Graduate"
+
+## UI/UX DESIGN FOR TUTORIAL
+
+### Visual Cues System
+
+| Cue | Meaning |
+|-----|---------|
+| GREEN GLOW | Do this now |
+| PULSING | This is important |
+| ARROW | Drag here |
+| MAGNIFY | Hover for info |
+| CONFETTI | You did it right! |
+
+### Hotspot Highlighting
+
+When player needs to click somewhere, that area glows with a bright, pulsing ring. Rest of screen slightly dims.
+
+### Progress Indicator
+
+```
+[⚫⚫⚫⚫⚪] Chapter 4 of 5
+```
+
+Shows at bottom, so player knows they're almost done.
+
+## DIFFICULTY SCALING
+
+### If Player Struggles
+
+- **After 2 failed attempts:** Gentle hint appears: "Try putting your strongest card in the ACTION slot."
+- **After 3 failures:** Optional "Show Me" button appears that demonstrates the move.
+
+### If Player Breezes Through
+
+- Skip some explanations. Let them discover.
+- "You're fast! We'll let you figure this one out."
+
+## FUN ELEMENTS TO ADD
+
+### Easter Eggs
+
+- If player clicks same spot 5 times: "Reality bends to your will. Eventually."
+- Hidden achievement: "Button Masher" for clicking randomly during tutorial
+
+### Humor
+
+- When player makes first mistake: "Even Layer Walkers stumble. Try again?"
+- When player wins first battle: "The layers trembled. You did that."
+
+### Sound Design
+
+- Each correct action = satisfying "ding"
+- Each chapter complete = ascending chime
+- Victory = crowd cheer (imaginary crowd in their head)
+
+## TUTORIAL FLOWCHART
+
+```
+START
+  │
+  ├─→ Chapter 1: Place Cards ──→ SUCCESS? ──→ Yes ──→ Chapter 2
+  │         │                      │
+  │         No                     No
+  │         │                      │
+  │    Highlight correct slot  Repeat with simpler cards
+  │         │                      │
+  └─────────┴──────────────────────┘
+  
+Chapter 2: First Battle ──→ SUCCESS? ──→ Yes ──→ Chapter 3
+         │                      │
+         No                     No
+         │                      │
+    Slow motion replay     Offer "Show Me" button
+         │                      │
+         └──────────────────────┘
+         
+[Continues similarly for all chapters]
+```
+
+## WHY THIS WORKS
+
+| Principle | How We Achieve It |
+|-----------|-------------------|
+| 5-minute rule | Player wins in under 5 minutes |
+| Active learning | They DO, not just read |
+| Immediate reward | Victory at end of tutorial |
+| Feeling of power | They defeat an opponent |
+| Curiosity triggered | "What do other layers do?" |
+| Low frustration | Hints before they get stuck |
+| High satisfaction | Confetti, sounds, unlocks |
+
+## SUMMARY FOR DEVS
+
+### Tutorial Requirements
+
+- 5 chapters, 1 minute each
+- No reading required (voice/visuals only)
+- Player clicks everything themselves
+- Victory at the end
+- Rewards after completion
+- Replayable tutorial (with skip option for alts)
+
+### Must-Have Elements
+
+- Green glow = click this
+- Satisfying sounds for correct actions
+- Confetti for victories (even small ones)
+- Encouraging narrator (never condescending)
+- Visual layer shifts that feel POWERFUL
+
+## UI ELEMENTS SUMMARY
+
+| Element | Appearance | When Used |
+|---------|------------|-----------|
+| Green pulse | Pulsing ring | Click here now |
+| Arrow | Animated pointer | Drag here |
+| Tooltip | Floating text box | Explain mechanic |
+| Glow | Soft light | Card has bonus |
+| Dim overlay | Darkened screen | Focus on one area |
+| Confetti | Bursting particles | Success moment |
+| Checkmark | Floating ✓ | Chapter complete |
+
+## IMPLEMENTATION NOTES
+
+### Narrator System
+
+- Character: "Luna" - friendly guide
+- Voice tone: Encouraging, never condescending
+- Text boxes: Short, punchy, action-oriented
+- Timing: 2-3 seconds per message, auto-advance or click-to-continue
+
+### Visual Effects Priority
+
+1. **Green pulse** - Highest priority, always visible
+2. **Confetti** - Celebratory, not overwhelming
+3. **Layer shift** - Dramatic but smooth (0.5s transition)
+4. **Card animations** - Satisfying snap/thud sounds
+5. **HP changes** - Clear, visible, with floating numbers
+
+### Accessibility
+
+- All text should have voice narration option
+- Visual cues should work for colorblind players (use patterns + colors)
+- Skip tutorial option available after first completion
+- Pause tutorial option at any time

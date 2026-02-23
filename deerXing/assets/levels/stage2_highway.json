@@ -1,0 +1,50 @@
+{
+  "levelId": 2,
+  "name": "Stage 2 - Highway",
+  "theme": "highway",
+  "background": {
+    "skyColor": "#9CC6E7",
+    "groundColor": "#5C7F52",
+    "weather": "clear",
+    "timeOfDay": "dusk"
+  },
+  "lanes": [
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.35,
+      "carTypes": [
+        "sedan",
+        "sports"
+      ],
+      "speedVariation": 0.2
+    },
+    {
+      "type": "median",
+      "direction": "none",
+      "carDensity": 0.0,
+      "carTypes": [],
+      "speedVariation": 0.0
+    },
+    {
+      "type": "road",
+      "direction": "left",
+      "carDensity": 0.4,
+      "carTypes": [
+        "sedan",
+        "truck",
+        "bus"
+      ],
+      "speedVariation": 0.25
+    }
+  ],
+  "startPosition": {
+    "x": 10,
+    "y": 18
+  },
+  "exitPosition": {
+    "x": 10,
+    "y": 2
+  },
+  "obstacles": []
+}

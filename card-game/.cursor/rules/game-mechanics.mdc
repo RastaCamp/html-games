@@ -1,0 +1,131 @@
+---
+description: Detailed game mechanics, rules, and card system documentation
+globs: js/*.js
+---
+
+# FUM: Shatterlayers - Game Mechanics
+
+## Turn Structure
+
+1. **Sync Phase**: Player may shift layers (+1/-1) or stay
+2. **Draw Phase**: Draw 2 cards, keep 1, place 1 in Shared Reveal
+3. **Play Phase**: Place 1 card into empty grid slot
+4. **Ability Phase**: Trigger abilities in order (♦ Diamonds, ♣ Clubs, ♥ Hearts, ♠ Spades, Royals, Aces)
+5. **Combat Phase**: Resolve battles between opposing cards
+6. **Intuition Phase** (Conditional): Triggered by specific conditions
+7. **End Phase**: Discard to 7 cards, check Waypoint Attunement
+
+## Layer-Specific Rules
+
+### Layer 1: Physical
+- Standard combat only
+- No Flux triggers
+- +1 Defense to all Entities
+
+### Layer 2: Emotional
+- Influence cards +50% effect
+- Hearts abilities doubled
+- Winners heal 1 HP
+
+### Layer 3: Fractal
+- Attacks may split to adjacent slots
+- Flux triggers twice
+- Echo keyword active
+- Diamond abilities reveal 2 cards instead of 1
+
+### Layer 4: Archetypal
+- Entities reveal True Forms (+2 Presence)
+- Queen abilities affect whole row
+- Enemy debuffs amplified
+
+### Layer 5: Conceptual
+- Can treat 1 card as another type
+- May ignore 1 layer restriction
+- King abilities affect entire grid
+- Can redirect attacks
+
+### Layer 6: Source
+- Double all damage/effects
+- Can play cards from discard
+- Can create 1 custom rule for turn
+- **Source Fade**: After leaving, -1 to all stats for 2 turns
+
+## Win Conditions
+
+1. **Stability Break**: Reduce opponent HP to 0
+2. **Attunement Victory**: Reach 4 Attunements first
+3. **Layer Collapse**: Opponent over-shifts beyond Layer 6 or takes 3+ Flux damage
+4. **Source Resonance** (Secret): Visit each layer (1-6) in order, play 1 Entity in each layer
+
+## Waypoint Attunement
+
+**How to Attune**:
+- Play a card matching Waypoint suit
+- Successfully guess Intuition Check
+- Activate certain Ace abilities
+- Complete a full row in grid
+
+**Attunement Bonuses**:
+- 1 Attunement = Draw 1 card
+- 2 Attunements = +1 Energy per turn
+- 3 Attunements = Reduce opponent max hand size
+- 4 Attunements = **WIN CONDITION**
+
+## Energy System
+
+- Start with 3 Energy
+- Gain +1 Energy per turn
+- Max 10 Energy
+
+**Energy Costs**:
+- Reroll a card: 1
+- Force Intuition Check: 2
+- Activate Ace ability: 3
+- Layer Shift (extra): 1
+- Draw extra card: 2
+
+## Combat Resolution
+
+**When Cards Battle**:
+- Compare Modified Strength = Rank + Bonuses – Debuffs
+- Higher strength destroys lower
+- Ties destroy both cards
+- Destroyed cards go to owner's discard pile
+
+**Damage to Player**:
+- Unblocked attackers deal damage = their Strength
+- Damage reduces player HP (Stability)
+- HP at 0 = loss
+
+## Intuition Check Process
+
+1. Opponent selects 3 facedown cards from hand/deck
+2. Player guesses: "Which has highest value?" OR "Which suit?"
+3. Reveal cards
+4. If correct: Bonus effect + Intuition Counter
+5. If incorrect: Normal resolution, possible minor penalty
+
+**Intuition Bonuses** (scales with counters):
+- 1 Counter: Draw 1 card
+- 2 Counters: +1 Energy
+- 3+ Counters: +1 Attunement
+
+## Card Effect Resolution Order
+
+1. **Diamonds** (Vision - reveals/scries first)
+2. **Clubs** (Matter - barriers/defense)
+3. **Hearts** (Life - healing/support)
+4. **Spades** (Void - attack/disruption)
+5. **Royals** (J/Q/K - special abilities)
+6. **Aces** (Anchors - major effects)
+
+## Grid Slot Meanings
+
+- **S (Self)**: Core identity, defensive position
+- **A (Action)**: Offensive move, ability trigger
+- **O (Outcome)**: Result modifier, combo enabler
+
+Each row represents a complete "engagement":
+- Row 1: Primary engagement
+- Row 2: Secondary/Support
+- Row 3: Reserve/Setup

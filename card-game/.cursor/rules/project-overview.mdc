@@ -1,0 +1,170 @@
+---
+alwaysApply: true
+description: FUM Shatterlayers project overview, game mechanics, and technical requirements
+---
+
+# FUM: Shatterlayers - Project Overview
+
+## 🎮 Game Concept
+
+FUM: Shatterlayers is a 1-4 player tactical card game where reality bends across multiple dimensions. Players battle by shifting between 6 reality layers, each with unique rules, while using intuition-based mechanics that create watchable, tense gameplay moments.
+
+**Core Innovation**: Layer-shifting mechanics + Intuition Checks (players guess facedown cards for bonuses)
+
+## 🛠️ Technical Stack
+
+### Recommended Tools (Free/Open Source)
+
+| Component | Tool | Why |
+|-----------|------|-----|
+| Engine | Unity (Personal) or Godot | Cross-platform, free, great for card games |
+| Multiplayer | Photon PUN (Free) / Mirror | Real-time card interactions |
+| Backend | Firebase Free Tier | Player progress, deck collections |
+| Art Pipeline | Stable Diffusion / DALL·E | Generate layered, cosmic art |
+| Web Tools | React + Tailwind | Deck builder / rule reference |
+
+**Current Implementation**: Browser-based JavaScript/HTML/CSS (standalone, no server required)
+
+## 🎯 Core Game Structure
+
+### The 6 Reality Layers
+
+Each layer has unique visual style + rules:
+
+1. **Layer 1 - Physical**: Photo-real, straightforward combat
+2. **Layer 2 - Emotional**: Glowy, influence cards gain power
+3. **Layer 3 - Fractal**: Particles, attacks split/chain/repeat
+4. **Layer 4 - Archetypal**: Sacred geometry, entities reveal "true forms"
+5. **Layer 5 - Conceptual**: Minimal icons, rules can be bent
+6. **Layer 6 - Source**: White/gold negative space, reality-breaking effects
+
+### Card Types
+
+- **Entity Cards (Creatures)**: Presence (attack), Stability (HP), Flux (reactivity)
+- **Influence Cards**: Spells/emotions with layer-dependent effects
+- **Artifact Cards**: Tools requiring specific layers to activate
+- **Layer Cards**: The battlefield itself (changes rules of play)
+
+## 🔮 Intuition Mechanic (Viral Hook)
+
+**Intuition Check** - On certain turns, opponent selects 3 facedown cards. Player guesses:
+- Which card has highest "vibration value"
+- Card type, symbol, or position
+
+**Results**:
+- **If correct**: Double effects, free layer shifts, bonus draws
+- **If incorrect**: Normal resolution, possible mild backlash
+
+**Why this works**: Creates tense, psychological moments perfect for streaming/viral clips
+
+## 📊 Game Modes
+
+### 1. Core Competitive (2 Players)
+- 3×3 Grid (Self, Action, Outcome slots per row)
+- First to 4 Attunements or reduce opponent HP to 0
+
+### 2. Solitaire Mode (1 Player)
+- Play against "The Veil" (automated opponent)
+- Veil plays by simple rules: ♠=Attack, ♥=Recover, ♦=Reveal, ♣=Disrupt
+- Puzzle-roguelike feel
+
+### 3. Multiplayer (3-4 Players)
+- FFA or 2v2 with shared draw pile
+- Grids shrink to 2×3
+
+### 4. Optional Depth Die (d6)
+Adds randomness without breaking balance:
+- 1=Echo, 2=Distort, 3=Energy, 4=Draw, 5=Bleed, 6=Ascend
+
+## 🎨 Visual Design System
+
+### Layer Color Palettes
+
+- **Layer 1**: Muted earth tones, worn textures
+- **Layer 2**: Warm glows, semi-translucent
+- **Layer 3**: Fractal patterns, cyan/purple
+- **Layer 4**: Monochrome + gold geometry
+- **Layer 5**: Minimal, stark icons
+- **Layer 6**: White space, subtle gold negative
+
+### Card Layout
+
+- **Background**: Abstract cosmic pattern matching layer
+- **Center**: Creature/event/symbol artwork
+- **Borders**: Glow intensity = card rarity/rank
+- **Corner**: Suit icon + rank (2-A)
+- **Optional**: Mini lore snippet
+
+### Visual References
+- **Games**: Control, Outer Wilds, Hyper Light Drifter
+- **Films**: Blade Runner 2049, The Fountain
+- **Artists**: Beeple, Simon Stålenhag, Craig Mullins
+
+## 📝 Card-to-FUM Translation (Standard 52-Card Deck)
+
+### Suits
+
+| Suit | Domain | Function |
+|------|--------|----------|
+| ♠ Spades | Void / Shadow | Attack, disruption, predation |
+| ♥ Hearts | Life / Resonance | Healing, bonding, support |
+| ♦ Diamonds | Vision / Insight | Revelation, scry, intuition |
+| ♣ Clubs | Matter / Defense | Barriers, crafting, survival |
+
+### Ranks
+
+- **2-10**: Numeric strength
+- **J**: Trickster (swap cards)
+- **Q**: Guide (empower adjacent)
+- **K**: Sovereign (dominate row/column)
+- **A**: Anchor (major reality effect)
+
+## 🚀 Development Phases
+
+### Phase 1: Prototype (2-4 weeks)
+- Core 52-card mechanics
+- Basic 3×3 grid implementation
+- Turn structure + battle resolution
+- Single-player vs AI
+
+### Phase 2: Layer Mechanics (3-5 weeks)
+- Visual layer transitions
+- Layer-specific rules engine
+- Intuition Check system
+- Shared areas (Draw/Discard/Energy/Waypoint)
+
+## 📁 Current Project Structure
+
+The game is currently implemented as a **standalone browser game** (no server required):
+
+- **Entry Point**: [index.html](mdc:index.html) - Main game interface
+- **Game Bundle**: [js/game-bundle.js](mdc:js/game-bundle.js) - Combined standalone JavaScript (all game logic)
+- **Source Files**: Individual modules in `js/` directory:
+  - [js/cards.js](mdc:js/cards.js) - Complete 52-card database
+  - [js/game.js](mdc:js/game.js) - Core game engine
+  - [js/ui.js](mdc:js/ui.js) - UI Manager
+  - [js/ai.js](mdc:js/ai.js) - AI opponent
+  - [js/campaign.js](mdc:js/campaign.js) - Campaign mode
+  - [js/layers.js](mdc:js/layers.js) - Layer system
+  - [js/intuition.js](mdc:js/intuition.js) - Intuition mechanics
+  - [js/board.js](mdc:js/board.js) - Grid/board management
+  - [js/deck.js](mdc:js/deck.js) - Deck management
+
+- **Build Script**: [build-standalone.ps1](mdc:build-standalone.ps1) - Combines source files into bundle
+
+## 🎯 Key Implementation Notes
+
+1. **Standalone Requirement**: Game must work by double-clicking `index.html` - no server setup required
+2. **All 52 Cards**: Complete starter pack with full effects implemented
+3. **Layer System**: All 6 layers with unique rules and visual styles
+4. **Intuition Checks**: Core viral mechanic fully implemented
+5. **Campaign Mode**: 7-chapter story mode with progressive difficulty
+6. **AI Opponent**: 5 difficulty levels with adaptive strategy
+
+## 🔧 Development Guidelines
+
+- Always maintain standalone functionality (no ES6 modules in final build)
+- Use `build-standalone.ps1` to rebuild bundle after source changes
+- Keep card database in [js/cards.js](mdc:js/cards.js) for easy updates
+- UI should reflect current layer with appropriate color schemes
+- Intuition checks should create visual tension and feedback

@@ -1,0 +1,84 @@
+{
+  "levelId": 4,
+  "name": "Stage 4 - Multi-level",
+  "theme": "city",
+  "background": {
+    "skyColor": "#8DA7BE",
+    "groundColor": "#56616F",
+    "weather": "rain",
+    "timeOfDay": "dusk"
+  },
+  "lanes": [
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.45,
+      "carTypes": [
+        "sedan",
+        "truck"
+      ],
+      "speedVariation": 0.25
+    },
+    {
+      "type": "road",
+      "direction": "left",
+      "carDensity": 0.45,
+      "carTypes": [
+        "sedan",
+        "sports",
+        "bus"
+      ],
+      "speedVariation": 0.25
+    },
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.5,
+      "carTypes": [
+        "motorcycle",
+        "sports"
+      ],
+      "speedVariation": 0.35
+    },
+    {
+      "type": "road",
+      "direction": "left",
+      "carDensity": 0.5,
+      "carTypes": [
+        "truck",
+        "bus"
+      ],
+      "speedVariation": 0.2
+    }
+  ],
+  "startPosition": {
+    "x": 10,
+    "y": 18
+  },
+  "exitPosition": {
+    "x": 10,
+    "y": 2
+  },
+  "obstacles": [
+    {
+      "type": "bush",
+      "position": {
+        "x": 5,
+        "y": 13
+      },
+      "width": 1,
+      "height": 1,
+      "effect": "hide"
+    },
+    {
+      "type": "puddle",
+      "position": {
+        "x": 13,
+        "y": 8
+      },
+      "width": 2,
+      "height": 1,
+      "effect": "slow"
+    }
+  ]
+}

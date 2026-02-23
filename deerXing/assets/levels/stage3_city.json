@@ -1,0 +1,74 @@
+{
+  "levelId": 3,
+  "name": "Stage 3 - City Streets",
+  "theme": "city",
+  "background": {
+    "skyColor": "#B9D6F2",
+    "groundColor": "#6B7D8D",
+    "weather": "fog",
+    "timeOfDay": "day"
+  },
+  "lanes": [
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.4,
+      "carTypes": [
+        "sedan",
+        "taxi"
+      ],
+      "speedVariation": 0.2
+    },
+    {
+      "type": "road",
+      "direction": "left",
+      "carDensity": 0.45,
+      "carTypes": [
+        "sedan",
+        "truck",
+        "bus"
+      ],
+      "speedVariation": 0.2
+    },
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.5,
+      "carTypes": [
+        "sports",
+        "motorcycle"
+      ],
+      "speedVariation": 0.3
+    },
+    {
+      "type": "road",
+      "direction": "left",
+      "carDensity": 0.35,
+      "carTypes": [
+        "sedan",
+        "taxi"
+      ],
+      "speedVariation": 0.2
+    }
+  ],
+  "startPosition": {
+    "x": 10,
+    "y": 18
+  },
+  "exitPosition": {
+    "x": 10,
+    "y": 2
+  },
+  "obstacles": [
+    {
+      "type": "barrier",
+      "position": {
+        "x": 8,
+        "y": 10
+      },
+      "width": 2,
+      "height": 1,
+      "effect": "block"
+    }
+  ]
+}

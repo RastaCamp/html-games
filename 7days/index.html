@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<!-- 7 Days... - Entry point. Game runs from project root; assets in js/, data/, VISUALS/, sounds/. Docs/unused in extras/. -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7 Days...</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Cover art: fades in first, then fades out to title -->
+        <div id="cover-art-screen">
+            <img id="cover-art-img" src="" alt="" width="1280" height="720">
+        </div>
+        <!-- Title Screen: basement + death markers behind, menu overlay on top -->
+        <div id="title-screen" class="hidden">
+            <canvas id="title-canvas" width="1280" height="720" aria-hidden="true"></canvas>
+            <div id="title-stats">
+                <span id="tip-count">0</span> tips &middot; <span id="death-count">0</span> deaths
+            </div>
+            <div id="death-marker-tooltip" class="hidden">
+                <div id="marker-name"></div>
+                <div id="marker-date"></div>
+                <div id="marker-days"></div>
+                <div id="marker-cause"></div>
+            </div>
+            <div id="title-content">
+                <h1 id="game-title">7 DAYS...</h1>
+                <p id="title-tagline">Survive the basement.<br>Keep your sanity.<br>Don't become the monster.</p>
+                <div id="title-menu">
+                    <button id="new-game-btn" class="menu-btn" onclick="if(window.doNewGame)window.doNewGame();">NEW GAME</button>
+                    <button id="continue-btn" class="menu-btn hidden">CONTINUE</button>
+                    <button id="options-btn" class="menu-btn">OPTIONS</button>
+                    <button id="credits-btn" class="menu-btn">CREDITS</button>
+                    <button id="exit-btn" class="menu-btn">EXIT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Season Selection -->
+        <div id="season-selection" class="hidden">
+            <div id="season-content">
+                <h2>THE WORLD OUTSIDE</h2>
+                <p>What season is it?</p>
+                <div id="season-options">
+                    <button id="spring-btn" class="season-btn" type="button" onclick="if(window.doSeasonChoice)window.doSeasonChoice('spring');">SPRING<br><small>Rainy, mild</small></button>
+                    <button id="summer-btn" class="season-btn" type="button" onclick="if(window.doSeasonChoice)window.doSeasonChoice('summer');">SUMMER<br><small>Hot, dry, long days</small></button>
+                    <button id="fall-btn" class="season-btn" type="button" onclick="if(window.doSeasonChoice)window.doSeasonChoice('fall');">FALL<br><small>Cool, occasional rain</small></button>
+                    <button id="winter-btn" class="season-btn" type="button" onclick="if(window.doSeasonChoice)window.doSeasonChoice('winter');">WINTER<br><small>Freezing, snow</small></button>
+                    <button id="random-btn" class="season-btn" type="button" onclick="if(window.doSeasonChoice)window.doSeasonChoice('random');">RANDOM<br><small>Surprise me</small></button>
+                </div>
+                <p style="margin-top: 20px; font-size: 12px; color: #888;">
+                    Season affects: Temperature • Rainfall • Daylight • Animal Activity
+                </p>
+            </div>
+        </div>
+
+        <!-- Intro Sequence -->
+        <div id="intro-screen" class="hidden">
+            <div id="emergency-broadcast">
+                <div id="broadcast-symbol">
+                    <div id="blue-circle" class="broadcast-circle"></div>
+                    <div id="yellow-circle" class="broadcast-circle"></div>
+                </div>
+                <div id="ticker-container">
+                    <div id="ticker-text"></div>
+                </div>
+                <div id="intro-caption" class="intro-caption">Disaster strikes. Authorities say stay inside until further notice.</div>
+                <button type="button" id="skip-intro-btn" class="menu-btn" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10001;">Skip</button>
+            </div>
+            <div id="living-room" class="hidden">
+                <div id="tv-screen">
+                    <div id="tv-static">STATIC</div>
+                </div>
+                <div id="player-circle"></div>
+            </div>
+        </div>
+
+        <!-- Death Screen -->
+        <div id="death-screen" class="hidden">
+            <img id="death-character-img" src="" alt="" style="max-width: 200px; margin: 0 auto 16px; display: block;">
+            <h2>YOU DIED</h2>
+            <div id="death-stats">
+                <p id="death-cause"></p>
+                <p id="days-survived"></p>
+                <p id="death-flavor"></p>
+            </div>
+            <div id="death-name-container" class="hidden">
+                <p style="margin: 20px 0 10px 0;">Enter your name:</p>
+                <input type="text" id="death-name-input" maxlength="20" placeholder="Your name or leave blank" style="padding: 10px; font-size: 16px; width: 300px; background: #333; color: #fff; border: 1px solid #666; border-radius: 3px;">
+                <p style="margin: 10px 0 20px 0; font-size: 12px; color: #888;">Your memory will remain in the basement.</p>
+                <button id="death-continue-btn" class="menu-btn">CONTINUE</button>
+                <button id="death-skip-btn" class="menu-btn">SKIP</button>
+            </div>
+            <div id="death-buttons">
+                <button id="death-restart-btn" class="menu-btn">RESTART</button>
+                <button id="death-menu-btn" class="menu-btn">MAIN MENU</button>
+            </div>
+        </div>
+
+        <!-- Ending Screen -->
+        <div id="ending-screen" class="hidden">
+            <div id="ending-content">
+                <p id="ending-text"></p>
+                <div id="ending-choice" class="hidden">
+                    <button id="open-door-btn" class="menu-btn" type="button" onclick="if(window.doEndingChoice)window.doEndingChoice('open_door');">OPEN DOOR</button>
+                    <button id="stay-silent-btn" class="menu-btn" type="button" onclick="if(window.doEndingChoice)window.doEndingChoice('stay_silent');">STAY SILENT</button>
+                </div>
+                <div id="ending-result" class="hidden">
+                    <p id="ending-result-text"></p>
+                    <button id="ending-menu-btn" class="menu-btn" type="button" onclick="if(window.doEndingMenu)window.doEndingMenu();">MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options Menu -->
+        <div id="options-menu" class="hidden">
+            <h2>OPTIONS</h2>
+            <div class="option-group">
+                <label>Music Volume</label>
+                <input type="range" id="music-volume" min="0" max="100" value="50">
+                <span id="music-volume-value">50%</span>
+            </div>
+            <div class="option-group">
+                <label>SFX Volume</label>
+                <input type="range" id="sfx-volume" min="0" max="100" value="50">
+                <span id="sfx-volume-value">50%</span>
+            </div>
+            <div class="option-group">
+                <label>Text Speed</label>
+                <input type="range" id="text-speed" min="1" max="10" value="5">
+                <span id="text-speed-value">5</span>
+            </div>
+            <div class="option-group">
+                <label>Difficulty</label>
+                <select id="difficulty-select">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <label>Game Speed</label>
+                <select id="game-speed-select">
+                    <option value="fast">Fast (10 min/day)</option>
+                    <option value="normal" selected>Normal (20 min/day) *Recommended</option>
+                    <option value="slow">Slow (30 min/day)</option>
+                    <option value="realist">Realistic (60 min/day)</option>
+                </select>
+            </div>
+            <button id="clear-death-markers-btn" class="menu-btn">CLEAR DEATH MARKERS</button>
+            <button id="reset-tip-jar-btn" class="menu-btn">RESET TIP JAR</button>
+            <button id="factory-reset-btn" class="menu-btn">FACTORY RESET</button>
+            <button id="reset-save-btn" class="menu-btn">RESET SAVE DATA</button>
+            <button id="options-back-btn" class="menu-btn">BACK</button>
+            <button id="options-quit-to-menu-btn" class="menu-btn">BACK TO START MENU</button>
+        </div>
+
+        <!-- Credits Screen -->
+        <div id="credits-screen" class="hidden">
+            <h2>CREDITS</h2>
+            <div id="credits-content">
+                <p><strong>Designer / Creative Director</strong><br>Your Name</p>
+                <p><strong>Programming</strong><br>Developer Name</p>
+                <p><strong>Art</strong><br>Placeholder Graphics</p>
+            </div>
+            <button id="credits-back-btn" class="menu-btn" type="button" onclick="if(window.doCreditsBack)window.doCreditsBack();">BACK</button>
+        </div>
+
+        <!-- Achievement Notification -->
+        <div id="achievement-notification" class="hidden">
+            <div class="achievement-icon">🏆</div>
+            <div class="achievement-text">
+                <div class="achievement-title">ACHIEVEMENT UNLOCKED</div>
+                <div class="achievement-name"></div>
+            </div>
+        </div>
+
+        <!-- Loading screen (shown until placement/scene data is ready) -->
+        <div id="loading-screen" class="hidden">
+            <img id="loading-screen-img" src="visuals/marauder_loading.png" alt="Loading">
+            <p id="loading-screen-text">Loading...</p>
+        </div>
+
+        <img id="scene-background" src="" alt="" width="1280" height="720" class="hidden">
+        <canvas id="game-canvas" width="1280" height="720" class="hidden"></canvas>
+        <div id="ui-overlay" class="hidden">
+            <div id="meters-panel">
+                <div class="meter">
+                    <label>Health</label>
+                    <div class="meter-bar">
+                        <div id="health-bar" class="meter-fill health"></div>
+                    </div>
+                    <span id="health-value">100/100</span>
+                </div>
+                <div class="meter">
+                    <label>Hydration</label>
+                    <div class="meter-bar">
+                        <div id="hydration-bar" class="meter-fill hydration"></div>
+                    </div>
+                    <span id="hydration-value">100/100</span>
+                </div>
+                <div class="meter">
+                    <label>Hunger</label>
+                    <div class="meter-bar">
+                        <div id="hunger-bar" class="meter-fill hunger"></div>
+                    </div>
+                    <span id="hunger-value">100/100</span>
+                </div>
+                <div class="meter">
+                    <label>Morale</label>
+                    <div class="meter-bar">
+                        <div id="morale-bar" class="meter-fill morale"></div>
+                    </div>
+                    <span id="morale-value">100/100</span>
+                </div>
+                <div class="meter">
+                    <label>Hygiene</label>
+                    <div class="meter-bar">
+                        <div id="hygiene-bar" class="meter-fill hygiene"></div>
+                    </div>
+                    <span id="hygiene-value">0/100</span>
+                </div>
+                <div class="meter">
+                    <label>Fatigue</label>
+                    <div class="meter-bar">
+                        <div id="fatigue-bar" class="meter-fill fatigue"></div>
+                    </div>
+                    <span id="fatigue-value">20/100</span>
+                    <span id="fatigue-status" class="meter-status"></span>
+                </div>
+                <div class="meter">
+                    <label>Bathroom</label>
+                    <div class="meter-bar">
+                        <div id="bathroom-bar" class="meter-fill bathroom"></div>
+                    </div>
+                    <span id="bathroom-value">30/100</span>
+                </div>
+                <div class="meter">
+                    <label>Body Heat <span class="meter-ideal" title="35–65 = safe; 100 = heat stroke risk">(ideal 35–65)</span></label>
+                    <div class="meter-bar meter-bodyHeat" title="Ideal 35–65. Too low = hypothermia; 100 = heat stroke risk.">
+                        <span class="bodyHeat-marker bodyHeat-marker-low" aria-hidden="true">35</span>
+                        <span class="bodyHeat-marker bodyHeat-marker-high" aria-hidden="true">65</span>
+                        <div id="bodyHeat-bar" class="meter-fill bodyHeat"></div>
+                    </div>
+                    <span id="bodyHeat-value">100/100</span>
+                </div>
+                <div class="meter">
+                    <label>Sickness</label>
+                    <div class="meter-bar">
+                        <div id="sicknessLevel-bar" class="meter-fill sickness"></div>
+                    </div>
+                    <span id="sicknessLevel-value">0/100</span>
+                </div>
+                <div id="sickness-indicator" class="status-effect hidden">SICK</div>
+            </div>
+            <!-- Rest: Nap / Full sleep using best surface from inventory; Wake up when sleeping. -->
+            <div class="rest-wrap">
+                <button type="button" id="rest-btn" class="rest-btn" title="Rest or sleep to recover fatigue">Rest</button>
+                <div id="rest-panel" class="rest-panel hidden">
+                    <button type="button" id="rest-nap-btn">Nap (2–4 hrs)</button>
+                    <button type="button" id="rest-full-btn">Full sleep (8 hrs)</button>
+                    <button type="button" id="rest-wake-btn" class="hidden">Wake up</button>
+                </div>
+            </div>
+            <div id="day-counter">Day <span id="day-number">1</span> of 7</div>
+            <div id="time-display">
+                <span id="time-text">Morning</span>
+                <span id="game-time-text" style="margin-left: 5px; font-size: 10px; color: #aaa;">8:00 AM</span>
+                <span id="weather-display">
+                    <span id="weather-icon">☀️</span>
+                    <span id="temperature-text" style="color: #44ff88;">75°F</span>
+                    <span id="temperature-inside-text" style="margin-left: 6px; color: #88ccff;">In: 62°F</span>
+                    <span id="season-text">SUMMER</span>
+                </span>
+                <button id="pause-btn" type="button">⏸ Pause</button>
+            </div>
+            <div id="equip-panel" class="equip-panel">
+                <label>Equipped</label>
+                <div id="equip-slots"></div>
+            </div>
+            <div id="attraction-indicator" class="hidden">
+                <label>Threat Level</label>
+                <div class="meter-bar">
+                    <div id="attraction-bar" class="meter-fill attraction"></div>
+                </div>
+                <span id="attraction-level-text">Low</span>
+            </div>
+        </div>
+        <div id="inventory-panel">
+            <h3>Inventory</h3>
+            <div id="inventory-grid"></div>
+        </div>
+        <div id="message-log">
+            <div id="message-content"></div>
+        </div>
+        <div id="interaction-hint" class="hidden"></div>
+        <div id="crafting-panel" class="hidden">
+            <h3>Crafting</h3>
+            <div id="crafting-slots">
+                <div class="craft-slot" data-slot="0"></div>
+                <div class="craft-slot" data-slot="1"></div>
+                <div class="craft-slot" data-slot="2"></div>
+            </div>
+            <button id="craft-btn">Combine</button>
+            <button id="clear-craft-btn">Clear</button>
+        </div>
+        <div id="item-examine" class="hidden">
+            <h3 id="examine-title"></h3>
+            <p id="examine-description"></p>
+            <div id="examine-actions"></div>
+            <button id="examine-close-btn" type="button" class="action-btn" style="margin-top: 15px;">Close</button>
+        </div>
+        <div id="menu-panel" class="hidden">
+            <button id="pause-resume-btn" type="button" onclick="if(window.doPauseResume)window.doPauseResume();">Resume</button>
+            <button id="pause-tip-jar-btn" type="button">Tip Jar (<span id="pause-tip-count">0</span>)</button>
+            <button id="pause-save-btn" type="button" onclick="if(window.doPauseSave)window.doPauseSave();">Save Game</button>
+            <button id="pause-options-btn" type="button">Options</button>
+            <button id="pause-quit-btn" type="button" onclick="if(window.doQuitToMenu)window.doQuitToMenu();">Quit to Menu</button>
+        </div>
+        
+        <!-- Tip Jar Menu -->
+        <div id="tip-jar-menu" class="hidden">
+            <h2>TIP JAR (<span id="tip-jar-count">0</span> tips)</h2>
+            <p style="margin-bottom: 20px;">Need a hint?</p>
+            <div id="tip-categories">
+                <button class="tip-category-btn" data-category="water">Water</button>
+                <button class="tip-category-btn" data-category="food">Food</button>
+                <button class="tip-category-btn" data-category="warmth">Warmth</button>
+                <button class="tip-category-btn" data-category="security">Security</button>
+                <button class="tip-category-btn" data-category="health">Health</button>
+                <button class="tip-category-btn" data-category="morale">Morale</button>
+                <button class="tip-category-btn" data-category="power">Power</button>
+                <button class="tip-category-btn" data-category="crafting">Crafting</button>
+                <button class="tip-category-btn" data-category="random">Random</button>
+            </div>
+            <div id="tip-display" class="hidden">
+                <p id="tip-text"></p>
+            </div>
+            <button id="tip-jar-close-btn" class="menu-btn">CLOSE</button>
+        </div>
+    </div>
+    <script src="js/AchievementSystem.js"></script>
+    <script src="js/TitleScreen.js"></script>
+    <script src="js/IntroSequence.js"></script>
+    <script src="js/DeathScreen.js"></script>
+    <script src="js/EndingSequence.js"></script>
+    <script src="js/GameState.js"></script>
+    <script src="js/ItemSystem.js"></script>
+    <script src="js/Inventory.js"></script>
+    <script src="js/CraftingSystem.js"></script>
+    <script src="js/MeterSystem.js"></script>
+    <script src="js/DayCycle.js"></script>
+    <script src="js/EventSystem.js"></script>
+    <script src="js/InteractableObjects.js"></script>
+    <script src="js/Renderer.js"></script>
+    <script src="js/SaveSystem.js"></script>
+    <script src="js/ActionTracker.js"></script>
+    <script src="js/AttractionSystem.js"></script>
+    <script src="js/DeathMarkerSystem.js"></script>
+    <script src="js/TipJarSystem.js"></script>
+    <script src="js/WeatherSystem.js"></script>
+    <script src="js/EquipSystem.js"></script>
+    <script src="js/TemperatureSystem.js"></script>
+    <script src="js/SeasonSelection.js"></script>
+    <script src="js/CombatSystem.js"></script>
+    <script src="js/FireSystem.js"></script>
+    <script src="js/LuckSystem.js"></script>
+    <script src="js/DecaySystem.js"></script>
+    <script src="js/MoldSystem.js"></script>
+    <script src="js/PestSystem.js"></script>
+    <script src="js/StructuralDamageSystem.js"></script>
+    <script src="js/PreviousSurvivorSystem.js"></script>
+    <script src="js/RabbitMinigame.js"></script>
+    <script src="js/DesensitizationSystem.js"></script>
+    <script src="js/AudioSystem.js"></script>
+    <script src="js/TransitionSystem.js"></script>
+    <script src="js/SceneRenderer.js"></script>
+    <script src="js/CharacterRenderer.js"></script>
+    <script src="js/FlashlightSystem.js"></script>
+    <script src="js/SpawnTable.js"></script>
+    <script src="js/LocationSystem.js"></script>
+    <script src="js/MasterItemList.js"></script>
+    <script src="js/MasterCraftingRecipes.js"></script>
+    <script src="js/ContainerRandomizer.js"></script>
+    <script src="js/Game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

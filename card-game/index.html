@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akasha: Shatterlayers</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/card-animations.css">
+    <link rel="stylesheet" href="css/campaign-ui.css">
+    <link rel="stylesheet" href="css/tutorial-ui.css">
+    <link rel="stylesheet" href="css/intro-sequence.css">
+    <link rel="stylesheet" href="css/audio-settings.css">
+    <link rel="stylesheet" href="css/title-screen.css">
+    <link rel="stylesheet" href="css/card-flip.css">
+    <link rel="stylesheet" href="css/damage-numbers.css">
+    <link rel="stylesheet" href="css/pause-menu.css">
+    <link rel="stylesheet" href="css/layer-shift-effects.css">
+    <link rel="stylesheet" href="css/card-tooltips.css">
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <link rel="stylesheet" href="css/victory-loss-screens.css">
+</head>
+<body>
+    <!-- Fallback: if game script fails or doesn't load, show menu after a short delay so user never sees only a blue screen -->
+    <script>
+        (function() {
+            function showMenuFallback() {
+                var menu = document.getElementById('main-menu');
+                if (menu && menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    menu.style.opacity = '1';
+                    var content = menu.querySelector('.menu-content');
+                    if (content) {
+                        var p = document.createElement('p');
+                        p.className = 'tagline';
+                        p.style.marginTop = '1rem';
+                        p.style.color = '#F1C40F';
+                        p.textContent = 'If the game did not load, refresh the page or open index.html from the game folder.';
+                        content.appendChild(p);
+                    }
+                }
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() { setTimeout(showMenuFallback, 5000); });
+            } else {
+                setTimeout(showMenuFallback, 5000);
+            }
+        })();
+    </script>
+    <div id="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <button id="menu-btn" class="btn-menu">☰</button>
+            <h1 class="game-title">Akasha: Shatterlayers</h1>
+            <div class="energy-display">
+                <span class="energy-label">Energy:</span>
+                <span id="player-energy" class="energy-value">3</span>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Shared Reveal Area -->
+            <section class="shared-area">
+                <div class="shared-reveal">
+                    <h3>Shared Reveal</h3>
+                    <div id="shared-reveal-slots" class="card-slots">
+                        <div class="card-slot" data-slot="0"></div>
+                        <div class="card-slot" data-slot="1"></div>
+                        <div class="card-slot" data-slot="2"></div>
+                        <div class="card-slot" data-slot="3"></div>
+                    </div>
+                </div>
+                <div class="shared-piles">
+                    <div class="pile draw-pile" id="draw-pile" style="background-image: url('visuals/cards/back.png'); background-size: cover; background-position: center;">
+                        <div class="pile-label">Draw</div>
+                        <div id="draw-count" class="pile-count">52</div>
+                    </div>
+                    <div class="pile discard-pile">
+                        <div class="pile-label">Discard</div>
+                        <div id="discard-count" class="pile-count">0</div>
+                    </div>
+                    <div class="pile waypoint">
+                        <div class="pile-label">Waypoint</div>
+                        <div id="waypoint-card" class="waypoint-slot"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Player Grids -->
+            <section class="player-grids">
+                <!-- Player 2 Grid (Top) -->
+                <div class="player-grid player-2-grid" id="player-2-grid">
+                    <div class="player-info">
+                        <div class="player-name">Player 2</div>
+                        <div class="player-stats">
+                            <span class="stat">HP: <span id="player-2-hp">20</span></span>
+                            <span class="stat">Layer: <span id="player-2-layer">1</span></span>
+                            <span class="stat">Attunements: <span id="player-2-attunements">0</span></span>
+                        </div>
+                    </div>
+                    <div class="grid-container" id="grid-2">
+                        <!-- 3x3 Grid -->
+                    </div>
+                </div>
+
+                <!-- Player 1 Grid (Bottom) -->
+                <div class="player-grid player-1-grid" id="player-1-grid">
+                    <div class="player-info">
+                        <div class="player-name">Player 1</div>
+                        <div class="player-stats">
+                            <span class="stat">HP: <span id="player-1-hp">20</span></span>
+                            <span class="stat">Layer: <span id="player-1-layer">1</span></span>
+                            <span class="stat">Attunements: <span class="attunement-display" id="player-1-attunements">0</span></span>
+                        </div>
+                    </div>
+                    <div class="grid-container" id="grid-1">
+                        <!-- 3x3 Grid -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Player Hand -->
+            <section class="hand-area">
+                <h3>Your Hand</h3>
+                <div id="player-hand" class="hand-cards">
+                    <!-- Cards will be inserted here -->
+                </div>
+            </section>
+
+            <!-- Layer Display -->
+            <div class="layer-display">
+                <div class="current-layer" id="current-layer-display">
+                    <span class="layer-name">Layer 1: Physical</span>
+                    <div class="layer-effects" id="layer-effects"></div>
+                </div>
+            </div>
+
+            <!-- Battle Log -->
+            <section class="battle-log-section">
+                <h3>Battle Log</h3>
+                <div id="battle-log" class="battle-log">
+                    <!-- Log entries will be inserted here -->
+                </div>
+            </section>
+
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <button id="end-turn-btn" class="btn-primary">End Turn</button>
+                <button id="intuition-btn" class="btn-secondary" disabled>Intuition (2 Energy)</button>
+                <div class="layer-selector">
+                    <button id="layer-down" class="btn-layer">◄</button>
+                    <span id="layer-display" class="layer-value">Layer 1</span>
+                    <button id="layer-up" class="btn-layer">►</button>
+                </div>
+                <button id="settings-btn" class="btn-secondary">⚙</button>
+            </section>
+        </main>
+
+        <!-- Modals -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modal-title">Modal Title</h2>
+                    <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.add('hidden')">&times;</button>
+                </div>
+                <div class="modal-content" id="modal-content"></div>
+            </div>
+        </div>
+
+        <!-- Intuition Modal -->
+        <div id="intuition-modal" class="intuition-modal hidden">
+            <div class="intuition-content">
+                <h2>Trust Your Feeling</h2>
+                <p>Guess which card has the highest value or which suit appears:</p>
+                <div id="intuition-cards" class="intuition-card-slots"></div>
+                <div class="intuition-options">
+                    <button class="intuition-guess" data-guess="highest">Highest Value</button>
+                    <button class="intuition-guess" data-guess="suit">Guess Suit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Menu (hidden until title screen finishes) -->
+        <div id="main-menu" class="main-menu hidden">
+            <div class="menu-content">
+                <h1>Akasha: Shatterlayers</h1>
+                <p class="tagline">A card game where reality itself is your battlefield</p>
+                
+                
+                <div class="menu-buttons">
+                    <button type="button" class="menu-btn" id="btn-tutorial" onclick="if(window.fumStartTutorial) window.fumStartTutorial()">Tutorial</button>
+                    <button type="button" class="menu-btn" id="btn-campaign" onclick="if(window.fumStartCampaign) window.fumStartCampaign()">Campaign</button>
+                    <button type="button" class="menu-btn" id="btn-practice" onclick="if(window.fumStartPractice) window.fumStartPractice()">Practice</button>
+                    <button type="button" class="menu-btn" id="btn-versus" onclick="if(window.fumStartVersus) window.fumStartVersus()">Versus</button>
+                    <button type="button" class="menu-btn" id="btn-coop" onclick="if(window.fumStartCoop) window.fumStartCoop()">Co-op</button>
+                    <button type="button" class="menu-btn" id="btn-simulation" onclick="if(window.fumStartSimulation) window.fumStartSimulation()">Simulation</button>
+                    <button type="button" class="menu-btn" id="btn-settings" onclick="var m=document.getElementById('settings-modal');if(m) m.classList.remove('hidden')">Settings</button>
+                </div>
+                <div id="campaign-progress" class="campaign-progress hidden" style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <h3 style="margin-bottom: 0.5rem;">Campaign Progress</h3>
+                    <div id="progress-text">No progress yet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden">
+        <div class="settings-modal-content">
+            <h2>GAME SETTINGS</h2>
+            
+            <!-- Audio Settings Section -->
+            <div class="settings-section">
+                <h3>AUDIO</h3>
+                
+                <div class="setting-row">
+                    <span>Music</span>
+                    <div class="toggle-buttons">
+                        <button id="music-on" class="toggle-btn active">ON</button>
+                        <button id="music-off" class="toggle-btn">OFF</button>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <span>Sound Effects</span>
+                    <div class="toggle-buttons">
+                        <button id="sfx-on" class="toggle-btn active">ON</button>
+                        <button id="sfx-off" class="toggle-btn">OFF</button>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <span>Volume</span>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.7">
+                </div>
+            </div>
+            
+            <!-- Game Options Section -->
+            <div class="settings-section">
+                <h3>GAME OPTIONS</h3>
+                
+                <div class="setting-row">
+                    <span>Depth Die (d6)</span>
+                    <div class="toggle-buttons">
+                        <button id="depth-die-on" class="toggle-btn">ON</button>
+                        <button id="depth-die-off" class="toggle-btn active">OFF</button>
+                    </div>
+                    <p class="setting-description">Roll a die each turn for random effects (Echo, Distort, Energy, Draw, Bleed, Ascend)</p>
+                </div>
+            </div>
+            
+            <button id="settings-close" class="close-btn" onclick="document.getElementById('settings-modal').classList.add('hidden')">CLOSE</button>
+        </div>
+    </div>
+    
+    <!-- Main game script - Standalone (no server required) -->
+    <script src="js/game-bundle.js"></script>
+    
+    <!-- Menu start functions: defined here so they always work even if bundle fails to assign them -->
+    <script>
+        (function() {
+            function go(mode, difficulty, afterInit) {
+                if (typeof window.ensureGame !== 'function' || !window.ensureGame()) return;
+                var menu = document.getElementById('main-menu');
+                var container = document.getElementById('game-container');
+                if (menu) menu.classList.add('hidden');
+                if (container) container.classList.add('game-active');
+                if (window.gameInstance) {
+                    window.gameInstance.initialize(mode, difficulty);
+                    if (typeof afterInit === 'function') afterInit();
+                    if (window.AudioManager && window.AudioManager.playGameMusic) window.AudioManager.playGameMusic();
+                }
+            }
+            window.fumStartPractice = function() { go('practice', 2); };
+            window.fumStartVersus = function() { go('versus'); };
+            window.fumStartCoop = function() { go('coop'); };
+            window.fumStartSimulation = function() { go('simulation', 2); };
+            window.fumStartCampaign = function() {
+                if (typeof window.ensureGame !== 'function' || !window.ensureGame()) return;
+                var menu = document.getElementById('main-menu');
+                var container = document.getElementById('game-container');
+                if (menu) menu.classList.add('hidden');
+                if (container) container.classList.add('game-active');
+                if (window.gameInstance) {
+                    window.gameInstance.initialize('campaign', 2);
+                }
+            };
+            window.fumStartTutorial = function() {
+                if (typeof window.ensureGame !== 'function' || !window.ensureGame()) return;
+                var menu = document.getElementById('main-menu');
+                var container = document.getElementById('game-container');
+                if (menu) menu.classList.add('hidden');
+                if (container) container.classList.add('game-active');
+                if (window.gameInstance) {
+                    window.gameInstance.initialize('practice', 1);
+                    if (window.AudioManager && window.AudioManager.playGameMusic) window.AudioManager.playGameMusic();
+                    if (typeof IntroSequence !== 'undefined' && IntroSequence.showStoryModal) IntroSequence.showStoryModal();
+                }
+            };
+        })();
+    </script>
+    
+    <!-- Fallback: Simple button test and server status -->
+    <script>
+        function showSettingsMenu() {
+            const modal = document.getElementById('modal-overlay');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+            
+            title.textContent = 'Settings';
+            content.innerHTML = `
+                <div class="settings-content">
+                    <h3>Game Settings</h3>
+                    <div style="margin: 1rem 0;">
+                        <label>
+                            <input type="checkbox" id="sound-enabled" checked> Enable Sound Effects
+                        </label>
+                    </div>
+                    <div style="margin: 1rem 0;">
+                        <label>
+                            <input type="checkbox" id="animations-enabled" checked> Enable Animations
+                        </label>
+                    </div>
+                    <div style="margin: 1rem 0;">
+                        <label>
+                            <input type="checkbox" id="tooltips-enabled" checked> Show Card Tooltips
+                        </label>
+                    </div>
+                    <div style="margin: 2rem 0; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button class="btn-primary" onclick="document.getElementById('modal-overlay').classList.add('hidden')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+        
+        window.addEventListener('load', function() {
+            console.log('Page loaded - Standalone version');
+            
+            // Settings button (from main menu)
+            const settingsBtn = document.getElementById('btn-settings');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    const settingsModal = document.getElementById('settings-modal');
+                    if (settingsModal) {
+                        settingsModal.classList.remove('hidden');
+                    } else {
+                        showSettingsMenu();
+                    }
+                });
+            }
+            
+            // Start title music when page loads (if audio manager is available)
+            // Note: Audio will only play after user interaction due to browser autoplay policies
+            // The intro sequence will handle starting music when user presses a key
+        });
+    </script>
+</body>
+</html>

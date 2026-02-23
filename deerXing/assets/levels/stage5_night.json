@@ -1,0 +1,54 @@
+{
+  "levelId": 5,
+  "name": "Stage 5 - Night Stage",
+  "theme": "night",
+  "background": {
+    "skyColor": "#0C1020",
+    "groundColor": "#1B2A34",
+    "weather": "fog",
+    "timeOfDay": "night"
+  },
+  "lanes": [
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.4,
+      "carTypes": [
+        "sedan",
+        "police"
+      ],
+      "speedVariation": 0.2
+    },
+    {
+      "type": "road",
+      "direction": "left",
+      "carDensity": 0.45,
+      "carTypes": [
+        "sedan",
+        "truck",
+        "hearse"
+      ],
+      "speedVariation": 0.25
+    },
+    {
+      "type": "road",
+      "direction": "right",
+      "carDensity": 0.5,
+      "carTypes": [
+        "sports",
+        "motorcycle",
+        "taxi"
+      ],
+      "speedVariation": 0.3
+    }
+  ],
+  "startPosition": {
+    "x": 10,
+    "y": 18
+  },
+  "exitPosition": {
+    "x": 10,
+    "y": 2
+  },
+  "obstacles": []
+}

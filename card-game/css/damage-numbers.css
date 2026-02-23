@@ -1,0 +1,29 @@
+/**
+ * =====================================================
+ * DAMAGE NUMBERS POPUP
+ * =====================================================
+ */
+
+/* =====================================================
+   DAMAGE NUMBER STYLING
+   ===================================================== */
+
+.damage-number {
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    user-select: none;
+}
+
+.damage-number.damage-damage {
+    color: #ff4444;
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.8),
+                 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.damage-number.damage-heal {
+    color: #44ff44;
+    text-shadow: 0 0 10px rgba(68, 255, 68, 0.8),
+                 2px 2px 4px rgba(0, 0, 0, 0.8);
+}

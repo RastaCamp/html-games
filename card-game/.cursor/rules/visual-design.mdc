@@ -1,0 +1,383 @@
+---
+description: Visual design specifications for the game table, UI elements, and atmospheric effects
+globs: *.css,*.html,*.scss
+---
+
+# FUM: Shatterlayers - Visual Design Specifications
+
+## Board Structure (Clean Tournament Layout)
+
+### CAMERA ANGLE
+- Top-down, perfectly symmetrical tabletop view
+- Centered composition
+- Cosmic, layered-reality aesthetic
+- High clarity, no clutter, clean labeling
+
+### BOARD STRUCTURE (TOP TO BOTTOM)
+
+#### 🔷 TOP SECTION — PLAYER A FIELD
+
+**PLAYER A TITLE BAR**
+- Centered label: "PLAYER A"
+
+**PLAYER A GRID (3×3 layout)**
+- Three columns labeled: **SELF | ACTION | OUTCOME**
+- Nine slots arranged in 3 rows:
+  ```
+  [ SLOT 1 ] [ SLOT 2 ] [ SLOT 3 ]
+  [ SLOT 4 ] [ SLOT 5 ] [ SLOT 6 ]
+  [ SLOT 7 ] [ SLOT 8 ] [ SLOT 9 ]
+  ```
+- Face-up card placement zones
+- Grid glows faint blue for Player A
+
+**Left of Player A Grid:**
+- **ENERGY POOL A**: Circular token slots (0–10 markers), small glowing counters
+
+**Right of Player A Grid:**
+- **STABILITY TRACK A**: Numbered track (0–10 or 0–20), circular indicator tokens
+
+#### 🔷 CENTER SECTION — SHARED ZONES
+
+**1️⃣ DRAW PILE**
+- Centered at upper middle
+- Label: "DRAW PILE (Face Down)"
+- Stack of cards icon
+
+**2️⃣ DISCARD PILE**
+- Directly beneath Draw Pile
+- Label: "DISCARD PILE (Face Up)"
+- Cards slightly fanned
+
+**3️⃣ SHARED REVEAL ZONE (Intuition Zone)**
+- Centered middle of board
+- Label: "SHARED REVEAL (Intuition Zone)"
+- Three card slots side-by-side: `[ ? ] [ ? ] [ ? ]`
+- This is where Intuition Checks occur
+- Area glows purple or cyan to indicate psychic interaction
+
+**4️⃣ WAYPOINT ZONE (Attunement Track)**
+- Below Shared Reveal
+- Label: "WAYPOINT ZONE (Attunement Track)"
+- Four circular markers: `○ ○ ○ ○`
+- When filled → player wins by Attunement
+- Optional vertical Layer Track beside it:
+  ```
+  PHYSICAL
+  EMOTIONAL
+  FRACTAL
+  ARCHETYPAL
+  CONCEPTUAL
+  SOURCE
+  ```
+
+#### 🔷 BOTTOM SECTION — PLAYER B FIELD
+
+**Mirrored version of Player A:**
+- **PLAYER B TITLE BAR**: Centered label "PLAYER B"
+- **PLAYER B GRID (3×3)**: Same layout with SELF | ACTION | OUTCOME columns
+- Grid glow tint: slightly red or gold to distinguish from Player A
+- **ENERGY POOL B**: Left of grid
+- **STABILITY TRACK B**: Right of grid
+
+### TURN VISUAL FLOW
+
+**DRAW PHASE:**
+- Player draws 2 cards from DRAW PILE
+- Keeps 1
+- Places 1 into SHARED REVEAL (face up)
+
+**PLAY PHASE:**
+- Player places 1 card into empty slot in their 3×3 grid
+- Card is face up
+
+**ABILITY PHASE (Visual Order):**
+Resolve in this order with visual effects:
+1. ♦ Diamonds
+2. ♣ Clubs
+3. ♥ Hearts
+4. ♠ Spades
+5. Royals (J/Q/K)
+6. Aces
+
+**RESOLVE CONFLICTS:**
+- Cards in same column across both grids clash
+- Compare: Rank Value + Modifiers + Shields - Debuffs
+- Lower value card destroyed → move to DISCARD PILE
+
+**ATTUNEMENT CHECK:**
+- If suit matches top Waypoint card: Place marker on Waypoint Track
+- If 4 markers → win
+
+**INTUITION CHECK:**
+- Place 3 cards in SHARED REVEAL: `[ ? ] [ ? ] [ ? ]`
+- Player chooses one
+- Reveal
+- If highest VV → bonus effect
+
+### WIN CONDITIONS (VISUALLY TRACKED)
+
+Player wins if:
+- Opponent Stability = 0
+- OR 4 Waypoints filled
+- OR Special Source Resonance (if advanced mode enabled)
+
+### AESTHETIC NOTES
+
+**Theme:**
+- Post-apocalyptic cosmic battlefield
+- Fractal nebula background
+- Thin glowing line dividers
+- Subtle sacred geometry
+- Clean modern TCG readability
+
+**Color Language:**
+- Spades = Dark violet / black void
+- Hearts = Warm crimson glow
+- Diamonds = Cyan / bright blue
+- Clubs = Deep green / stone texture
+- Grid lines: faint, elegant, readable
+
+**Design Principles:**
+- No clutter
+- No duplicate zones
+- No mislabeling
+- High contrast for competitive play
+
+### PLAYMAT DIMENSIONS (If Printing)
+
+- Standard playmat size: **24" x 14"**
+- Zones proportionally centered
+- Symmetrical layout
+- High-contrast labeling
+
+## Game Table Visual Description (Atmospheric Version)
+
+### OVERVIEW COMPOSITION
+A mystical, layered gaming table viewed from a slight overhead angle (30-45 degrees), showing two players positioned on opposite sides. The table itself appears to exist in multiple dimensions simultaneously, with ethereal layers of reality visible like transparent sheets floating above the surface.
+
+### THE TABLE
+
+**Base Structure:**
+- Dark obsidian-like surface with subtle galaxy swirls deep within
+- Edges inlaid with glowing runes that pulse gently with power
+- Six circular layer indicators embedded around the perimeter, each showing a different reality symbol
+- The table seems to float slightly above the ground, with a soft glow emanating from beneath
+
+**Size & Shape:**
+- Octagonal or circular shape
+- Large enough for two players with cards spread comfortably
+- Center area slightly recessed, creating a natural focal point
+
+### LAYER VISUALIZATION
+
+The most striking feature: **Six translucent, parallel planes float above the table** like sheets of colored glass, each representing a different reality layer:
+
+1. **Layer 1 (Physical)** - Bottom layer, semi-transparent with photo-realistic textures, earth tones
+2. **Layer 2 (Emotional)** - Warm pink/orange glow, soft and pulsing like a heartbeat
+3. **Layer 3 (Fractal)** - Geometric patterns repeating infinitely, cyan and purple
+4. **Layer 4 (Archetypal)** - Sacred geometry, gold lines on dark background
+5. **Layer 5 (Conceptual)** - Minimal, stark white symbols floating in void
+6. **Layer 6 (Source)** - Pure white/gold light, almost blinding, at the top
+
+Each layer is separated by about an inch of space, creating a stunning 3D effect. Small particles drift between layers.
+
+### CENTRAL SHARED AREA
+
+**The Waypoint (center of table):**
+- A floating crystal or geometric shape, about 4 inches across
+- Rotates slowly, reflecting the current layer's color
+- Contains a face-down card visible through its facets
+
+**Layer Shift Track (Optional Add-On):**
+- Vertical track placed beside the Waypoint Zone
+- Shows progression: PHYSICAL (1) → EMOTIONAL (2) → FRACTAL (3) → ARCHETTYAL (4) → CONCEPTUAL (5) → SOURCE (6)
+- Each layer represented by a numbered indicator or icon
+- Current layer highlighted with glow or active state
+- Arrows or connecting lines show progression path
+- Can be toggled on/off for different game modes
+
+**Shared Reveal (4 slots):**
+- Four glowing card-sized rectangles arranged in a diamond or line pattern
+- Each slot has a soft golden border
+- Cards placed here appear to float slightly above the surface
+- Faint light beams connect them to the Waypoint
+
+**Intuition Check Zone:**
+- When performing an Intuition Check, three facedown cards are placed directly inside the Shared Reveal Zone
+- Cards displayed as: `[ ? ] [ ? ] [ ? ]` with "Choose 1 by intuition" prompt below
+- Cards appear with question mark overlays, pulsing gently
+- Positioned prominently in the center of Shared Reveal area
+- Visual indicator (glowing border or aura) highlights this is an active Intuition Check
+
+**Draw Pile:**
+- Neat stack of cards with ornate FUM back design
+- Located to the left side of center
+- Cards appear to phase slightly in and out of reality
+- Tiny particles float up from the stack
+
+**Discard Pile:**
+- Slightly messy stack to the right of center
+- Cards show their faces, with artwork visible
+- Faint wisps of energy rise from discarded cards
+
+### PLAYER AREAS
+
+**Player 1 Side (Bottom of image)**
+
+**3×3 Grid:**
+- Nine card-sized rectangles arranged in perfect 3×3 grid
+- Each slot outlined with player's color (deep blue)
+- Slots labeled with subtle icons: S (Self), A (Action), O (Outcome) in corners
+- Cards in grid appear to be slightly inset into the table surface
+- Active cards have a soft glow matching current layer
+
+**Player Stats Display:**
+- Floating holographic display showing:
+  - **HP/Stability**: 20 with a bar that pulses
+  - **Current Layer**: Large number 1-6 with matching colored aura
+  - **Energy**: 3 glowing orbs or counters
+  - **Attunements**: Small gemstones that light up (0-4)
+
+**Hand Area:**
+- 7 cards fanned slightly, held just above table surface
+- Cards appear to float, gently bobbing
+- Backs visible to opponent, faces visible to player
+
+**Player Avatar (optional):**
+- Ethereal silhouette or partial figure behind cards
+- Hands reaching toward the board
+- Face obscured by shadows, but intent visible
+
+**Player 2 Side (Top of image)**
+- Mirror of Player 1's layout
+- Player color: deep red
+- Cards shown from back side (art visible but not readable)
+- Same floating displays and grid structure
+
+### ATMOSPHERIC EFFECTS
+
+**Lighting:**
+- Primary light source seems to come from within the table itself
+- Colored light beams rise from cards based on their suit:
+  - ♠ Spades: Deep purple/black
+  - ♥ Hearts: Warm red/pink
+  - ♦ Diamonds: Bright cyan
+  - ♣ Clubs: Earthy green
+- Shadows are soft, with multiple directions suggesting multiple light sources
+
+**Particle Effects:**
+- Tiny glowing motes drift slowly throughout the scene
+- Occasionally, a mote will be drawn into a card
+- Faint sparkles when cards are "played" (static scene, but hint at motion)
+- Wispy smoke-like tendrils curl at table edges
+
+**Background:**
+- Infinite void with distant stars and nebulas
+- Faint outlines of impossible geometry in the distance
+- Aurora-like curtains of light in the distance
+- Suggestion that the table exists in its own dimension
+
+**Mood:**
+- Mysterious but inviting
+- Magical but not cartoonish
+- Deep, cosmic, infinite
+- Slightly surreal - viewers should feel they're seeing multiple realities at once
+
+### CARDS (Detailed Close-up)
+
+Each card shows:
+- Prominent suit symbol (♠♥♦♣) with color coding
+- Large rank number/letter (2-10, J, Q, K, A)
+- Stunning cosmic/surreal artwork appropriate to the card
+- Border that subtly shifts color based on card's layer affinity
+- Ability icons in corners
+- Flavor text area (too small to read in full scene, but implied)
+
+### COLOR PALETTE SUMMARY
+
+| Element | Colors |
+|---------|--------|
+| Table base | Deep black with purple/blue galaxy swirls |
+| Layer 1 | Earth tones, muted greens/browns |
+| Layer 2 | Warm pinks, oranges, coral |
+| Layer 3 | Cyan, electric purple, geometric patterns |
+| Layer 4 | Black/white with gold accents |
+| Layer 5 | Stark white, deep blue, minimal |
+| Layer 6 | Pure white, gold, blinding |
+| Player 1 accent | Deep electric blue |
+| Player 2 accent | Deep blood red |
+| Shared areas | Golden amber, soft white |
+| Background | Cosmic purples, distant stars |
+
+### CSS Implementation Guidelines
+
+When implementing visual elements:
+
+1. **Layer Transitions**: Use CSS transforms and opacity for layer shifts
+2. **Floating Effects**: Use subtle animations with `transform: translateY()` for floating cards
+3. **Glow Effects**: Use `box-shadow` with multiple layers and `filter: drop-shadow()` for ethereal glows
+4. **Particle Effects**: Use CSS animations with `@keyframes` for drifting particles
+5. **3D Layers**: Use `transform-style: preserve-3d` and `perspective` for layered effect
+6. **Color Transitions**: Smooth transitions between layer colors using CSS `transition` or `animation`
+
+### LAYOUT VARIANTS
+
+**Standard Layout:**
+- Full visual effects and atmospheric elements
+- All shared areas visible
+- Layer Shift Track optional
+
+**Clean Tournament Version:**
+- **Removed Elements:**
+  - Depth Die area (if present)
+  - Excessive particle effects
+  - Overlapping card animations
+  
+- **Required Elements:**
+  - Shared Reveal + Waypoint strictly centered
+  - 3×3 grids only (no variations)
+  - No overlapping cards
+  - Clear row alignment required
+  - Minimal visual effects for clarity
+  - High contrast for competitive visibility
+
+- **Layout Rules:**
+  - Cards must align perfectly in grid slots
+  - No visual ambiguity about card positions
+  - Clean, professional aesthetic
+  - Focus on gameplay clarity over atmosphere
+
+### AI Image Generation Prompt
+
+For generating reference images:
+
+```
+Epic cosmic card game table viewed from slight overhead angle, two players opposite each other, six translucent glowing parallel planes floating above table representing different reality layers (earth tones, warm pink, fractal cyan/purple, sacred geometry gold, stark white minimal, pure white/gold), central floating crystal waypoint with face-down card, four glowing card slots in shared area, draw pile and discard pile with energy wisps, each player has 3x3 glowing grid with S/A/O slots, floating holographic displays showing HP 20 and layer number, 7 cards floating in each hand, deep blue player 1 side deep red player 2 side, infinite cosmic nebula background with distant impossible geometry, particle motes drifting, ethereal lighting from within table, mystical mysterious mood, ultra detailed, 8K, fantasy art, trending on ArtStation
+```
+
+### UI IMPLEMENTATION NOTES
+
+**Intuition Check Display:**
+- When triggered, replace or overlay Shared Reveal area with three facedown cards
+- Display prompt: "Choose 1 by intuition" below cards
+- Cards should have question mark overlay or be completely facedown
+- Add pulsing animation to draw attention
+- Include visual feedback when player hovers/selects a card
+
+**Layer Shift Track:**
+- Implement as vertical sidebar or beside Waypoint
+- Use numbered indicators (1-6) with layer names
+- Highlight current layer with active state (glow, color change, or border)
+- Show progression with arrows or connecting lines
+- Make toggleable via settings for different game modes
+
+**Tournament Mode Toggle:**
+- Add setting to switch between Standard and Tournament layouts
+- Tournament mode should:
+  - Disable particle effects
+  - Remove Depth Die UI element
+  - Ensure perfect grid alignment
+  - Increase contrast and clarity
+  - Simplify animations
+  - Center Shared Reveal + Waypoint precisely

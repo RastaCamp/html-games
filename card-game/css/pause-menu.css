@@ -1,0 +1,121 @@
+/**
+ * =====================================================
+ * PAUSE MENU STYLES
+ * =====================================================
+ */
+
+/* =====================================================
+   PAUSE MENU OVERLAY
+   ===================================================== */
+
+.pause-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pause-menu-content {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 3px solid gold;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    min-width: 300px;
+}
+
+.pause-menu-content h2 {
+    color: gold;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-shadow: 0 0 20px gold;
+}
+
+.pause-menu-btn {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid gold;
+    border-radius: 10px;
+    color: gold;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pause-menu-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+/* =====================================================
+   CONFIRM DIALOG
+   ===================================================== */
+
+.confirm-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10003;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-dialog {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 3px solid #ff6b6b;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    min-width: 350px;
+}
+
+.confirm-dialog h3 {
+    color: #ff6b6b;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.confirm-dialog p {
+    color: #fff;
+    font-size: 1.1rem;
+    margin: 10px 0;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn-danger {
+    background: #ff6b6b;
+    color: #fff;
+    border: 2px solid #ff6b6b;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #ff5252;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+}

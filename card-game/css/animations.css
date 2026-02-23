@@ -1,0 +1,290 @@
+/* Animation Styles */
+
+@keyframes cardDraw {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) rotateY(180deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateY(0deg);
+    }
+}
+
+@keyframes cardPlay {
+    from {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes layerShift {
+    0% {
+        filter: blur(5px);
+        opacity: 0.5;
+    }
+    50% {
+        filter: blur(10px);
+        opacity: 0.3;
+    }
+    100% {
+        filter: blur(0);
+        opacity: 1;
+    }
+}
+
+@keyframes combatHit {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+    50% {
+        transform: scale(0.95) rotate(5deg);
+    }
+    75% {
+        transform: scale(1.05) rotate(-3deg);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes cardDestroy {
+    from {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.5) rotate(180deg);
+    }
+}
+
+@keyframes intuitionSuccess {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(241, 196, 15, 0);
+    }
+    50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 30px rgba(241, 196, 15, 0.8);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(241, 196, 15, 0);
+    }
+}
+
+@keyframes intuitionFail {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+        filter: grayscale(1);
+    }
+    100% {
+        opacity: 0.7;
+        filter: grayscale(0.5);
+    }
+}
+
+@keyframes attunement {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(241, 196, 15, 0);
+    }
+    50% {
+        transform: scale(1.3);
+        box-shadow: 0 0 40px rgba(241, 196, 15, 1);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+    }
+}
+
+@keyframes victory {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes damageNumber {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-50px) scale(1.5);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px currentColor;
+    }
+    50% {
+        box-shadow: 0 0 20px currentColor;
+    }
+}
+
+/* Animation Classes */
+.animate-card-draw {
+    animation: cardDraw 0.3s ease-out;
+}
+
+.animate-card-play {
+    animation: cardPlay 0.3s ease-out;
+}
+
+.animate-layer-shift {
+    animation: layerShift 0.5s ease-in-out;
+}
+
+.animate-combat-hit {
+    animation: combatHit 0.4s ease-out;
+}
+
+.animate-card-destroy {
+    animation: cardDestroy 0.3s ease-out;
+}
+
+.animate-intuition-success {
+    animation: intuitionSuccess 0.6s ease-out;
+}
+
+.animate-intuition-fail {
+    animation: intuitionFail 0.4s ease-out;
+}
+
+.animate-attunement {
+    animation: attunement 0.5s ease-out;
+}
+
+.animate-victory {
+    animation: victory 1s ease-out;
+}
+
+.damage-number {
+    position: absolute;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #E74C3C;
+    pointer-events: none;
+    z-index: 1000;
+    animation: damageNumber 1s ease-out forwards;
+    text-shadow: 0 0 10px #E74C3C;
+}
+
+/* Layer Transition Effects */
+.layer-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 500;
+    animation: layerShift 0.5s ease-in-out;
+}
+
+.layer-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.layer-compatible {
+    animation: layerGlow 1s ease-out;
+}
+
+@keyframes layerGlow {
+    0% {
+        box-shadow: 0 0 0 currentColor;
+    }
+    50% {
+        box-shadow: 0 0 30px currentColor;
+        transform: scale(1.05);
+    }
+    100% {
+        box-shadow: 0 0 0 currentColor;
+        transform: scale(1);
+    }
+}
+
+/* Shake Effect */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.shake {
+    animation: shake 0.4s ease-out;
+}
+
+/* Pulse Effect */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Slide In */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}

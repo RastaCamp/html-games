@@ -1,0 +1,119 @@
+/**
+ * =====================================================
+ * LAYER SHIFT VISUAL EFFECTS
+ * =====================================================
+ */
+
+/* =====================================================
+   LAYER SHIFT EFFECT OVERLAY
+   ===================================================== */
+
+.layer-shift-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998;
+    pointer-events: none;
+    animation: layerShiftEffect 1s ease-out forwards;
+}
+
+/* =====================================================
+   LAYER 1 → 2: WARM PINK PULSE, SOFT BLUR
+   ===================================================== */
+
+.shift-1-to-2 {
+    background: radial-gradient(circle, rgba(255, 154, 139, 0.6), transparent);
+    backdrop-filter: blur(10px);
+    animation: warmPinkPulse 1s ease-out;
+}
+
+@keyframes warmPinkPulse {
+    0% { opacity: 0; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1); }
+}
+
+/* =====================================================
+   LAYER 2 → 3: GEOMETRIC PATTERN OVERLAY
+   ===================================================== */
+
+.shift-2-to-3 {
+    background: 
+        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(78, 205, 196, 0.3) 10px, rgba(78, 205, 196, 0.3) 20px),
+        repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(155, 89, 182, 0.3) 10px, rgba(155, 89, 182, 0.3) 20px);
+    animation: geometricPattern 1s ease-out;
+}
+
+@keyframes geometricPattern {
+    0% { opacity: 0; transform: rotate(0deg) scale(0.5); }
+    50% { opacity: 1; transform: rotate(180deg) scale(1.2); }
+    100% { opacity: 0; transform: rotate(360deg) scale(1); }
+}
+
+/* =====================================================
+   LAYER 3 → 4: GOLD SHIMMER, SACRED GEOMETRY
+   ===================================================== */
+
+.shift-3-to-4 {
+    background: 
+        radial-gradient(circle at 50% 50%, rgba(241, 196, 15, 0.8), transparent 70%),
+        repeating-conic-gradient(from 0deg, transparent 0deg, rgba(241, 196, 15, 0.2) 30deg, transparent 60deg);
+    animation: goldShimmer 1s ease-out;
+}
+
+@keyframes goldShimmer {
+    0% { opacity: 0; transform: rotate(0deg); }
+    50% { opacity: 1; transform: rotate(180deg); }
+    100% { opacity: 0; transform: rotate(360deg); }
+}
+
+/* =====================================================
+   LAYER 4 → 5: STARK CONTRAST FLASH
+   ===================================================== */
+
+.shift-4-to-5 {
+    background: #000;
+    animation: starkFlash 1s ease-out;
+}
+
+@keyframes starkFlash {
+    0% { opacity: 0; }
+    20% { opacity: 1; background: #fff; }
+    40% { opacity: 0.5; background: #000; }
+    60% { opacity: 1; background: #fff; }
+    80% { opacity: 0.5; background: #000; }
+    100% { opacity: 0; }
+}
+
+/* =====================================================
+   LAYER 5 → 6: WHITE LIGHT EXPLOSION
+   ===================================================== */
+
+.shift-5-to-6 {
+    background: radial-gradient(circle, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8), transparent);
+    animation: whiteExplosion 1s ease-out;
+}
+
+@keyframes whiteExplosion {
+    0% { opacity: 0; transform: scale(0); }
+    30% { opacity: 1; transform: scale(2); }
+    100% { opacity: 0; transform: scale(3); }
+}
+
+/* =====================================================
+   GENERIC LAYER SHIFT
+   ===================================================== */
+
+.shift-generic {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    animation: genericShift 1s ease-out;
+}
+
+@keyframes genericShift {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}

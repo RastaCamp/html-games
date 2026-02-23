@@ -1,0 +1,169 @@
+/**
+ * =====================================================
+ * MOBILE RESPONSIVE DESIGN
+ * =====================================================
+ */
+
+/* =====================================================
+   TOUCH SUPPORT
+   ===================================================== */
+
+/* Enable touch scrolling */
+* {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* =====================================================
+   RESPONSIVE BREAKPOINTS
+   ===================================================== */
+
+/* Large Desktop (>1200px) - Full size */
+@media (min-width: 1200px) {
+    .card {
+        width: 100px;
+        height: 140px;
+    }
+    
+    .grid-slot {
+        width: 100px;
+        height: 140px;
+    }
+}
+
+/* Tablet (768px - 1200px) */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .card {
+        width: 80px;
+        height: 112px;
+    }
+    
+    .grid-slot {
+        width: 80px;
+        height: 112px;
+    }
+    
+    .game-header {
+        font-size: 1.2rem;
+    }
+    
+    .menu-button {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+}
+
+/* Mobile (<768px) */
+@media (max-width: 767px) {
+    .card {
+        width: 60px;
+        height: 84px;
+        font-size: 0.7rem;
+    }
+    
+    .grid-slot {
+        width: 60px;
+        height: 84px;
+    }
+    
+    .game-header {
+        font-size: 1rem;
+        padding: 10px;
+    }
+    
+    .menu-button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    /* Stack grids vertically on mobile */
+    .player-grid {
+        margin: 10px 0;
+    }
+    
+    /* Make buttons touch-friendly */
+    button, .menu-button, .btn-primary, .btn-secondary {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+    
+    /* Adjust battle log for mobile */
+    .battle-log-container {
+        width: 100%;
+        max-width: 100%;
+        height: 150px;
+        font-size: 0.8rem;
+    }
+    
+    /* Hide tooltips on mobile (use tap instead) */
+    .card-tooltip {
+        display: none !important;
+    }
+    
+    /* Show tooltip on tap */
+    .card:active {
+        /* Tooltip would show here on tap */
+    }
+}
+
+/* =====================================================
+   TOUCH GESTURES
+   ===================================================== */
+
+/* Prevent text selection on cards */
+.card {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Touch feedback */
+.card:active {
+    transform: scale(0.95);
+}
+
+/* =====================================================
+   HORIZONTAL SCROLL FOR MOBILE GRIDS
+   ===================================================== */
+
+@media (max-width: 767px) {
+    .game-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .player-grid {
+        min-width: 600px; /* Ensure grids don't compress too much */
+    }
+}
+
+/* =====================================================
+   MODAL ADJUSTMENTS FOR MOBILE
+   ===================================================== */
+
+@media (max-width: 767px) {
+    .modal-overlay,
+    .pause-menu-overlay,
+    .victory-screen-overlay,
+    .loss-screen-overlay {
+        padding: 10px;
+    }
+    
+    .modal-content,
+    .pause-menu-content,
+    .victory-screen-content,
+    .loss-screen-content {
+        width: 90%;
+        max-width: 100%;
+        padding: 20px;
+    }
+    
+    .settings-modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+}

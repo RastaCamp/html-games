@@ -1,0 +1,12 @@
+DEER XING - HOW TO START THE GAME
+=================================
+
+Double-click:  START_GAME.bat
+
+  - Starts a small local server and opens the game in your browser.
+  - Keep the black command window open while you play.
+  - You need Python OR Node.js installed. (Python: https://python.org  |  Node: https://nodejs.org)
+
+If you don't have Python or Node:
+  - Double-click OPEN_INDEX.bat to open index.html in your browser.
+  - Some browsers may block the game when opened this way; if nothing happens, install Python and use START_GAME.bat.

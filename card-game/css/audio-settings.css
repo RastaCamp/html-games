@@ -1,0 +1,172 @@
+/**
+ * =====================================================
+ * AUDIO SETTINGS UI
+ * =====================================================
+ */
+
+/* =====================================================
+   SETTINGS MODAL
+   ===================================================== */
+
+#settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#settings-modal.hidden {
+    display: none;
+}
+
+.settings-modal-content {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 3px solid gold;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    color: white;
+}
+
+.settings-modal-content h2 {
+    color: gold;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.settings-modal-content h3 {
+    color: #4A90E2;
+    font-size: 1.3rem;
+    margin: 20px 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.setting-description {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-top: 5px;
+    font-style: italic;
+    line-height: 1.3;
+}
+
+/* =====================================================
+   SETTING ROWS
+   ===================================================== */
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.setting-row span {
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+/* =====================================================
+   TOGGLE BUTTONS
+   ===================================================== */
+
+.toggle-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #666;
+    color: #aaa;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.toggle-btn.active {
+    background: gold;
+    color: #000;
+    border-color: gold;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* =====================================================
+   VOLUME SLIDER
+   ===================================================== */
+
+#volume-slider {
+    width: 200px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: gold;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#volume-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: gold;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* =====================================================
+   CLOSE BUTTON
+   ===================================================== */
+
+.close-btn {
+    width: 100%;
+    background: gold;
+    color: #000;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: #ffd700;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
