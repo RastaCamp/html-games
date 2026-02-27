@@ -1,34 +1,290 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My HTML Games</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Working MVPs / Prototypes</title>
   <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      padding-top: 80px;
+    :root{
+      --bg:#0f0f0f;
+      --panel:#151515;
+      --text:#f1f1f1;
+      --muted:#a8a8a8;
+      --accent:#00ff88;
+      --border: rgba(255,255,255,0.09);
     }
-    a {
-      display: block;
-      margin: 20px;
-      font-size: 24px;
-      color: #00ff88;
-      text-decoration: none;
+    body{
+      margin:0;
+      background: radial-gradient(1000px 500px at 50% -10%, rgba(0,255,136,0.08), transparent 60%), var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 44px 16px;
     }
-    a:hover {
-      color: white;
+    .wrap{max-width: 980px; margin: 0 auto;}
+    h1{margin:0 0 6px; text-align:center; font-size:34px; letter-spacing:.4px;}
+    .sub{margin:0 0 26px; text-align:center; color: var(--muted); font-size:14px; line-height:1.5;}
+    .grid{display:grid; grid-template-columns: 1fr; gap: 14px;}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 55%), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .top{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .title{
+      margin:0;
+      font-size: 22px;
+      letter-spacing: .2px;
+    }
+    .play{
+      display:inline-block;
+      background: rgba(0,255,136,0.12);
+      border: 1px solid rgba(0,255,136,0.35);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 12px;
+      text-decoration:none;
+      font-weight:bold;
+      white-space:nowrap;
+    }
+    .play:hover{filter: brightness(1.06);}
+    .tagline{margin: 10px 0 0; font-weight:bold;}
+    .desc{margin: 8px 0 0; color: var(--muted); line-height:1.55;}
+    .meta{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+    }
+    @media (max-width: 720px){
+      .meta{grid-template-columns: 1fr;}
+    }
+    .kv{
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 10px;
+    }
+    .k{font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px;}
+    .v{margin-top: 6px; line-height:1.5;}
+    ul{margin: 8px 0 0 18px; color: var(--muted); line-height:1.55;}
+    .footer{
+      margin-top: 22px;
+      text-align:center;
+      color: var(--muted);
+      font-size: 12px;
+      opacity: 0.95;
+    }
+    .pill{
+      display:inline-block;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--muted);
+      margin-left: 8px;
     }
   </style>
 </head>
+
 <body>
-  <h1>My Games</h1>
+  <div class="wrap">
+    <h1>Working MVPs / Prototypes</h1>
+    <p class="sub">
+      Browser-playable builds (no install). Best on desktop. Share this page link with friends.
+    </p>
 
-  <a href="7days/">7 Days</a>
-  <a href="card-game/">Card Game</a>
-  <a href="deerXing/">DeerXing</a>
-  <a href="desolation/">Desolation</a>
+    <div class="grid">
 
+      <!-- 7 Days -->
+      <section class="card">
+        <div class="top">
+          <h2 class="title">7 Days Down… <span class="pill">Survival / Puzzle</span></h2>
+          <a class="play" href="7days/">▶ Play</a>
+        </div>
+
+        <div class="tagline">Tagline: Seven days underground. No rescue guaranteed.</div>
+        <p class="desc">
+          7 Days… is a 2D side-scrolling survival puzzle game set in a disaster-stricken basement.
+          You manage limited resources and multiple survival stats while responding to scripted day events,
+          threats, and environmental hazards.
+        </p>
+
+        <div class="meta">
+          <div class="kv">
+            <div class="k">Core Features</div>
+            <ul>
+              <li>7-day survival structure</li>
+              <li>Five+ survival stats</li>
+              <li>Interactive environment zones</li>
+              <li>Resource scarcity mechanics</li>
+              <li>Scripted day-based events</li>
+            </ul>
+          </div>
+          <div class="kv">
+            <div class="k">Tone / Controls / Status</div>
+            <div class="v">
+              <strong>Tone:</strong> Grounded, tense, atmospheric survival.<br>
+              <strong>Controls:</strong> Mouse interaction + keyboard movement (if applicable).<br>
+              <strong>Status:</strong> Playable survival build.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Shatterlayers -->
+      <section class="card">
+        <div class="top">
+          <h2 class="title">Akasha: Shatterlayers <span class="pill">Card Tactics</span></h2>
+          <a class="play" href="card-game/">▶ Play</a>
+        </div>
+
+        <div class="tagline">Tagline: Shift dimensions. Rewrite reality.</div>
+        <p class="desc">
+          Shatterlayers is a 1–4 player tactical card game where reality shifts across multiple dimensions.
+          Players fight by moving between six reality layers (each with its own rules) and using intuition-based
+          mechanics designed for tense, streamable moments. Dice optional.
+        </p>
+
+        <div class="meta">
+          <div class="kv">
+            <div class="k">Core Features</div>
+            <ul>
+              <li>Six reality layers with distinct rule sets</li>
+              <li>Layer-shift mechanics</li>
+              <li>Intuition-based decision moments</li>
+              <li>Dice optional</li>
+              <li>1–4 player support</li>
+            </ul>
+          </div>
+          <div class="kv">
+            <div class="k">Tone / Controls / Status</div>
+            <div class="v">
+              <strong>Tone:</strong> Strategic, cerebral, competitive.<br>
+              <strong>Controls:</strong> Mouse-based card interaction.<br>
+              <strong>Status:</strong> Early tactical prototype.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Deer Xing -->
+      <section class="card">
+        <div class="top">
+          <h2 class="title">Deer Xing: Road of Fate <span class="pill">Arcade</span></h2>
+          <a class="play" href="deerXing/">▶ Play</a>
+        </div>
+
+        <div class="tagline">Tagline: Cross the road. Defy fate.</div>
+        <p class="desc">
+          Deer Xing is a browser-based arcade survival game where you play as a buck navigating dangerous highways.
+          Avoid traffic, grab pickups, and reach safety as levels increase in speed and complexity.
+        </p>
+
+        <div class="meta">
+          <div class="kv">
+            <div class="k">Core Features</div>
+            <ul>
+              <li>Classic arcade crossing gameplay</li>
+              <li>Increasing vehicle speed per level</li>
+              <li>Power-up pickups</li>
+              <li>Score & progression tracking</li>
+              <li>Tight keyboard controls</li>
+            </ul>
+          </div>
+          <div class="kv">
+            <div class="k">Tone / Controls / Status</div>
+            <div class="v">
+              <strong>Tone:</strong> Arcade, reflex-based, minimalist tension.<br>
+              <strong>Controls:</strong> Arrow keys or WASD.<br>
+              <strong>Status:</strong> Playable arcade build.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Desolation -->
+      <section class="card">
+        <div class="top">
+          <h2 class="title">Desolation: Tears of the Moon <span class="pill">Mgmt / Horror</span></h2>
+          <a class="play" href="desolation/">▶ Play</a>
+        </div>
+
+        <div class="tagline">Tagline: Manage the lab. Control the wolves. Survive the moon.</div>
+        <p class="desc">
+          Desolation: Tears of the Moon is a grim management/survival simulation set in a remote forest lab.
+          You oversee workers, manage resources, and care for werewolves whose power rises and falls with lunar cycles.
+          Day, night, seasons, and moon phases directly affect behavior and survival.
+        </p>
+
+        <div class="meta">
+          <div class="kv">
+            <div class="k">Core Features</div>
+            <ul>
+              <li>Werewolf lifecycle & transformation system</li>
+              <li>Moon phase mechanics that alter stats</li>
+              <li>Worker assignment & morale system</li>
+              <li>Breeding & combat system</li>
+              <li>Consequences for neglect or “releasing” staff</li>
+              <li>Dynamic day/night/seasonal cycles</li>
+            </ul>
+          </div>
+          <div class="kv">
+            <div class="k">Tone / Controls / Status</div>
+            <div class="v">
+              <strong>Tone:</strong> Dark, grim, strategic, psychologically heavy.<br>
+              <strong>Controls:</strong> Mouse-driven management interface.<br>
+              <strong>Status:</strong> Playable prototype (actively expanding).
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Iron Coliseum -->
+      <section class="card">
+        <div class="top">
+          <h2 class="title">Iron Coliseum: Sparks and Blood <span class="pill">2P Fighting</span></h2>
+          <a class="play" href="exo/">▶ Play</a>
+        </div>
+
+        <div class="tagline">Tagline: Break the armor. End the match.</div>
+        <p class="desc">
+          Iron Coliseum: Sparks and Blood is a simple 2D, local 2-player browser fighting game set in a post-apocalyptic society.
+          Fighters compete in a new combat sport where victory comes from damaging the opponent’s exoskeleton until it fails.
+          Armor breaks first—then the real damage starts.
+        </p>
+
+        <div class="meta">
+          <div class="kv">
+            <div class="k">Core Features</div>
+            <ul>
+              <li>Local 2-player fighting (same keyboard)</li>
+              <li>Exoskeleton damage / armor break win condition</li>
+              <li>Fast arcade rounds</li>
+              <li>Post-apocalyptic sport setting</li>
+              <li>Readable 2D combat designed for quick rematches</li>
+            </ul>
+          </div>
+          <div class="kv">
+            <div class="k">Tone / Controls / Status</div>
+            <div class="v">
+              <strong>Tone:</strong> Brutal, competitive, arcade intensity.<br>
+              <strong>Controls:</strong> WASD + Arrow Keys (plus a few others shown on the play screen).<br>
+              <strong>Status:</strong> Playable prototype (tuning balance & hit reactions).
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="footer">
+      Tip: If something doesn’t load online, it’s usually an asset path issue (needs relative paths).
+    </div>
+  </div>
 </body>
 </html>
