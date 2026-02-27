@@ -1,0 +1,47 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.game-container {
+  box-shadow: 0 0 0 4px #333, 0 8px 32px rgba(0,0,0,0.5);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#gameCanvas {
+  display: block;
+  background: #2a2a2a;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  background: #222;
+  border-top: 1px solid #333;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.controls-col strong {
+  color: #ddd;
+}

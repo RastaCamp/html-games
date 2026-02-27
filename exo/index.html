@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iron Coliseum Brawler</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="game-container">
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <!-- Controls: edit js/input.js to change keys. -->
+    <div class="controls">
+      <div class="controls-col">
+        <strong>Player 1</strong>
+        <span>A/D move · W light · E heavy · R special · Q grab · Shift dash</span>
+      </div>
+      <div class="controls-col">
+        <strong>Player 2</strong>
+        <span>←/→ move · ↑ light · . heavy · ; special · , grab · / dash</span>
+      </div>
+    </div>
+  </div>
+  <!-- Script order matters: constants first, then assets, input, arena, players, combat, ui, cpu, weather, screens, game last. -->
+  <script src="js/constants.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/arena.js"></script>
+  <script src="js/players.js?v=3"></script>
+  <script src="js/combat.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/cpu.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/screens.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
