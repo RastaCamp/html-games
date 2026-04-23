@@ -149,6 +149,11 @@
                     <option value="realist">Realistic (60 min/day)</option>
                 </select>
             </div>
+            <div class="option-group">
+                <label for="interaction-hint-toggle">Interaction Hand Hint</label>
+                <input type="checkbox" id="interaction-hint-toggle" checked>
+                <span>Show when near searchable area</span>
+            </div>
             <button id="clear-death-markers-btn" class="menu-btn">CLEAR DEATH MARKERS</button>
             <button id="reset-tip-jar-btn" class="menu-btn">RESET TIP JAR</button>
             <button id="factory-reset-btn" class="menu-btn">FACTORY RESET</button>
@@ -179,7 +184,7 @@
 
         <!-- Loading screen (shown until placement/scene data is ready) -->
         <div id="loading-screen" class="hidden">
-            <img id="loading-screen-img" src="visuals/marauder_loading.png" alt="Loading">
+            <img id="loading-screen-img" src="VISUALS/marauder_loading.png" alt="Loading">
             <p id="loading-screen-text">Loading...</p>
         </div>
 
@@ -296,6 +301,7 @@
             <div id="message-content"></div>
         </div>
         <div id="interaction-hint" class="hidden"></div>
+        <div id="proximity-hand-hint" class="hidden" aria-hidden="true">🖐</div>
         <div id="crafting-panel" class="hidden">
             <h3>Crafting</h3>
             <div id="crafting-slots">

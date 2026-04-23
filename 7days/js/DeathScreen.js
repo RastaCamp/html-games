@@ -126,10 +126,10 @@ class DeathScreen {
         if (deathImg) {
             const base = typeof window !== 'undefined' && window.location && window.location.href ? window.location.href.replace(/[^/]*$/, '') : '';
             const isFile = typeof window !== 'undefined' && window.location && window.location.protocol === 'file:';
-            deathImg.src = (isFile ? '' : base) + 'visuals/adam/defeated.PNG';
+            deathImg.src = (isFile ? '' : base) + 'VISUALS/adam/defeated.PNG';
             deathImg.onerror = function () {
                 this.onerror = null;
-                this.src = (base || '') + 'VISUALS/adam/defeated.PNG';
+                this.src = (base || '') + 'visuals/adam/defeated.PNG';
             };
         }
 

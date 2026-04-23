@@ -112,6 +112,8 @@ class Game {
         this.moveTargetX = null;
         this.moveTargetY = null;
         this.moveTargetObject = null;
+        this.moveTargetInteractOnArrival = false;
+        this.interactionRange = 70;
         this.moveSpeed = 280; // pixels per second
         this.showHitboxCalibration = false; // H toggles hitbox overlay (yellow zones) when needed
         this.calibrationMouseX = 0;
@@ -424,6 +426,7 @@ class Game {
         }
         
         this.updateSceneLighting();
+        this.updateInteractionProximityHint();
         this.updateUI();
     }
 
@@ -1078,6 +1081,7 @@ class Game {
         this.moveTargetX = destX;
         this.moveTargetY = destY;
         this.moveTargetObject = obj || null;
+        this.moveTargetInteractOnArrival = false;
     }
 
     goToClosetScene() {
@@ -1097,7 +1101,76 @@ class Game {
         this.moveTargetX = cx;
         this.moveTargetY = cy;
         this.moveTargetObject = null;
+        this.moveTargetInteractOnArrival = false;
         this.moveTargetLocationId = location.id != null ? location.id : (location.name || true);
+    }
+
+    isNearLocationForInteraction(location) {
+        if (!location || !this.characterRenderer) return false;
+        const targetX = location.x + (location.width || 0) / 2;
+        const targetY = Math.max(this.adamMinY, Math.min(this.adamMaxY, location.y + (location.height || 0) / 2));
+        const dx = targetX - this.characterRenderer.characterX;
+        const dy = targetY - this.characterRenderer.characterY;
+        return Math.sqrt(dx * dx + dy * dy) <= this.interactionRange;
+    }
+
+    interactWithLocation(locationId) {
+        if (!locationId || !this.locationSystem) return;
+        const result = this.locationSystem.searchLocation(locationId, this);
+        if (result.message) this.addMessage(result.message);
+        if (result.success && result.items && result.items.length > 0 && this.locationSystem.syncFromSceneLoot) {
+            this.locationSystem.syncFromSceneLoot(this);
+        }
+    }
+
+    getNearbySearchableLocation() {
+        if (!this.characterRenderer || !this.sceneRenderer || !this.locationSystem) return null;
+        const sceneId = this.sceneRenderer.currentScene || 'A';
+        const sceneLocations = this.sceneRenderer.clickableLocations && this.sceneRenderer.clickableLocations[sceneId];
+        if (!sceneLocations) return null;
+        let best = null;
+        for (const [locationId, area] of Object.entries(sceneLocations)) {
+            if (!area || locationId === 'L36') continue;
+            const location = this.locationSystem.getLocation(locationId);
+            if (!location || location.searched || location.scene !== sceneId) continue;
+            const targetX = area.x + (area.width || 0) / 2;
+            const targetY = Math.max(this.adamMinY, Math.min(this.adamMaxY, area.y + (area.height || 0) / 2));
+            const dx = targetX - this.characterRenderer.characterX;
+            const dy = targetY - this.characterRenderer.characterY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance <= this.interactionRange && (!best || distance < best.distance)) {
+                best = { id: locationId, area, distance };
+            }
+        }
+        return best;
+    }
+
+    updateInteractionProximityHint() {
+        const hintEl = document.getElementById('proximity-hand-hint');
+        if (!hintEl) return;
+        const settings = this.loadSettings();
+        const showHint = settings.showInteractionHint !== false;
+        if (!showHint || this.gameState.isPaused || this.gameState.isGameOver) {
+            hintEl.classList.add('hidden');
+            return;
+        }
+        const nearby = this.getNearbySearchableLocation();
+        if (!nearby || !nearby.area) {
+            hintEl.classList.add('hidden');
+            return;
+        }
+        const rect = this.canvas ? this.canvas.getBoundingClientRect() : null;
+        if (!rect || !rect.width || !rect.height) {
+            hintEl.classList.add('hidden');
+            return;
+        }
+        const targetX = nearby.area.x + (nearby.area.width || 0) / 2;
+        const targetY = Math.max(this.adamMinY - 20, nearby.area.y) - 30;
+        const viewportX = rect.left + (targetX / this.logicalWidth) * rect.width;
+        const viewportY = rect.top + (targetY / this.logicalHeight) * rect.height;
+        hintEl.style.left = `${viewportX}px`;
+        hintEl.style.top = `${viewportY}px`;
+        hintEl.classList.remove('hidden');
     }
 
     updateMoveToTarget(deltaTime) {
@@ -1119,9 +1192,9 @@ class Game {
             const locId = this.moveTargetLocationId;
             this.moveTargetObject = null;
             this.moveTargetLocationId = null;
+            this.moveTargetInteractOnArrival = false;
             if (locId) {
-                cr.setAnimation('examine', cr.currentDirection, 0);
-                this.examineReturnToIdleAt = Date.now() + 2500;
+                cr.setAnimation('idle', cr.currentDirection, 0);
             } else {
                 cr.setAnimation('idle', cr.currentDirection, 0);
             }
@@ -1747,9 +1820,10 @@ class Game {
     loadSettings() {
         try {
             const settings = localStorage.getItem('7days_settings');
-            return settings ? JSON.parse(settings) : { gameSpeed: 'normal' };
+            const parsed = settings ? JSON.parse(settings) : {};
+            return { gameSpeed: 'normal', showInteractionHint: true, ...parsed };
         } catch (e) {
-            return { gameSpeed: 'normal' };
+            return { gameSpeed: 'normal', showInteractionHint: true };
         }
     }
 

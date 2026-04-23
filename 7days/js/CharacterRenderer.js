@@ -1,7 +1,7 @@
 /**
  * CharacterRenderer - Adam sprite and position.
  *
- * Loads sprites from visuals/adam/ (fallback VISUALS/adam/). Draws at half sprite size.
+ * Loads sprites from VISUALS/adam/ (fallback visuals/adam/). Draws at half sprite size.
  * Position (characterX, characterY) is updated by Game.updateMoveToTarget(); click-to-move sets target.
  *
  * ANIMATIONS: idle, walk, examine, reach_low, reach_high, drink, eat, crafting, sleep, attack, attacked, defeated, sick_idle_walk.
@@ -18,7 +18,7 @@ class CharacterRenderer {
         this.characterX = 640; // Center of canvas (1280/2)
         this.characterY = 500; // Character base position
         this.isSick = false;
-        this.imagesPath = 'visuals/adam/'; // Assets in visuals/; fallback VISUALS/
+        this.imagesPath = 'VISUALS/adam/'; // Canonical assets path; fallback supports lowercase path
         // Random facing on start (idle_left or idle_right)
         this.currentDirection = Math.random() < 0.5 ? 'left' : 'right';
         this.currentAnimation = 'idle';
@@ -62,7 +62,7 @@ class CharacterRenderer {
                     resolve();
                 };
                 img.onerror = () => {
-                    const altPath = this.imagesPath.startsWith('visuals/') ? 'VISUALS/adam/' : 'visuals/adam/';
+                    const altPath = this.imagesPath.startsWith('VISUALS/') ? 'visuals/adam/' : 'VISUALS/adam/';
                     const img2 = new Image();
                     img2.onload = () => { this.sprites[name] = img2; resolve(); };
                     img2.onerror = () => { resolve(); };

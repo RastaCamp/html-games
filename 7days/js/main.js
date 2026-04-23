@@ -142,8 +142,8 @@ window.addEventListener('DOMContentLoaded', () => {
             return i >= 0 ? h.substring(0, i + 1) : '';
         })();
         coverArtImg.style.opacity = '0';
-        coverArtImg.src = base + 'visuals/cover_art.png';
-        coverArtImg.onerror = function () { this.onerror = null; this.src = base + 'VISUALS/cover_art.png'; };
+        coverArtImg.src = base + 'VISUALS/cover_art.png';
+        coverArtImg.onerror = function () { this.onerror = null; this.src = base + 'visuals/cover_art.png'; };
         function startCoverSequence() {
             if (typeof TransitionSystem === 'undefined') {
                 if (titleScreenEl) titleScreenEl.classList.remove('hidden');
@@ -391,8 +391,11 @@ window.addEventListener('DOMContentLoaded', () => {
                         if (g.goToClosetScene) g.goToClosetScene();
                         return;
                     }
-                    handleLocationClick(location, g);
-                    g.setMoveTargetToLocation(location);
+                    if (g.isNearLocationForInteraction && g.isNearLocationForInteraction(location)) {
+                        handleLocationClick(location, g);
+                    } else {
+                        g.setMoveTargetToLocation(location);
+                    }
                 } else {
                     g.handleCanvasClick(p.x, p.y);
                 }
@@ -416,7 +419,12 @@ window.addEventListener('DOMContentLoaded', () => {
         
         // Handle location clicks (new scene system): check sceneLoot, show found items, take into inventory
         function handleLocationClick(location, game) {
-            if (!location || !game || !game.locationSystem) return;
+            if (!location || !game) return;
+            if (typeof game.interactWithLocation === 'function') {
+                game.interactWithLocation(location.id);
+                return;
+            }
+            if (!game.locationSystem) return;
             const result = game.locationSystem.searchLocation(location.id, game);
             if (result.message) game.addMessage(result.message);
             if (result.success && result.items && result.items.length > 0 && game.locationSystem.syncFromSceneLoot) {

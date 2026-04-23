@@ -4,16 +4,21 @@ Survive 7 days in the basement. A browser-based survival game.
 
 ## How to run
 
-- Open **index.html** in a browser, or serve the project root with any static server.
-- Documentation and unused project files (Godot projects, guides) are in **extras/**.
+- Quick test: open `index.html` in a browser.
+- Deployment-like test (recommended): run a static server from this folder and open the served URL.
+  - Example: `python -m http.server 8080`
+  - Then open `http://localhost:8080`
 
 ## Project structure (used by the game)
 
-- **index.html** – Entry point and UI
-- **styles.css** – Layout and styling
-- **js/** – Game logic (Game.js, main.js, SceneRenderer, meters, inventory, etc.)
-- **data/** – location_placements.json (scene alignment)
-- **VISUALS/** – Art assets (adam, scenes, cover, loading, news caster, rabbit)
-- **sounds/** – Audio (click, music, effects)
+- `index.html` - Entry point and UI
+- `styles.css` - Layout and styling
+- `js/` - Game logic (Game, systems, rendering, UI flow)
+- `data/` - Scene placement data (`location_placements.json`)
+- `VISUALS/` - Art assets (case-sensitive path for deployment)
+- `sounds/` - Audio (music and effects)
 
-See **extras/README.md** for what’s in extras.
+## Legacy folder
+
+- `7days/` (nested) is a separate older Python/Kivy prototype and is not used by the browser game.
+- Keep it only as archive/reference. The deployable game is the top-level web project in this folder.

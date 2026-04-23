@@ -488,6 +488,20 @@ body {
     display: none;
 }
 
+#proximity-hand-hint {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    z-index: 21;
+    pointer-events: none;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
+    filter: drop-shadow(0 0 4px rgba(255, 230, 120, 0.8));
+}
+
+#proximity-hand-hint.hidden {
+    display: none;
+}
+
 #crafting-panel {
     position: absolute;
     top: 50%;
@@ -1110,6 +1124,11 @@ body {
 .option-group span {
     min-width: 50px;
     text-align: left;
+}
+
+#interaction-hint-toggle {
+    width: 18px;
+    height: 18px;
 }
 
 /* Credits */

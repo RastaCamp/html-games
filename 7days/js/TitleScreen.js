@@ -42,8 +42,8 @@ class TitleScreen {
     init() {
         this.titleBasementImage = new Image();
         this.titleBasementImage.onload = () => this.renderDeathMarkers();
-        this.titleBasementImage.onerror = function () { this.onerror = null; this.src = 'VISUALS/scenes/day_lights_off.png'; };
-        this.titleBasementImage.src = 'visuals/scenes/day_lights_off.png';
+        this.titleBasementImage.onerror = function () { this.onerror = null; this.src = 'visuals/scenes/day_lights_off.png'; };
+        this.titleBasementImage.src = 'VISUALS/scenes/day_lights_off.png';
         this.setupButtons();
         this.checkContinueButton();
     }
@@ -269,6 +269,7 @@ class TitleScreen {
         const sfxVolume = document.getElementById('sfx-volume');
         const textSpeed = document.getElementById('text-speed');
         const difficultySelect = document.getElementById('difficulty-select');
+        const interactionHintToggle = document.getElementById('interaction-hint-toggle');
         const resetSaveBtn = document.getElementById('reset-save-btn');
         const optionsBackBtn = document.getElementById('options-back-btn');
 
@@ -317,6 +318,12 @@ class TitleScreen {
                 if (window.game && window.game.dayCycle) {
                     window.game.dayCycle.setGameSpeed(e.target.value);
                 }
+            });
+        }
+        if (interactionHintToggle) {
+            interactionHintToggle.checked = settings.showInteractionHint !== false;
+            interactionHintToggle.addEventListener('change', (e) => {
+                this.saveSettings({ showInteractionHint: !!e.target.checked });
             });
         }
 

@@ -2,12 +2,12 @@
  * SceneRenderer - Two-layer scene and character drawing.
  *
  * BOTTOM: Invisible hitboxes (initializeLocations) for click-to-move and location search.
- * TOP: Background image from visuals/scenes (or VISUALS/scenes). Optional flashlight overlay.
+ * TOP: Background image from VISUALS/scenes (fallback visuals/scenes). Optional flashlight overlay.
  *
  * CHARACTER: When game over and deathPosition set, draws defeated.PNG at death spot.
  * When sleeping (game.meters.isSleeping), draws sleep.PNG at character position; else CharacterRenderer.
  *
- * ASSETS: visuals/adam/ (defeated.PNG, sleep.PNG), visuals/scenes/, data/location_placements.json.
+ * ASSETS: VISUALS/adam/ (defeated.PNG, sleep.PNG), VISUALS/scenes/, data/location_placements.json.
  */
 
 class SceneRenderer {
@@ -38,14 +38,14 @@ class SceneRenderer {
         this.placementOverridesReady = this.loadPlacementOverrides();
         // Defeated Adam image (shown at death position when game over)
         this.defeatedImage = new Image();
-        this.defeatedImage.src = (this.getBaseUrl()) + 'visuals/adam/defeated.PNG';
+        this.defeatedImage.src = (this.getBaseUrl()) + 'VISUALS/adam/defeated.PNG';
         // Sleeping Adam image (shown when napping or full sleep)
         this.sleepImage = new Image();
         this.sleepImage.onerror = () => {
             this.sleepImage.onerror = null;
-            this.sleepImage.src = (this.getBaseUrl()) + 'VISUALS/adam/sleep.PNG';
+            this.sleepImage.src = (this.getBaseUrl()) + 'visuals/adam/sleep.PNG';
         };
-        this.sleepImage.src = (this.getBaseUrl()) + 'visuals/adam/sleep.PNG';
+        this.sleepImage.src = (this.getBaseUrl()) + 'VISUALS/adam/sleep.PNG';
     }
 
     loadPlacementOverrides() {
@@ -203,12 +203,12 @@ class SceneRenderer {
         // Base URL = directory of current page (works for file:// and http://)
         const baseUrl = this.getBaseUrl();
         const basePaths = [
-            baseUrl + 'visuals/scenes/',
             baseUrl + 'VISUALS/scenes/',
-            'visuals/scenes/',
+            baseUrl + 'visuals/scenes/',
             'VISUALS/scenes/',
-            './visuals/scenes/',
-            './VISUALS/scenes/'
+            'visuals/scenes/',
+            './VISUALS/scenes/',
+            './visuals/scenes/'
         ];
         for (const key of imageKeys) {
             if (!this.backgroundImages[key]) {
@@ -281,8 +281,8 @@ class SceneRenderer {
         const bgEl = typeof document !== 'undefined' && document.getElementById('scene-background');
         if (bgEl && imageKey) {
             const base = this.getBaseUrl();
-            bgEl.src = base + 'visuals/scenes/' + imageKey + '.png';
-            bgEl.onerror = function () { this.onerror = null; this.src = base + 'VISUALS/scenes/' + imageKey + '.png'; };
+            bgEl.src = base + 'VISUALS/scenes/' + imageKey + '.png';
+            bgEl.onerror = function () { this.onerror = null; this.src = base + 'visuals/scenes/' + imageKey + '.png'; };
         } else if (bgEl) {
             bgEl.src = '';
         }
