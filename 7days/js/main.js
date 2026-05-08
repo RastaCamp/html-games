@@ -98,10 +98,21 @@ function updateGameViewportLayout() {
     const scale = useCover
         ? Math.max(cw / lw, ch / lh)
         : Math.min(cw / lw, ch / lh);
-    const dw = Math.max(2, Math.round(lw * scale));
-    const dh = Math.max(2, Math.round(lh * scale));
+    /* Ceil avoids subpixel gaps where inner is 1px shorter than viewport — touches then hit #game-play-viewport (no pan handlers). */
+    const dw = Math.max(2, Math.ceil(lw * scale - 1e-9));
+    const dh = Math.max(2, Math.ceil(lh * scale - 1e-9));
     inner.style.width = `${dw}px`;
     inner.style.height = `${dh}px`;
+
+    const pointerLayer = document.getElementById('game-play-pointer-layer');
+    if (pointerLayer) {
+        pointerLayer.style.width = '';
+        pointerLayer.style.height = '';
+        pointerLayer.style.left = '';
+        pointerLayer.style.top = '';
+        pointerLayer.style.right = '';
+        pointerLayer.style.bottom = '';
+    }
 
     gameViewVpW = cw;
     gameViewVpH = ch;
@@ -150,29 +161,47 @@ function initGameViewportPanning() {
         dragging = false;
     }
 
-    surface.addEventListener(
+    function beginPanInteraction(e) {
+        if (e.button != null && e.button !== 0) return;
+        if (e.target && e.target.closest && e.target.closest('#closet-back-btn')) return;
+        const touchLike = e.pointerType === 'touch' || e.pointerType === 'pen';
+        if (touchLike) {
+            e.preventDefault();
+            if (gameViewPanEnabled) {
+                try {
+                    surface.setPointerCapture(e.pointerId);
+                } catch (_) {}
+            }
+        }
+        activePointerId = e.pointerId;
+        startX = e.clientX;
+        startY = e.clientY;
+        basePanX = gameViewPanX;
+        basePanY = gameViewPanY;
+        dragging = false;
+    }
+
+    surface.addEventListener('pointerdown', beginPanInteraction, { capture: true, passive: false });
+
+    const playInner = document.getElementById('game-play-inner');
+    /* Letterbox gutters + any gap where inner receives the event instead of #game-play-pointer-layer */
+    playViewport.addEventListener(
         'pointerdown',
         (e) => {
-            if (e.button != null && e.button !== 0) return;
-            if (e.target && e.target.closest && e.target.closest('#closet-back-btn')) return;
-            const touchLike = e.pointerType === 'touch' || e.pointerType === 'pen';
-            if (touchLike) {
-                e.preventDefault();
-                if (gameViewPanEnabled) {
-                    try {
-                        surface.setPointerCapture(e.pointerId);
-                    } catch (_) {}
-                }
-            }
-            activePointerId = e.pointerId;
-            startX = e.clientX;
-            startY = e.clientY;
-            basePanX = gameViewPanX;
-            basePanY = gameViewPanY;
-            dragging = false;
+            if (e.target !== playViewport && e.target !== playInner) return;
+            beginPanInteraction(e);
         },
         { capture: true, passive: false }
     );
+
+    if (typeof window !== 'undefined' && window.__7D_DEBUG_POINTER) {
+        const logPtr = (tag, e) => {
+            const t = e.target && e.target.id ? `#${e.target.id}` : (e.target && e.target.className) || e.target;
+            console.log('[7d pointer]', tag, Math.round(e.clientX), Math.round(e.clientY), String(t));
+        };
+        surface.addEventListener('pointerdown', (e) => logPtr('layer', e), { capture: false, passive: true });
+        playViewport.addEventListener('pointerdown', (e) => logPtr('viewport-cap', e), { capture: true, passive: true });
+    }
 
     surface.addEventListener(
         'pointermove',

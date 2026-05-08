@@ -187,7 +187,7 @@ body {
 }
 
 #game-canvas {
-    border: 2px solid #333;
+    border: none;
     background: transparent;
     cursor: crosshair;
     position: absolute;
@@ -202,19 +202,24 @@ body {
     touch-action: none;
 }
 
-/* Full inner hit target: pan/tap/click attach here so the whole transformed playfield receives pointers (not only canvas quirks). */
+/* Full inner hit target: explicit w/h set in JS to match inner; pan/tap listeners attach here. */
 .game-play-pointer-layer,
 #game-play-pointer-layer {
     position: absolute;
+    /* Fill #game-play-inner exactly (constraint box); avoids JS px vs subpixel gaps where inner would steal events */
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
     z-index: 12;
     pointer-events: auto;
     touch-action: none;
     cursor: crosshair;
-    background: transparent;
+    /* DEBUG: semi-transparent overlay — set background to transparent when verified on device */
+    background: rgba(0, 255, 100, 0.14);
+    box-sizing: border-box;
 }
 #game-canvas:not(.hidden) {
     display: block !important;
@@ -233,6 +238,8 @@ body {
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 #game-play-root.hidden {
@@ -258,7 +265,10 @@ body {
 }
 
 .hud-sidebar-scroll {
-    flex: 1 1 0%;
+    flex: 1 1 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
     min-height: 0;
     min-width: 0;
     width: 100%;
@@ -272,7 +282,7 @@ body {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     overscroll-behavior-x: none;
-    touch-action: pan-y;
+    touch-action: auto;
 }
 
 #hud-sidebar-left {
@@ -299,17 +309,21 @@ body {
     min-height: 0;
     overflow: hidden;
     background: #050505;
-    padding: 2px;
+    padding: 0;
     box-sizing: border-box;
     touch-action: none;
 }
 
+/* Frame on inner (not canvas) so border box matches pointer layer 1:1 with no extra inset. */
 #game-play-inner {
     position: absolute;
     left: 0;
     top: 0;
     transform-origin: 0 0;
     will-change: transform;
+    box-sizing: border-box;
+    outline: 2px solid #333;
+    outline-offset: -2px;
     box-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
 }
 
