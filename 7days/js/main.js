@@ -127,14 +127,17 @@ function initGameViewportPanning() {
     let basePanY = 0;
     let dragging = false;
 
+    function releaseCaptureSafe(id) {
+        try {
+            playViewport.releasePointerCapture(id);
+        } catch (_) {}
+    }
+
     function cleanupPointer(e) {
         if (e.pointerId !== activePointerId) return;
-        if (dragging) {
-            try {
-                playViewport.releasePointerCapture(e.pointerId);
-            } catch (_) {}
-        } else if (
-            gameViewPanEnabled &&
+        releaseCaptureSafe(e.pointerId);
+        if (
+            !dragging &&
             (e.pointerType === 'touch' || e.pointerType === 'pen') &&
             typeof window.__gamePerformWorldClick === 'function'
         ) {
@@ -149,8 +152,14 @@ function initGameViewportPanning() {
         (e) => {
             if (e.button != null && e.button !== 0) return;
             if (e.target && e.target.closest && e.target.closest('#closet-back-btn')) return;
-            if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+            const touchLike = e.pointerType === 'touch' || e.pointerType === 'pen';
+            if (touchLike) {
                 e.preventDefault();
+                if (gameViewPanEnabled) {
+                    try {
+                        playViewport.setPointerCapture(e.pointerId);
+                    } catch (_) {}
+                }
             }
             activePointerId = e.pointerId;
             startX = e.clientX;
@@ -162,25 +171,34 @@ function initGameViewportPanning() {
         { capture: true, passive: false }
     );
 
-    playViewport.addEventListener('pointermove', (e) => {
-        if (e.pointerId !== activePointerId || !gameViewPanEnabled) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        if (!dragging) {
-            if (dx * dx + dy * dy < GAME_VIEWPORT_PAN_THRESHOLD_PX * GAME_VIEWPORT_PAN_THRESHOLD_PX) return;
-            dragging = true;
-            try {
-                playViewport.setPointerCapture(e.pointerId);
-            } catch (_) {}
-        }
-        gameViewPanX = basePanX + dx;
-        gameViewPanY = basePanY + dy;
-        clampGameViewportPan();
-        applyGameViewportTransform();
-    });
+    playViewport.addEventListener(
+        'pointermove',
+        (e) => {
+            if (e.pointerId !== activePointerId || !gameViewPanEnabled) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            const dist2 = dx * dx + dy * dy;
+            const touchLike = e.pointerType === 'touch' || e.pointerType === 'pen';
 
-    playViewport.addEventListener('pointerup', cleanupPointer);
-    playViewport.addEventListener('pointercancel', cleanupPointer);
+            if (!dragging) {
+                if (dist2 < GAME_VIEWPORT_PAN_THRESHOLD_PX * GAME_VIEWPORT_PAN_THRESHOLD_PX) return;
+                dragging = true;
+                if (!touchLike) {
+                    try {
+                        playViewport.setPointerCapture(e.pointerId);
+                    } catch (_) {}
+                }
+            }
+            gameViewPanX = basePanX + dx;
+            gameViewPanY = basePanY + dy;
+            clampGameViewportPan();
+            applyGameViewportTransform();
+        },
+        true
+    );
+
+    playViewport.addEventListener('pointerup', cleanupPointer, true);
+    playViewport.addEventListener('pointercancel', cleanupPointer, true);
 }
 
 let gameViewportResizeObserver = null;
