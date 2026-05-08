@@ -124,7 +124,6 @@ const shots = [
   <text x="120" y="375" fill="#ddd" font-family="Arial, sans-serif" font-size="26">Flashlight</text>
   <rect x="80" y="460" width="920" height="120" rx="12" fill="#1a1f28" stroke="#444"/>
   <text x="120" y="515" fill="#ddd" font-family="Arial, sans-serif" font-size="26">Water bottle</text>
-  <text x="540" y="900" text-anchor="middle" fill="#556677" font-family="Arial, sans-serif" font-size="22">Stylized UI preview — not final layout</text>
 `,
     },
     {
