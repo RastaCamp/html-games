@@ -285,6 +285,8 @@ window.addEventListener('DOMContentLoaded', () => {
             else if (window.audioSystem.playTitleLoop) window.audioSystem.playTitleLoop();
         }
     };
+    // Attempt immediately on app start; if autoplay is blocked, unlockOnce retries on first interaction.
+    maybeStartTitleLoop();
     const unlockOnce = () => {
         try {
             if (window.audioSystem && window.audioSystem.ensureUnlocked) window.audioSystem.ensureUnlocked();
@@ -457,6 +459,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (typeof TransitionSystem === 'undefined') {
                 if (titleScreenEl) titleScreenEl.classList.remove('hidden');
                 if (titleScreen) titleScreen.show();
+                maybeStartTitleLoop();
                 if (coverArtScreen) coverArtScreen.classList.add('hidden');
                 return;
             }
@@ -466,6 +469,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         if (coverArtScreen) coverArtScreen.classList.add('hidden');
                         if (titleScreenEl) titleScreenEl.classList.remove('hidden');
                         if (titleScreen) titleScreen.show();
+                        maybeStartTitleLoop();
                     });
                 }, 2500);
             });
@@ -478,6 +482,7 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
         if (titleScreenEl) titleScreenEl.classList.remove('hidden');
         if (titleScreen) titleScreen.show();
+        maybeStartTitleLoop();
     }
 
     window.weatherSystem = weatherSystem;
