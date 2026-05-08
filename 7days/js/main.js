@@ -10,6 +10,58 @@ let introSequence = null;
 const LOGICAL_CANVAS_WIDTH = 1280;
 const LOGICAL_CANVAS_HEIGHT = 720;
 
+/** Match gameplay CSS breakpoint: narrow = mobile/tablet (cover scale + touch pan). */
+function isNarrowGameViewport() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 1024px)').matches;
+}
+
+let gameViewVpW = 0;
+let gameViewVpH = 0;
+let gameViewContentW = 0;
+let gameViewContentH = 0;
+/** When false (wide/desktop), pan is forced to center — full map visible (contain). */
+let gameViewPanEnabled = false;
+let gameViewPanX = 0;
+let gameViewPanY = 0;
+
+function clampGameViewportPan() {
+    const cw = gameViewVpW;
+    const ch = gameViewVpH;
+    const dw = gameViewContentW;
+    const dh = gameViewContentH;
+    if (!gameViewPanEnabled) {
+        gameViewPanX = (cw - dw) / 2;
+        gameViewPanY = (ch - dh) / 2;
+        return;
+    }
+    const minX = Math.min(0, cw - dw);
+    const maxX = Math.max(0, cw - dw);
+    const minY = Math.min(0, ch - dh);
+    const maxY = Math.max(0, ch - dh);
+    gameViewPanX = Math.max(minX, Math.min(maxX, gameViewPanX));
+    gameViewPanY = Math.max(minY, Math.min(maxY, gameViewPanY));
+}
+
+function applyGameViewportTransform() {
+    const inner = document.getElementById('game-play-inner');
+    if (!inner) return;
+    inner.style.transform = `translate(${gameViewPanX}px, ${gameViewPanY}px)`;
+}
+
+/** Center the “camera” after layout (call when entering gameplay). */
+function centerGameViewportPan() {
+    const cw = gameViewVpW;
+    const ch = gameViewVpH;
+    const dw = gameViewContentW;
+    const dh = gameViewContentH;
+    gameViewPanX = (cw - dw) / 2;
+    gameViewPanY = (ch - dh) / 2;
+    clampGameViewportPan();
+    applyGameViewportTransform();
+}
+
+window.centerGameViewportPan = centerGameViewportPan;
+
 /** HiDPI canvas: backing store = logical × devicePixelRatio; CSS fills #game-play-inner (size set by updateGameViewportLayout). */
 function setupCanvas(canvas, logicalW = LOGICAL_CANVAS_WIDTH, logicalH = LOGICAL_CANVAS_HEIGHT) {
     const dpr = window.devicePixelRatio || 1;
@@ -24,7 +76,10 @@ function setupCanvas(canvas, logicalW = LOGICAL_CANVAS_WIDTH, logicalH = LOGICAL
     return { ctx, dpr, logicalW, logicalH };
 }
 
-/** Letterbox-scale the full 1280×720 world into the center column (no scroll panning). Hit-test uses getBoundingClientRect. */
+/**
+ * Size the 1280×720 world in the center column: on mobile/tablet use cover scale (large, cropped — pan to see rest);
+ * on desktop use contain (full map). Pan offsets are in CSS px on #game-play-inner; hit-test uses canvas getBoundingClientRect (includes transform).
+ */
 function updateGameViewportLayout() {
     const root = document.getElementById('game-play-root');
     const vp = document.getElementById('game-play-viewport');
@@ -39,11 +94,93 @@ function updateGameViewportLayout() {
     const ch = vp.clientHeight;
     if (cw < 2 || ch < 2) return;
 
-    const scale = Math.min(cw / lw, ch / lh);
+    const useCover = isNarrowGameViewport();
+    const scale = useCover
+        ? Math.max(cw / lw, ch / lh)
+        : Math.min(cw / lw, ch / lh);
     const dw = Math.max(2, Math.round(lw * scale));
     const dh = Math.max(2, Math.round(lh * scale));
     inner.style.width = `${dw}px`;
     inner.style.height = `${dh}px`;
+
+    gameViewVpW = cw;
+    gameViewVpH = ch;
+    gameViewContentW = dw;
+    gameViewContentH = dh;
+    gameViewPanEnabled = useCover;
+
+    clampGameViewportPan();
+    applyGameViewportTransform();
+}
+
+const GAME_VIEWPORT_PAN_THRESHOLD_PX = 12;
+
+function initGameViewportPanning() {
+    const playViewport = document.getElementById('game-play-viewport');
+    if (!playViewport || playViewport.dataset.panInit === '1') return;
+    playViewport.dataset.panInit = '1';
+
+    let activePointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let basePanX = 0;
+    let basePanY = 0;
+    let dragging = false;
+
+    function cleanupPointer(e) {
+        if (e.pointerId !== activePointerId) return;
+        if (dragging) {
+            try {
+                playViewport.releasePointerCapture(e.pointerId);
+            } catch (_) {}
+        } else if (
+            gameViewPanEnabled &&
+            (e.pointerType === 'touch' || e.pointerType === 'pen') &&
+            typeof window.__gamePerformWorldClick === 'function'
+        ) {
+            window.__gamePerformWorldClick(e.clientX, e.clientY);
+        }
+        activePointerId = null;
+        dragging = false;
+    }
+
+    playViewport.addEventListener(
+        'pointerdown',
+        (e) => {
+            if (e.button != null && e.button !== 0) return;
+            if (e.target && e.target.closest && e.target.closest('#closet-back-btn')) return;
+            if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                e.preventDefault();
+            }
+            activePointerId = e.pointerId;
+            startX = e.clientX;
+            startY = e.clientY;
+            basePanX = gameViewPanX;
+            basePanY = gameViewPanY;
+            dragging = false;
+        },
+        { capture: true, passive: false }
+    );
+
+    playViewport.addEventListener('pointermove', (e) => {
+        if (e.pointerId !== activePointerId || !gameViewPanEnabled) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (!dragging) {
+            if (dx * dx + dy * dy < GAME_VIEWPORT_PAN_THRESHOLD_PX * GAME_VIEWPORT_PAN_THRESHOLD_PX) return;
+            dragging = true;
+            try {
+                playViewport.setPointerCapture(e.pointerId);
+            } catch (_) {}
+        }
+        gameViewPanX = basePanX + dx;
+        gameViewPanY = basePanY + dy;
+        clampGameViewportPan();
+        applyGameViewportTransform();
+    });
+
+    playViewport.addEventListener('pointerup', cleanupPointer);
+    playViewport.addEventListener('pointercancel', cleanupPointer);
 }
 
 let gameViewportResizeObserver = null;
@@ -67,12 +204,25 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     setupCanvas(canvas, LOGICAL_CANVAS_WIDTH, LOGICAL_CANVAS_HEIGHT);
     attachGameViewportResizeObserver();
+    initGameViewportPanning();
+    if (window.matchMedia) {
+        const mq = window.matchMedia('(max-width: 1024px)');
+        const onBp = () => {
+            requestAnimationFrame(() => {
+                updateGameViewportLayout();
+                centerGameViewportPan();
+            });
+        };
+        if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onBp);
+        else if (typeof mq.addListener === 'function') mq.addListener(onBp);
+    }
     window.addEventListener('resize', () => {
         requestAnimationFrame(updateGameViewportLayout);
     });
     window.addEventListener('orientationchange', () => {
         requestAnimationFrame(() => {
             updateGameViewportLayout();
+            centerGameViewportPan();
         });
     });
     requestAnimationFrame(updateGameViewportLayout);
@@ -336,7 +486,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
-        requestAnimationFrame(updateGameViewportLayout);
+        requestAnimationFrame(() => {
+            updateGameViewportLayout();
+            centerGameViewportPan();
+        });
         setupGameHandlers();
         await game.start();
         game.addMessage('Welcome to 7 Days... Survive 7 days in the basement.');
@@ -376,7 +529,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
-        requestAnimationFrame(updateGameViewportLayout);
+        requestAnimationFrame(() => {
+            updateGameViewportLayout();
+            centerGameViewportPan();
+        });
 
         const result = game.saveSystem.load(game);
         if (result.success) {
@@ -404,7 +560,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
-        requestAnimationFrame(updateGameViewportLayout);
+        requestAnimationFrame(() => {
+            updateGameViewportLayout();
+            centerGameViewportPan();
+        });
         setupGameHandlers();
         await game.start();
         game.addMessage('New game started. Survive 7 days in the basement.');
@@ -506,33 +665,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
         canvas.addEventListener('click', onGameAreaClick);
 
-        function onGameAreaTouch(e) {
-            if (!e.touches || e.touches.length !== 1) return;
-            e.preventDefault();
-            const t = e.touches[0];
-            onGameAreaClick({ clientX: t.clientX, clientY: t.clientY });
-        }
-        canvas.addEventListener('touchstart', onGameAreaTouch, { passive: false });
-
-        // Taps on scroll viewport chrome (outside the 1280×720 inner) still move the character
-        const playViewport = document.getElementById('game-play-viewport');
-        if (playViewport) {
-            playViewport.addEventListener('click', (e) => {
-                if (e.target !== playViewport) return;
-                const g = window.game || game;
-                if (!g || g.gameState.isPaused || g.gameState.isGameOver) return;
-                canvas.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: e.clientX, clientY: e.clientY }));
-            });
-            playViewport.addEventListener('touchstart', (e) => {
-                if (e.target !== playViewport) return;
-                const g = window.game || game;
-                if (!g || g.gameState.isPaused || g.gameState.isGameOver) return;
-                if (!e.touches || e.touches.length !== 1) return;
-                e.preventDefault();
-                const t = e.touches[0];
-                onGameAreaClick({ clientX: t.clientX, clientY: t.clientY });
-            }, { passive: false });
-        }
+        /** Touch/pen taps (after pan-vs-tap in initGameViewportPanning); mouse uses canvas click only. */
+        window.__gamePerformWorldClick = function (clientX, clientY) {
+            onGameAreaClick({ clientX, clientY });
+        };
 
         const closetBackBtn = document.getElementById('closet-back-btn');
         if (closetBackBtn) {

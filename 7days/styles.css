@@ -186,7 +186,7 @@ body {
     display: block !important;
 }
 
-/* Three-column gameplay: fixed sidebars | letterboxed full 1280×720 world | fixed sidebars (no overlay, no scroll-pan) */
+/* Three-column gameplay: sidebars | center viewport (mobile: cover-scale + pan; desktop: contain, full map) | sidebars */
 #game-play-root {
     position: relative;
     flex: 1 1 auto;
@@ -248,21 +248,23 @@ body {
 }
 
 #game-play-viewport {
+    position: relative;
     flex: 1 1 auto;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: #050505;
-    padding: 6px;
+    padding: 2px;
     box-sizing: border-box;
+    touch-action: none;
 }
 
 #game-play-inner {
-    position: relative;
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    will-change: transform;
     box-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
 }
 
@@ -283,11 +285,14 @@ body {
 }
 
 @media (max-width: 1024px) {
+    /* Prioritize center playfield: thin rails (scroll inside for full HUD). */
     #hud-sidebar-left,
     #hud-sidebar-right {
-        width: clamp(72px, 22vw, 120px);
-        padding: 4px;
-        gap: 6px;
+        width: clamp(40px, 12vw, 72px);
+        min-width: 40px;
+        max-width: 80px;
+        padding: 3px;
+        gap: 4px;
     }
 
     .hud-left-top {
