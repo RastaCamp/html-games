@@ -126,7 +126,52 @@ window.addEventListener('DOMContentLoaded', () => {
     const deathMarkerSystem = new DeathMarkerSystem();
     const tipJar = new TipJarSystem();
     const weatherSystem = new WeatherSystem();
+
+    function loadStartingTimeFromStorage() {
+        try {
+            const raw = localStorage.getItem('7days_settings');
+            const settings = raw ? JSON.parse(raw) : {};
+            window.startingTimeOfDay = settings.startingTimeOfDay || 'morning';
+        } catch (e) {
+            window.startingTimeOfDay = 'morning';
+        }
+    }
+    loadStartingTimeFromStorage();
+
+    window.syncStartingTimeButtons = function () {
+        loadStartingTimeFromStorage();
+        const t = window.startingTimeOfDay || 'morning';
+        document.querySelectorAll('.start-time-btn').forEach(function (b) {
+            b.classList.toggle('selected', (b.getAttribute('data-time') || '') === t);
+        });
+    };
+
     const seasonSelection = new SeasonSelection(weatherSystem);
+    const _seasonShow = seasonSelection.show.bind(seasonSelection);
+    seasonSelection.show = function () {
+        _seasonShow();
+        if (typeof window.syncStartingTimeButtons === 'function') {
+            window.syncStartingTimeButtons();
+        }
+    };
+
+    document.querySelectorAll('.start-time-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            window.startingTimeOfDay = btn.getAttribute('data-time') || 'morning';
+            document.querySelectorAll('.start-time-btn').forEach(function (b) {
+                b.classList.remove('selected');
+            });
+            btn.classList.add('selected');
+            try {
+                const raw = localStorage.getItem('7days_settings');
+                const settings = raw ? JSON.parse(raw) : {};
+                settings.startingTimeOfDay = window.startingTimeOfDay;
+                localStorage.setItem('7days_settings', JSON.stringify(settings));
+            } catch (e) {}
+        });
+    });
+    window.syncStartingTimeButtons();
+
     titleScreen = new TitleScreen(saveSystem, deathMarkerSystem, tipJar);
     introSequence = new IntroSequence();
 
@@ -211,6 +256,15 @@ window.addEventListener('DOMContentLoaded', () => {
             ? ['spring', 'summer', 'fall', 'winter'][Math.floor(Math.random() * 4)]
             : season;
         window.weatherSystem.setSeason(s);
+        if (typeof window.weatherSystem.rollDailyWeather === 'function') {
+            window.weatherSystem.rollDailyWeather();
+        }
+        try {
+            const raw = localStorage.getItem('7days_settings');
+            const settings = raw ? JSON.parse(raw) : {};
+            settings.startingTimeOfDay = window.startingTimeOfDay || settings.startingTimeOfDay || 'morning';
+            localStorage.setItem('7days_settings', JSON.stringify(settings));
+        } catch (e) {}
         window.seasonSelection.hide();
         window.introSequence.start();
     };
@@ -833,4 +887,5 @@ window.addEventListener('DOMContentLoaded', () => {
             if (window.doCreditsBack) window.doCreditsBack();
         });
     }
+
 });

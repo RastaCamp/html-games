@@ -320,6 +320,20 @@ class TitleScreen {
                 }
             });
         }
+
+        const startingTimeSelect = document.getElementById('starting-time-select');
+        if (startingTimeSelect) {
+            startingTimeSelect.value = settings.startingTimeOfDay || 'morning';
+            startingTimeSelect.addEventListener('change', (e) => {
+                const v = e.target.value;
+                this.saveSettings({ startingTimeOfDay: v });
+                window.startingTimeOfDay = v;
+                if (typeof window.syncStartingTimeButtons === 'function') {
+                    window.syncStartingTimeButtons();
+                }
+            });
+        }
+
         if (interactionHintToggle) {
             interactionHintToggle.checked = settings.showInteractionHint !== false;
             interactionHintToggle.addEventListener('change', (e) => {

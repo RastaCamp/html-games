@@ -61,10 +61,13 @@ class Game {
         this.extractionTime = null; // Set on Day 7
         this.extractionMissed = false;
         
-        // Load game speed from settings
+        // Load game speed and starting time of day (new games; loads overwrite via setState)
         const settings = this.loadSettings();
         if (settings.gameSpeed) {
             this.dayCycle.setGameSpeed(settings.gameSpeed);
+        }
+        if (typeof this.dayCycle.setStartingTimeOfDay === 'function') {
+            this.dayCycle.setStartingTimeOfDay(settings.startingTimeOfDay || 'morning');
         }
         
         // New systems
@@ -1821,9 +1824,14 @@ class Game {
         try {
             const settings = localStorage.getItem('7days_settings');
             const parsed = settings ? JSON.parse(settings) : {};
-            return { gameSpeed: 'normal', showInteractionHint: true, ...parsed };
+            return {
+                gameSpeed: 'normal',
+                showInteractionHint: true,
+                startingTimeOfDay: 'morning',
+                ...parsed
+            };
         } catch (e) {
-            return { gameSpeed: 'normal', showInteractionHint: true };
+            return { gameSpeed: 'normal', showInteractionHint: true, startingTimeOfDay: 'morning' };
         }
     }
 

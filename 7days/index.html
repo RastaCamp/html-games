@@ -9,6 +9,8 @@
 </head>
 <body>
     <div id="game-container">
+        <!-- Game content sits above the ad strip; ad slot is a sibling for easy replacement. -->
+        <div id="game-stage">
         <!-- Cover art: fades in first, then fades out to title -->
         <div id="cover-art-screen">
             <img id="cover-art-img" src="" alt="" width="1280" height="720">
@@ -50,6 +52,14 @@
                     <button id="winter-btn" class="season-btn" type="button" onclick="if(window.doSeasonChoice)window.doSeasonChoice('winter');">WINTER<br><small>Freezing, snow</small></button>
                     <button id="random-btn" class="season-btn" type="button" onclick="if(window.doSeasonChoice)window.doSeasonChoice('random');">RANDOM<br><small>Surprise me</small></button>
                 </div>
+                <p class="season-sub">Starting time of day (when you reach the basement)</p>
+                <div id="starting-time-options">
+                    <button type="button" class="start-time-btn" data-time="morning">MORNING<br><small>~8:30 AM</small></button>
+                    <button type="button" class="start-time-btn" data-time="afternoon">AFTERNOON<br><small>~2:00 PM</small></button>
+                    <button type="button" class="start-time-btn" data-time="evening">EVENING<br><small>~6:30 PM</small></button>
+                    <button type="button" class="start-time-btn" data-time="night">NIGHT<br><small>~10:00 PM</small></button>
+                    <button type="button" class="start-time-btn" data-time="random">RANDOM</button>
+                </div>
                 <p style="margin-top: 20px; font-size: 12px; color: #888;">
                     Season affects: Temperature • Rainfall • Daylight • Animal Activity
                 </p>
@@ -63,11 +73,11 @@
                     <div id="blue-circle" class="broadcast-circle"></div>
                     <div id="yellow-circle" class="broadcast-circle"></div>
                 </div>
+                <div id="intro-story-caption" class="intro-story-caption" aria-live="polite"></div>
                 <div id="ticker-container">
                     <div id="ticker-text"></div>
                 </div>
-                <div id="intro-caption" class="intro-caption">Disaster strikes. Authorities say stay inside until further notice.</div>
-                <button type="button" id="skip-intro-btn" class="menu-btn" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10001;">Skip</button>
+                <button type="button" id="skip-intro-btn" class="menu-btn skip-intro-btn">Skip intro</button>
             </div>
             <div id="living-room" class="hidden">
                 <div id="tv-screen">
@@ -147,6 +157,16 @@
                     <option value="normal" selected>Normal (20 min/day) *Recommended</option>
                     <option value="slow">Slow (30 min/day)</option>
                     <option value="realist">Realistic (60 min/day)</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <label for="starting-time-select">Starting time (new game)</label>
+                <select id="starting-time-select">
+                    <option value="morning" selected>Morning (~8:30 AM)</option>
+                    <option value="afternoon">Afternoon (~2:00 PM)</option>
+                    <option value="evening">Evening (~6:30 PM)</option>
+                    <option value="night">Night (~10:00 PM)</option>
+                    <option value="random">Random</option>
                 </select>
             </div>
             <div class="option-group">
@@ -346,6 +366,15 @@
             </div>
             <button id="tip-jar-close-btn" class="menu-btn">CLOSE</button>
         </div>
+        </div>
+        <!-- Ad banner: design size 728×90 CSS px (IAB leaderboard). Creatives from ads/ + ads/manifest.json -->
+        <aside id="ad-banner-slot" class="ad-banner-slot" role="region" aria-label="Advertisement" data-ad-width="728" data-ad-height="90" data-ad-rotator="true" title="Ad slot: 728×90 CSS pixels">
+            <div id="ad-banner-frame" class="ad-banner-frame">
+                <div id="ad-banner-hit" class="ad-banner-hit" tabindex="-1">
+                    <img id="ad-banner-img" class="ad-banner-img" alt="" width="728" height="90" decoding="async" />
+                </div>
+            </div>
+        </aside>
     </div>
     <script src="js/AchievementSystem.js"></script>
     <script src="js/TitleScreen.js"></script>
@@ -391,6 +420,7 @@
     <script src="js/MasterCraftingRecipes.js"></script>
     <script src="js/ContainerRandomizer.js"></script>
     <script src="js/Game.js"></script>
+    <script src="js/AdBannerRotator.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

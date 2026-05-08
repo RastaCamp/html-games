@@ -1,17 +1,5 @@
-// IntroSequence: Setting the mood (of impending doom)! 🚨
-// This class handles the game's opening cinematic: the emergency broadcast,
-// the power outage, and the transition into the grim reality of the basement.
-//
-// 📝 HOW TO TWEAK THE INTRO:
-// 1. `this.tickerText`: Change the scrolling news ticker message.
-//    Make it more ominous, more absurd, or more hopeful!
-// 2. `showEmergencyBroadcast()` / `showLivingRoom()`: Adjust timings (`setTimeout`)
-//    or visual effects for each part of the intro.
-// 3. `transitionToGameplay()`: Customize the final fade to black before the game starts.
-//
-// 🔥 PRO TIP: The intro sets the tone. Make it memorable!
-// 🐛 COMMON MISTAKE: Timings being off, causing elements to appear/disappear too quickly or slowly.
-//
+// IntroSequence: emergency broadcast, news caster, rotating disaster stories by season/weather.
+
 class IntroSequence {
     constructor() {
         this.tickerText = `[EMERGENCY BROADCAST SYSTEM] ... THIS IS NOT A DRILL ... MULTIPLE CONFIRMED IMPACTS ... EVACUATION ORDERS IN EFFECT FOR ALL MAJOR METROPOLITAN AREAS ... GOVERNMENT ADVISES IMMEDIATE SHELTER ... DO NOT ATTEMPT TO OUTRUN ... REPEAT: THIS IS NOT A DRILL ... CASUALTY REPORTS UNCONFIRMED ... POWER GRID EXPECTED TO FAIL WITHIN HOURS ... IF YOU ARE IN A BASEMENT, STAY THERE ... DO NOT OPEN DOORS FOR ANYONE ... SUPPLIES WILL BE DEPLOYED WHEN CONDITIONS PERMIT ... GOD BLESS AMERICA ... GOD HELP US ALL ... [STATIC] ... [BROADCAST INTERRUPTED] ... `;
@@ -20,17 +8,84 @@ class IntroSequence {
         this.newsCasterFlashing = false;
         this.flashInterval = null;
         this.captionInterval = null;
-        this.disasterCaptions = [
-            'Disaster strikes. Authorities say stay inside until further notice.',
-            'Emergency declared. Shelter in place. Stay in the lowest level of your home.',
-            'Chemical spill nearby. Close windows. Stay in basement until all-clear.',
-            'Power grid failure. Remain indoors. Do not travel.',
-            'Outbreak declared. Quarantine in place. Stay home until further notice.',
-            'Rioting in the streets. Lock doors. Stay in basement.',
-            'Nuclear alert. Seek shelter below ground. Stay there.',
-            'Regional emergency. Move to basement or lowest level. Stay put.',
-            'Civil unrest. Lock doors. Stay in basement until further notice.'
-        ];
+        /** Seven rotating lower-third stories; keyed by season (from WeatherSystem). */
+        this.disasterStoriesBySeason = {
+            spring: [
+                'Spring runoff overwhelms drainage—rivers crest through midnight; low areas are being evacuated.',
+                'Saturated hillsides are sliding; road crews report mud blocking every major route out of the county.',
+                'Agricultural chemicals from flooded fields may have entered the water table—boil orders are spreading.',
+                'Dam operators are releasing spillway water; downstream neighborhoods are told to move to highest floor or basement.',
+                'Tornado watches blanket the region; emergency managers say interior rooms and basements are the only safe bet.',
+                'Power substations are flooding; utilities warn of long outages once pumps and switchyards go under.',
+                'Shelter guidance: seal windows, stay below grade, and do not wade through moving water to reach a vehicle.'
+            ],
+            summer: [
+                'A prolonged heat dome has buckled highways and strained hospitals; heat index advisories are in effect 24/7.',
+                'Wildfire smoke is pooling in valleys—air quality is hazardous; keep windows sealed and limit exertion.',
+                'The grid is shedding load; rolling blackouts may hit without warning as AC demand outpaces supply.',
+                'Reservoirs are at record lows; municipal water may be rationed within days.',
+                'Outdoor workers and the elderly are the first casualties—cooling centers are at capacity.',
+                'Dry lightning has sparked new fronts; embers can travel miles ahead of the main fire line.',
+                'Officials say basements stay cooler but bring water; dehydration kills faster than smoke in a sealed room.'
+            ],
+            fall: [
+                'A powerful low is wrapping up the coast—gusts are snapping trees and tearing at roofs county-wide.',
+                'Remnant moisture from the tropical system is parked overhead; flash flood warnings repeat every hour.',
+                'Early hard frost after a wet harvest has left roads slick with black ice tonight.',
+                'High wind has downed lines; assume every wire is live and every intersection is a blind corner.',
+                'Schools and offices are closed indefinitely; travel is for emergency services only.',
+                'Emergency stockpiles are being moved inland; coastal corridors are considered compromised.',
+                'If you are sheltering in a basement, check vents for debris—carbon monoxide risk rises when generators fail.'
+            ],
+            winter: [
+                'A polar outbreak has flash-frozen roads; ambulances are hours behind and warming centers are full.',
+                'Ice accretion is collapsing power lines; crews cannot bucket up until winds drop below 35 mph.',
+                'Water mains are bursting block by block; boil notices may not matter if pressure fails entirely.',
+                'Snow load is stressing flat roofs; listen for creaking and stay clear of exterior doors under drifts.',
+                'Wind chill is life-threatening within minutes; frostbite triage is overwhelming ERs.',
+                'Fuel trucks cannot reach outlying towns; propane and kerosene are being prioritized for hospitals.',
+                'Basement shelter is correct—stuff towels under doors, conserve heat in one room, and vent if using flames.'
+            ]
+        };
+    }
+
+    /** Human-readable weather line for the last rotating caption (uses first-day roll from WeatherSystem). */
+    weatherForecastLine() {
+        const ws = typeof window !== 'undefined' ? window.weatherSystem : null;
+        if (!ws) return 'Stay tuned for hazardous conditions in your area.';
+        const season = (ws.season || 'summer').toLowerCase();
+        const w = (ws.currentWeather || 'sunny').toLowerCase();
+        const labels = {
+            rain: 'Heavy rain and localized flooding',
+            overcast: 'Low gray skies and poor visibility',
+            partly_cloudy: 'Broken clouds with shifting winds',
+            sunny: 'Deceptively clear air—hazards remain',
+            hot_dry: 'Dangerous heat and tinder-dry fuels',
+            heat_wave: 'Extreme heat; grid and bodies under stress',
+            snow: 'Steady snow reducing visibility and mobility',
+            blizzard: 'Blizzard conditions; zero visibility possible',
+            bitter_cold: 'Bitter cold; exposed skin freezes fast',
+            clear_cold: 'Clear but deadly cold',
+            freezing_rain: 'Freezing rain coating every surface',
+            windy: 'Damaging winds; debris and power lines down',
+            crisp_clear: 'Crisp air with biting wind chills',
+            cold_snap: 'Sudden cold snap; pipes and people at risk',
+            thunderstorm: 'Severe storms with damaging wind and lightning'
+        };
+        const bit = labels[w] || 'Hazardous conditions';
+        const seasonLabel = season.charAt(0).toUpperCase() + season.slice(1);
+        return `${seasonLabel} outlook — ${bit}. Shelter in place until the all-clear.`;
+    }
+
+    buildRotatingCaptions() {
+        const ws = typeof window !== 'undefined' ? window.weatherSystem : null;
+        const season = (ws && ws.season ? ws.season : 'summer').toLowerCase();
+        const base = this.disasterStoriesBySeason[season] || this.disasterStoriesBySeason.summer;
+        const stories = base.slice(0, 7);
+        if (stories.length === 7) {
+            stories[6] = this.weatherForecastLine();
+        }
+        return stories;
     }
 
     start() {
@@ -44,35 +99,29 @@ class IntroSequence {
         const self = this;
         const skipBtn = document.getElementById('skip-intro-btn');
         if (skipBtn) {
-            skipBtn.textContent = 'Skip';
-            skipBtn.addEventListener('mousedown', function (e) {
+            skipBtn.textContent = 'Skip intro';
+            skipBtn.onclick = function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 self._skipRequested = true;
                 if (typeof self.transitionToGameplay === 'function') {
                     self.transitionToGameplay();
                 }
-            }, true);
-            skipBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                self._skipRequested = true;
-                if (typeof self.transitionToGameplay === 'function') {
-                    self.transitionToGameplay();
-                }
-            }, true);
+            };
         }
     }
 
     startCaptionRotation() {
-        const capEl = document.getElementById('intro-caption');
+        const capEl = document.getElementById('intro-story-caption');
         if (!capEl) return;
+        this.stopCaptionRotation();
+        const captions = this.buildRotatingCaptions();
         let idx = 0;
-        capEl.textContent = this.disasterCaptions[0];
+        capEl.textContent = captions[0] || '';
         this.captionInterval = setInterval(() => {
-            idx = (idx + 1) % this.disasterCaptions.length;
-            capEl.textContent = this.disasterCaptions[idx];
-        }, 6000);
+            idx = (idx + 1) % captions.length;
+            capEl.textContent = captions[idx] || '';
+        }, 5500);
     }
 
     stopCaptionRotation() {
@@ -83,14 +132,11 @@ class IntroSequence {
     }
 
     loadNewsCasterImages() {
-        // 🎬 LOAD NEWS CASTER IMAGES: Preload the two talking frames
-        // These images flash back and forth to create a talking animation
         this.newsCasterOpen = new Image();
         this.newsCasterOpen.src = 'VISUALS/news_open.png';
         this.newsCasterClosed = new Image();
         this.newsCasterClosed.src = 'VISUALS/news_closed.png';
-        
-        // Set up image elements in DOM if they don't exist
+
         let casterEl = document.getElementById('news-caster');
         if (!casterEl) {
             casterEl = document.createElement('img');
@@ -110,35 +156,32 @@ class IntroSequence {
     }
 
     startNewsCasterFlashing() {
-        // 🎬 FLASH NEWS CASTER: Alternate between open and closed mouth
-        // Creates a simple talking animation (every 200-300ms)
-        if (this.flashInterval) return; // Already flashing
-        
+        if (this.flashInterval) return;
+
         this.newsCasterFlashing = true;
         let isOpen = true;
         const casterEl = document.getElementById('news-caster');
-        
+
         if (!casterEl) return;
-        
+
         this.flashInterval = setInterval(() => {
             if (casterEl && this.newsCasterOpen && this.newsCasterClosed) {
                 casterEl.src = isOpen ? this.newsCasterOpen.src : this.newsCasterClosed.src;
                 isOpen = !isOpen;
             }
-        }, 250); // Switch every 250ms (natural speaking pace)
+        }, 250);
     }
 
     stopNewsCasterFlashing() {
-        // 🛑 STOP FLASHING: Freeze on closed mouth
         if (this.flashInterval) {
             clearInterval(this.flashInterval);
             this.flashInterval = null;
         }
         this.newsCasterFlashing = false;
-        
+
         const casterEl = document.getElementById('news-caster');
         if (casterEl && this.newsCasterClosed) {
-            casterEl.src = this.newsCasterClosed.src; // Freeze on closed mouth
+            casterEl.src = this.newsCasterClosed.src;
         }
     }
 
@@ -147,7 +190,6 @@ class IntroSequence {
         const ticker = document.getElementById('ticker-text');
         const livingRoom = document.getElementById('living-room');
 
-        // Fade in broadcast screen
         if (broadcast) {
             broadcast.classList.remove('hidden');
             broadcast.style.opacity = '0';
@@ -159,20 +201,15 @@ class IntroSequence {
         }
         if (livingRoom) livingRoom.classList.add('hidden');
 
-        // Set ticker text
         if (ticker) {
-            ticker.textContent = this.tickerText.repeat(3); // Repeat for continuous scroll
+            ticker.textContent = this.tickerText.repeat(3);
         }
 
-        // Start news caster flashing animation
         this.startNewsCasterFlashing();
 
-        // Show broadcast for 15 seconds
         setTimeout(() => {
-            // Stop flashing, freeze on closed mouth
             this.stopNewsCasterFlashing();
-            
-            // Fade out broadcast, then show living room
+
             if (broadcast && window.TransitionSystem) {
                 window.TransitionSystem.fadeOut(broadcast, 1000, () => {
                     this.showLivingRoom();
@@ -188,11 +225,9 @@ class IntroSequence {
     showLivingRoom() {
         const broadcast = document.getElementById('emergency-broadcast');
         const livingRoom = document.getElementById('living-room');
-        const tvStatic = document.getElementById('tv-static');
 
         if (broadcast) broadcast.classList.add('hidden');
-        
-        // Fade in living room
+
         if (livingRoom) {
             livingRoom.classList.remove('hidden');
             livingRoom.style.opacity = '0';
@@ -203,7 +238,6 @@ class IntroSequence {
             }
         }
 
-        // Show TV static for 3 seconds
         setTimeout(() => {
             this.showPowerOutage();
         }, 3000);
@@ -213,19 +247,16 @@ class IntroSequence {
         const tvStatic = document.getElementById('tv-static');
         const livingRoom = document.getElementById('living-room');
 
-        // Flicker TV (static effect)
         if (tvStatic) {
             tvStatic.textContent = '';
             tvStatic.style.background = '#000';
         }
 
-        // Fade to black (power outage effect)
         if (window.TransitionSystem) {
             window.TransitionSystem.fadeToBlack(null, 2000, () => {
                 this.transitionToGameplay();
             });
         } else if (livingRoom) {
-            // Fallback: simple fade
             livingRoom.style.transition = 'opacity 2s';
             livingRoom.style.opacity = '0';
             setTimeout(() => {
@@ -252,14 +283,12 @@ class IntroSequence {
             }
         };
 
-        // When called from Skip: instant transition (no fade) so click always works
         if (this._skipRequested) {
             this._skipRequested = false;
             showLoadingAndStart();
             return;
         }
 
-        // Normal intro path: fade from black then show loading and start
         if (window.TransitionSystem) {
             window.TransitionSystem.fadeFromBlack(null, 1500, () => {
                 if (introScreen) introScreen.classList.add('hidden');

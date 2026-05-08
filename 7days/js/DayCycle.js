@@ -71,6 +71,28 @@ class DayCycle {
         this.realTimeToGameTime = speedMultipliers[speed] || 72;
     }
 
+    /**
+     * Set in-game clock at day start (new game). dayTime=0 was midnight → UI showed "Night".
+     * Periods: morning (~8:30), afternoon (14:00), evening (~18:30), night (22:00), random.
+     */
+    setStartingTimeOfDay(period) {
+        const map = {
+            morning: 8 * 3600 + 30 * 60,
+            afternoon: 14 * 3600,
+            evening: 18 * 3600 + 30 * 60,
+            night: 22 * 3600
+        };
+        let p = typeof period === 'string' ? period.toLowerCase() : 'morning';
+        if (p === 'random') {
+            const keys = Object.keys(map);
+            p = keys[Math.floor(Math.random() * keys.length)];
+        }
+        const sec = map[p] != null ? map[p] : map.morning;
+        this.dayTime = sec;
+        const gameHours = (this.dayTime / 3600) % 24;
+        this.isNight = gameHours >= 18 || gameHours < 6;
+    }
+
     getTimeOfDay() {
         const gameHours = (this.dayTime / 3600) % 24;
         
