@@ -279,11 +279,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Title music loop: start on first user interaction (autoplay-safe), stop when gameplay begins.
     const maybeStartTitleLoop = () => {
-        const titleEl = document.getElementById('title-screen');
-        if (titleEl && !titleEl.classList.contains('hidden') && window.audioSystem) {
-            if (window.audioSystem.playTitleMusic) window.audioSystem.playTitleMusic();
-            else if (window.audioSystem.playTitleLoop) window.audioSystem.playTitleLoop();
-        }
+        if (!window.audioSystem) return;
+        const gameplayRoot = document.getElementById('game-play-root');
+        const gameplayVisible = gameplayRoot && !gameplayRoot.classList.contains('hidden');
+        if (gameplayVisible) return;
+        if (window.audioSystem.playTitleMusic) window.audioSystem.playTitleMusic();
+        else if (window.audioSystem.playTitleLoop) window.audioSystem.playTitleLoop();
     };
     // Attempt immediately on app start; if autoplay is blocked, unlockOnce retries on first interaction.
     maybeStartTitleLoop();
