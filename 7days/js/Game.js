@@ -1070,9 +1070,7 @@ class Game {
     handleCanvasClick(x, y) {
         if (this.sceneRenderer && this.sceneRenderer.currentScene === 'B' && this.sceneRenderer.currentSceneType === 'closet') {
             if (x < 220) {
-                this.sceneRenderer.setScene('A', 'main');
-                this.sceneRenderer.loadSceneImages();
-                this.addMessage('You return to the main room.');
+                this.returnFromCloset();
                 return;
             }
         }
@@ -1092,7 +1090,26 @@ class Game {
         this.sceneRenderer.setScene('B', 'closet');
         this.sceneRenderer.setLightsOn(false);
         this.sceneRenderer.loadSceneImages();
-        this.addMessage('You enter the closet room. Click the left side of the screen to return to the basement.');
+        this.addMessage('You enter the closet room. Use ← Basement or the left side of the room to return.');
+        this.syncClosetBackButton();
+    }
+
+    /** Show only while in closet scene (mobile-friendly exit). */
+    syncClosetBackButton() {
+        const el = document.getElementById('closet-back-btn');
+        if (!el) return;
+        const sr = this.sceneRenderer;
+        const inCloset = sr && sr.currentScene === 'B' && sr.currentSceneType === 'closet';
+        el.classList.toggle('hidden', !inCloset);
+    }
+
+    returnFromCloset() {
+        if (!this.sceneRenderer) return;
+        if (this.sceneRenderer.currentScene !== 'B' || this.sceneRenderer.currentSceneType !== 'closet') return;
+        this.sceneRenderer.setScene('A', 'main');
+        this.sceneRenderer.loadSceneImages();
+        this.addMessage('You return to the main room.');
+        this.syncClosetBackButton();
     }
 
     setMoveTargetToLocation(location) {

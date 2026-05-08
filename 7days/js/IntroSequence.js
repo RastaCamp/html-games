@@ -142,11 +142,11 @@ class IntroSequence {
             casterEl = document.createElement('img');
             casterEl.id = 'news-caster';
             casterEl.style.position = 'absolute';
-            casterEl.style.top = '10%';
+            casterEl.style.top = '8%';
             casterEl.style.left = '50%';
             casterEl.style.transform = 'translateX(-50%)';
-            casterEl.style.width = '60%';
-            casterEl.style.maxHeight = '70%';
+            casterEl.style.width = 'min(85vw, 720px)';
+            casterEl.style.maxHeight = '52vh';
             casterEl.style.objectFit = 'contain';
             const broadcast = document.getElementById('emergency-broadcast');
             if (broadcast) {

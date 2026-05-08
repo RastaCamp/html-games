@@ -459,6 +459,7 @@ class InteractableObjects {
                     game.sceneRenderer.setScene('B', 'closet');
                     game.sceneRenderer.setLightsOn(false); // closet with no lights as requested
                 }
+                if (typeof game.syncClosetBackButton === 'function') game.syncClosetBackButton();
                 if (window.audioSystem) window.audioSystem.playSound('proceed');
                 return { success: true, message: 'You enter the closet room. Old freezer and under-stairs storage are here. Click the left side of the screen to return to the main room.' };
             

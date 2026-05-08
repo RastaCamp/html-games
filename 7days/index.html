@@ -69,22 +69,18 @@
         <!-- Intro Sequence -->
         <div id="intro-screen" class="hidden">
             <div id="emergency-broadcast">
-                <div id="broadcast-symbol">
-                    <div id="blue-circle" class="broadcast-circle"></div>
-                    <div id="yellow-circle" class="broadcast-circle"></div>
-                </div>
                 <div id="intro-story-caption" class="intro-story-caption" aria-live="polite"></div>
                 <div id="ticker-container">
                     <div id="ticker-text"></div>
                 </div>
-                <button type="button" id="skip-intro-btn" class="menu-btn skip-intro-btn">Skip intro</button>
             </div>
             <div id="living-room" class="hidden">
                 <div id="tv-screen">
                     <div id="tv-static">STATIC</div>
                 </div>
-                <div id="player-circle"></div>
             </div>
+            <!-- Skip stays visible for whole intro (broadcast + living room); must not live inside #emergency-broadcast -->
+            <button type="button" id="skip-intro-btn" class="menu-btn skip-intro-btn">Skip intro</button>
         </div>
 
         <!-- Death Screen -->
@@ -211,6 +207,7 @@
         <img id="scene-background" src="" alt="" width="1280" height="720" class="hidden">
         <canvas id="game-canvas" width="1280" height="720" class="hidden"></canvas>
         <div id="ui-overlay" class="hidden">
+            <button type="button" id="closet-back-btn" class="closet-back-btn hidden" aria-label="Return to basement">← Basement</button>
             <div id="meters-panel">
                 <div class="meter">
                     <label>Health</label>

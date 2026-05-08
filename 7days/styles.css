@@ -194,6 +194,32 @@ body {
 #ui-overlay > * {
     pointer-events: auto; /* panels and buttons still receive clicks */
 }
+
+/* Closet: explicit return control for touch / small screens */
+.closet-back-btn {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 35;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #e0e0e0;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #4488ff;
+    border-radius: 5px;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+.closet-back-btn:hover {
+    background: rgba(68, 136, 255, 0.25);
+}
+.closet-back-btn.hidden {
+    display: none !important;
+}
 #pause-btn {
     pointer-events: auto;
     cursor: pointer;
@@ -885,11 +911,6 @@ body {
     z-index: 1;
 }
 
-#title-content {
-    position: relative;
-    z-index: 2;
-}
-
 #title-stats {
     margin-top: 20px;
     font-size: 14px;
@@ -933,17 +954,27 @@ body {
 }
 
 #title-content {
+    position: relative;
+    z-index: 2;
     text-align: center;
     color: #e0e0e0;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 12px;
+    box-sizing: border-box;
 }
 
 #game-title {
-    font-size: 64px;
+    font-size: clamp(28px, 11vw, 64px);
     font-weight: bold;
     margin-bottom: 20px;
     color: #4488ff;
     text-shadow: 0 0 20px #4488ff;
-    letter-spacing: 8px;
+    letter-spacing: clamp(2px, 1.2vw, 8px);
+    white-space: nowrap;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #title-tagline {
@@ -994,11 +1025,13 @@ body {
 /* Skip intro: fixed above bottom ad bar so it is not covered by #ad-banner-slot */
 #skip-intro-btn.skip-intro-btn {
     position: fixed;
-    bottom: calc(var(--ad-banner-height) + 16px);
+    bottom: calc(var(--ad-banner-height) + env(safe-area-inset-bottom, 0px) + 12px);
     left: 50%;
     transform: translateX(-50%);
     z-index: 10003;
     min-width: 140px;
+    padding: 12px 20px;
+    touch-action: manipulation;
 }
 
 #skip-intro-btn.skip-intro-btn:hover {
@@ -1010,42 +1043,10 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     background: #000;
-}
-
-#broadcast-symbol {
     position: relative;
-    width: 200px;
-    height: 200px;
-    margin-bottom: 100px;
-}
-
-.broadcast-circle {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    border: 8px solid;
-    animation: flash 1s infinite;
-}
-
-#blue-circle {
-    border-color: #4488ff;
-    background: rgba(68, 136, 255, 0.3);
-    animation-delay: 0s;
-}
-
-#yellow-circle {
-    border-color: #ffaa44;
-    background: rgba(255, 170, 68, 0.3);
-    animation-delay: 0.5s;
-}
-
-@keyframes flash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
 }
 
 /* Lower-third disaster stories during news caster (above ticker; not full-viewport marquee) */
@@ -1105,12 +1106,12 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 100px;
+    gap: 24px;
 }
 
 #tv-screen {
-    width: 400px;
-    height: 300px;
+    width: min(400px, 92vw);
+    height: min(300px, 40vh);
     background: #000;
     border: 10px solid #555;
     display: flex;
@@ -1129,14 +1130,6 @@ body {
 @keyframes static-flicker {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
-}
-
-#player-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: #4488ff;
-    border: 3px solid #66aaff;
 }
 
 /* Death Screen */
@@ -1425,3 +1418,123 @@ body {
     font-style: italic;
     line-height: 1.6;
 }
+
+/* —— Mobile / narrow viewports: keep playfield tappable; compact HUD —— */
+@media (max-width: 1024px) {
+    #meters-panel {
+        top: 4px;
+        left: 4px;
+        padding: 6px;
+        min-width: 0;
+        max-width: min(200px, 46vw);
+        font-size: 10px;
+    }
+    .meter-bar {
+        width: 100%;
+        max-width: 160px;
+    }
+    .meter label {
+        font-size: 10px;
+    }
+    .meter span {
+        font-size: 9px;
+    }
+
+    #day-counter {
+        top: 4px;
+        right: 4px;
+        padding: 6px 8px;
+        font-size: 11px;
+        pointer-events: none;
+    }
+
+    #time-display {
+        top: 44px;
+        right: 4px;
+        bottom: auto;
+        left: auto;
+        max-width: min(280px, calc(100vw - 12px));
+        flex-wrap: wrap;
+        row-gap: 4px;
+        padding: 6px 8px;
+        font-size: 10px;
+        pointer-events: none;
+    }
+    #pause-btn {
+        pointer-events: auto;
+        touch-action: manipulation;
+    }
+
+    .rest-wrap {
+        left: min(200px, 52vw);
+        top: 4px;
+    }
+    .rest-btn {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    #equip-panel {
+        top: 118px;
+        right: 4px;
+        bottom: auto;
+        left: auto;
+        max-width: min(200px, 44vw);
+        font-size: 10px;
+        pointer-events: none;
+    }
+    #equip-panel * {
+        pointer-events: auto;
+    }
+
+    #inventory-panel {
+        bottom: 4px;
+        left: 4px;
+        padding: 6px;
+        min-width: 0;
+        max-width: calc(100vw - 12px);
+        pointer-events: none;
+    }
+    #inventory-panel h3 {
+        pointer-events: auto;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+    #inventory-grid {
+        pointer-events: auto;
+        grid-template-columns: repeat(5, 34px);
+        gap: 3px;
+    }
+    .inventory-slot {
+        width: 34px;
+        height: 34px;
+    }
+    .item-icon, .item-emoji {
+        font-size: 20px;
+    }
+
+    #message-log {
+        bottom: 4px;
+        right: 4px;
+        width: min(150px, 38vw);
+        max-height: 90px;
+        padding: 6px;
+        font-size: 9px;
+        pointer-events: none;
+    }
+    #message-log #message-content {
+        pointer-events: auto;
+        touch-action: pan-y;
+    }
+
+    #ticker-text {
+        font-size: clamp(12px, 3.5vw, 20px);
+    }
+
+    .closet-back-btn {
+        left: 4px;
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+}
+

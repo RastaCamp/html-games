@@ -432,9 +432,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (g.sceneRenderer && g.sceneRenderer.currentScene === 'B' && g.sceneRenderer.currentSceneType === 'closet') {
                 const boxX = 40, boxY = 300, boxW = 120, boxH = 120;
                 if (p.x >= boxX && p.x <= boxX + boxW && p.y >= boxY && p.y <= boxY + boxH) {
-                    g.sceneRenderer.setScene('A', 'main');
-                    g.sceneRenderer.loadSceneImages();
-                    g.addMessage('You return to the main room.');
+                    if (g.returnFromCloset) g.returnFromCloset();
                     return;
                 }
             }
@@ -460,6 +458,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
         canvas.addEventListener('click', onGameAreaClick);
 
+        function onGameAreaTouch(e) {
+            if (!e.touches || e.touches.length !== 1) return;
+            e.preventDefault();
+            const t = e.touches[0];
+            onGameAreaClick({ clientX: t.clientX, clientY: t.clientY });
+        }
+        canvas.addEventListener('touchstart', onGameAreaTouch, { passive: false });
+
         // Forward overlay background clicks to canvas so Adam moves
         const uiOverlay = document.getElementById('ui-overlay');
         if (uiOverlay) {
@@ -469,7 +475,27 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (!g || g.gameState.isPaused || g.gameState.isGameOver) return;
                 canvas.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: e.clientX, clientY: e.clientY }));
             });
+            uiOverlay.addEventListener('touchstart', (e) => {
+                if (e.target !== uiOverlay) return;
+                const g = window.game || game;
+                if (!g || g.gameState.isPaused || g.gameState.isGameOver) return;
+                if (!e.touches || e.touches.length !== 1) return;
+                e.preventDefault();
+                const t = e.touches[0];
+                onGameAreaClick({ clientX: t.clientX, clientY: t.clientY });
+            }, { passive: false });
         }
+
+        const closetBackBtn = document.getElementById('closet-back-btn');
+        if (closetBackBtn) {
+            closetBackBtn.addEventListener('click', () => {
+                const g = window.game || game;
+                if (g && typeof g.returnFromCloset === 'function') g.returnFromCloset();
+            });
+        }
+
+        const gSync = window.game || game;
+        if (gSync && typeof gSync.syncClosetBackButton === 'function') gSync.syncClosetBackButton();
         
         // Handle location clicks (new scene system): check sceneLoot, show found items, take into inventory
         function handleLocationClick(location, game) {
