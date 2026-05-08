@@ -353,9 +353,9 @@ body {
 @media (max-width: 1024px) {
     #hud-sidebar-left,
     #hud-sidebar-right {
-        width: clamp(72px, 18vw, 108px);
-        min-width: 64px;
-        max-width: 120px;
+        width: clamp(96px, 26vw, 132px);
+        min-width: 88px;
+        max-width: 148px;
     }
 
     .hud-sidebar-scroll {
@@ -405,27 +405,27 @@ body {
     }
 
     #inventory-grid {
-        gap: 4px;
+        gap: 8px;
     }
 
     .inventory-slot {
-        min-height: 36px;
-        padding: 3px 4px;
+        min-height: 72px;
+        padding: 8px 6px;
     }
 
     .inventory-slot-inner {
-        gap: 6px;
+        gap: 8px;
     }
 
-    .item-emoji {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-        font-size: 18px;
+    .inventory-slot .item-emoji {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        font-size: 28px;
     }
 
     .inventory-slot-name {
-        font-size: 9px;
+        font-size: 10px;
     }
 
     .inventory-slot .item-count {
@@ -834,47 +834,52 @@ body {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    min-height: 44px;
+    min-height: 80px;
     height: auto;
     box-sizing: border-box;
     border: 2px solid #555;
     background: #222;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
     cursor: pointer;
     position: relative;
     flex-shrink: 0;
-    padding: 6px 8px;
+    padding: 10px 8px;
 }
 
+/* Label block on top, icon centered underneath */
 .inventory-slot-inner {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    justify-content: flex-start;
+    gap: 8px;
     width: 100%;
     min-width: 0;
 }
 
 .inventory-slot-meta {
-    flex: 1 1 auto;
+    width: 100%;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    text-align: center;
 }
 
 .inventory-slot-name {
-    font-size: 11px;
-    line-height: 1.25;
+    font-size: 12px;
+    line-height: 1.3;
     color: #ddd;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    hyphens: auto;
+    width: 100%;
     max-width: 100%;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
+    text-align: center;
 }
 
 .inventory-slot:hover {
@@ -884,8 +889,8 @@ body {
 
 .inventory-slot.empty {
     border-style: dashed;
-    min-height: 32px;
-    padding: 4px;
+    min-height: 40px;
+    padding: 6px;
 }
 
 .inventory-slot.selected {
@@ -903,19 +908,20 @@ body {
 
 .inventory-slot .item-emoji {
     flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    font-size: 26px;
+    align-self: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    font-size: 30px;
 }
 
 .inventory-slot .item-count {
     position: static;
-    align-self: flex-start;
+    align-self: center;
     font-size: 10px;
     font-weight: bold;
     background: rgba(0, 0, 0, 0.75);
-    padding: 1px 5px;
+    padding: 2px 6px;
     border-radius: 3px;
     color: #fff;
 }

@@ -573,9 +573,6 @@ class Game {
                 const emoji = item.icon || item.emoji || '❓';
                 const inner = document.createElement('div');
                 inner.className = 'inventory-slot-inner';
-                const emojiEl = document.createElement('div');
-                emojiEl.className = 'item-emoji';
-                emojiEl.textContent = emoji;
                 const meta = document.createElement('div');
                 meta.className = 'inventory-slot-meta';
                 const nameEl = document.createElement('div');
@@ -588,8 +585,11 @@ class Game {
                     cnt.textContent = String(item.quantity);
                     meta.appendChild(cnt);
                 }
-                inner.appendChild(emojiEl);
+                const emojiEl = document.createElement('div');
+                emojiEl.className = 'item-emoji';
+                emojiEl.textContent = emoji;
                 inner.appendChild(meta);
+                inner.appendChild(emojiEl);
                 slot.appendChild(inner);
                 slot.title = `${item.name || item.id}${item.condition ? ` (${item.condition})` : ''} — click to examine, double-click to use`;
                 const slotIndex = i;
