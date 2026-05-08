@@ -277,6 +277,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    align-items: stretch;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -291,15 +292,6 @@ body {
 
 #hud-sidebar-right {
     border-left: 2px solid #2a2a2a;
-}
-
-#inventory-panel {
-    margin-top: auto;
-    min-width: 0;
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    overflow-x: hidden;
 }
 
 #game-play-viewport {
@@ -334,6 +326,7 @@ body {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 8px;
+    flex: 0 0 auto;
     min-width: 0;
     max-width: 100%;
     width: 100%;
@@ -351,11 +344,17 @@ body {
 }
 
 @media (max-width: 1024px) {
-    #hud-sidebar-left,
+    /* Wider left column so inventory uses readable width; right stays compact */
+    #hud-sidebar-left {
+        width: clamp(128px, 38vw, 200px);
+        min-width: 118px;
+        max-width: 220px;
+    }
+
     #hud-sidebar-right {
-        width: clamp(96px, 26vw, 132px);
-        min-width: 88px;
-        max-width: 148px;
+        width: clamp(88px, 22vw, 120px);
+        min-width: 80px;
+        max-width: 132px;
     }
 
     .hud-sidebar-scroll {
@@ -393,15 +392,17 @@ body {
     }
 
     #inventory-panel {
-        padding: 4px;
-        margin-top: 0;
+        padding: 0;
+        padding-top: 8px;
+        margin: 2px 0 0 0;
         min-width: 0;
         width: 100%;
+        max-width: 100%;
     }
 
     #inventory-panel h3 {
-        font-size: 10px;
-        margin-bottom: 4px;
+        font-size: 11px;
+        margin-bottom: 6px;
     }
 
     #inventory-grid {
@@ -798,27 +799,34 @@ body {
 }
 .equip-take-off:hover { background: #555; }
 
+/* Inventory is plain flow inside .hud-sidebar-scroll — one vertical scroll, no nested panel */
 #inventory-panel {
     position: relative;
-    bottom: auto;
-    left: auto;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #444;
-    z-index: 10;
-    min-width: 0;
+    flex: 0 0 auto;
+    width: 100%;
     max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    border-top: 1px solid #333;
+    padding-top: 10px;
+    margin-top: 4px;
     overflow-x: hidden;
+    overflow-y: visible;
     box-sizing: border-box;
 }
 
 #inventory-panel h3 {
-    margin-bottom: 10px;
-    font-size: 14px;
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: bold;
+    color: #ccc;
 }
 
-/* Single column: full-width rows inside narrow sidebar; scroll on .hud-sidebar-scroll */
+/* Single column: full width of sidebar scroll area */
 #inventory-grid {
     display: flex;
     flex-direction: column;
