@@ -10,19 +10,54 @@ let introSequence = null;
 const LOGICAL_CANVAS_WIDTH = 1280;
 const LOGICAL_CANVAS_HEIGHT = 720;
 
-/** HiDPI canvas: backing store = logical × devicePixelRatio; CSS = logical px; ctx scaled so drawing is logical. */
+/** HiDPI canvas: backing store = logical × devicePixelRatio; CSS fills #game-play-inner (size set by updateGameViewportLayout). */
 function setupCanvas(canvas, logicalW = LOGICAL_CANVAS_WIDTH, logicalH = LOGICAL_CANVAS_HEIGHT) {
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.round(logicalW * dpr);
     canvas.height = Math.round(logicalH * dpr);
-    canvas.style.width = `${logicalW}px`;
-    canvas.style.height = `${logicalH}px`;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
     canvas.logicalWidth = logicalW;
     canvas.logicalHeight = logicalH;
     const ctx = canvas.getContext('2d');
     if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     return { ctx, dpr, logicalW, logicalH };
 }
+
+/** Letterbox-scale the full 1280×720 world into the center column (no scroll panning). Hit-test uses getBoundingClientRect. */
+function updateGameViewportLayout() {
+    const root = document.getElementById('game-play-root');
+    const vp = document.getElementById('game-play-viewport');
+    const inner = document.getElementById('game-play-inner');
+    const canvas = document.getElementById('game-canvas');
+    if (!vp || !inner || !canvas) return;
+    if (root && root.classList.contains('hidden')) return;
+
+    const lw = canvas.logicalWidth || LOGICAL_CANVAS_WIDTH;
+    const lh = canvas.logicalHeight || LOGICAL_CANVAS_HEIGHT;
+    const cw = vp.clientWidth;
+    const ch = vp.clientHeight;
+    if (cw < 2 || ch < 2) return;
+
+    const scale = Math.min(cw / lw, ch / lh);
+    const dw = Math.max(2, Math.round(lw * scale));
+    const dh = Math.max(2, Math.round(lh * scale));
+    inner.style.width = `${dw}px`;
+    inner.style.height = `${dh}px`;
+}
+
+let gameViewportResizeObserver = null;
+function attachGameViewportResizeObserver() {
+    const vp = document.getElementById('game-play-viewport');
+    if (!vp || typeof ResizeObserver === 'undefined') return;
+    if (gameViewportResizeObserver) gameViewportResizeObserver.disconnect();
+    gameViewportResizeObserver = new ResizeObserver(() => {
+        updateGameViewportLayout();
+    });
+    gameViewportResizeObserver.observe(vp);
+}
+
+window.updateGameViewportLayout = updateGameViewportLayout;
 
 window.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('game-canvas');
@@ -31,6 +66,16 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
     setupCanvas(canvas, LOGICAL_CANVAS_WIDTH, LOGICAL_CANVAS_HEIGHT);
+    attachGameViewportResizeObserver();
+    window.addEventListener('resize', () => {
+        requestAnimationFrame(updateGameViewportLayout);
+    });
+    window.addEventListener('orientationchange', () => {
+        requestAnimationFrame(() => {
+            updateGameViewportLayout();
+        });
+    });
+    requestAnimationFrame(updateGameViewportLayout);
 
     // Pause menu: always show/hide panel; toggle game only if game exists
     window.doPauseToggle = function () {
@@ -291,6 +336,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
+        requestAnimationFrame(updateGameViewportLayout);
         setupGameHandlers();
         await game.start();
         game.addMessage('Welcome to 7 Days... Survive 7 days in the basement.');
@@ -330,6 +376,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
+        requestAnimationFrame(updateGameViewportLayout);
 
         const result = game.saveSystem.load(game);
         if (result.success) {
@@ -357,6 +404,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
+        requestAnimationFrame(updateGameViewportLayout);
         setupGameHandlers();
         await game.start();
         game.addMessage('New game started. Survive 7 days in the basement.');

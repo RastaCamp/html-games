@@ -124,17 +124,6 @@ body {
     opacity: 1;
 }
 
-#scene-background {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 1280px;
-    height: 720px;
-    max-width: none;
-    object-fit: fill;
-    z-index: 0;
-    pointer-events: none;
-}
 #scene-background.hidden {
     display: none !important;
 }
@@ -168,6 +157,17 @@ body {
     font-size: 14px;
 }
 
+#game-play-inner #scene-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 0;
+    pointer-events: none;
+}
+
 #game-canvas {
     border: 2px solid #333;
     background: transparent;
@@ -175,14 +175,18 @@ body {
     position: absolute;
     left: 0;
     top: 0;
+    width: 100%;
+    height: 100%;
     z-index: 1;
-    pointer-events: auto; /* ensure canvas receives clicks so Adam moves */
+    pointer-events: auto;
+    display: block;
+    box-sizing: border-box;
 }
 #game-canvas:not(.hidden) {
     display: block !important;
 }
 
-/* Gameplay shell: two HUD sidebars + scrollable center (see mobile + desktop rules below) */
+/* Three-column gameplay: fixed sidebars | letterboxed full 1280×720 world | fixed sidebars (no overlay, no scroll-pan) */
 #game-play-root {
     position: relative;
     flex: 1 1 auto;
@@ -191,33 +195,75 @@ body {
     z-index: 5;
 }
 
+#game-play-root:not(.hidden) {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
 #game-play-root.hidden {
     display: none !important;
 }
 
+#hud-sidebar-left,
+#hud-sidebar-right {
+    flex: 0 0 auto;
+    width: clamp(200px, 26vw, 320px);
+    min-width: 0;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: rgba(8, 8, 8, 0.96);
+    border: 1px solid #333;
+    box-sizing: border-box;
+    z-index: 10;
+}
+
+#hud-sidebar-left {
+    border-right: 2px solid #2a2a2a;
+}
+
+#hud-sidebar-right {
+    border-left: 2px solid #2a2a2a;
+}
+
+#inventory-panel {
+    margin-top: auto;
+}
+
+#message-log {
+    margin-top: 12px;
+    flex: 1 1 auto;
+    min-height: 64px;
+    max-width: none;
+    width: 100%;
+}
+
+#hud-sidebar-right #message-log {
+    max-width: none;
+}
+
 #game-play-viewport {
-    position: relative;
+    flex: 1 1 auto;
     min-width: 0;
     min-height: 0;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #050505;
+    padding: 6px;
+    box-sizing: border-box;
 }
 
 #game-play-inner {
     position: relative;
-    width: 1280px;
-    height: 720px;
     flex-shrink: 0;
-}
-
-.hud-sidebar {
-    flex-shrink: 0;
-    background: rgba(8, 8, 8, 0.92);
-    border: 1px solid #333;
-    box-sizing: border-box;
-    z-index: 10;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
 }
 
 .hud-left-top {
@@ -233,123 +279,15 @@ body {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
+    flex: 0 0 auto;
 }
 
-/* Desktop: HUD in side margins; center viewport shows full basement with scroll if window is small */
-@media (min-width: 1025px) {
-    #game-play-root:not(.hidden) {
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        display: block;
-    }
-
-    #hud-sidebar-left {
-        position: absolute;
-        left: 10px;
-        top: 10px;
-        bottom: 10px;
-        width: auto;
-        max-width: min(340px, 32vw);
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        overflow-x: auto;
-        overflow-y: auto;
-    }
-
-    #hud-sidebar-right {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        bottom: 10px;
-        width: auto;
-        max-width: min(340px, 32vw);
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        overflow-x: auto;
-        overflow-y: auto;
-    }
-
-    #hud-sidebar-right #message-log {
-        max-width: none;
-        width: 100%;
-    }
-
-    #hud-sidebar-right .hud-right-top {
-        flex: 0 0 auto;
-    }
-
-    #inventory-panel {
-        margin-top: auto;
-    }
-
-    #message-log {
-        margin-top: 12px;
-        flex: 1 1 auto;
-        min-height: 80px;
-    }
-
-    #game-play-viewport {
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 8px;
-        box-sizing: border-box;
-    }
-
-    #game-play-inner {
-        box-shadow: 0 0 24px rgba(0, 0, 0, 0.65);
-    }
-}
-
-/* Mobile / tablet: fixed-width side rails; pan the basement in the center */
 @media (max-width: 1024px) {
-    #game-play-root:not(.hidden) {
-        display: flex !important;
-        flex-direction: row;
-        flex: 1 1 auto;
-        min-height: 0;
-        width: 100%;
-    }
-
-    #hud-sidebar-left {
-        flex: 0 0 100px;
-        width: 100px;
-        min-width: 72px;
-        max-width: 120px;
-        padding: 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
+    #hud-sidebar-left,
     #hud-sidebar-right {
-        flex: 0 0 108px;
-        width: 108px;
-        min-width: 88px;
-        max-width: 130px;
+        width: clamp(72px, 22vw, 120px);
         padding: 4px;
-        display: flex;
-        flex-direction: column;
         gap: 6px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
     }
 
     .hud-left-top {
@@ -357,35 +295,15 @@ body {
         gap: 4px;
     }
 
-    #game-play-viewport {
-        flex: 1 1 auto;
-        min-width: 0;
-        min-height: 0;
-    }
-
-    #inventory-panel {
-        margin-top: 0;
-    }
-
     #meters-panel {
-        position: relative;
-        top: auto;
-        left: auto;
-        min-width: 0;
-        width: 100%;
         padding: 4px;
         font-size: 9px;
+        min-width: 0;
     }
 
     .meter-bar {
         width: 100%;
-        max-width: 92px;
-    }
-
-    .rest-wrap {
-        position: relative;
-        top: auto;
-        left: auto;
+        max-width: 100%;
     }
 
     .rest-btn {
@@ -394,13 +312,8 @@ body {
     }
 
     #inventory-panel {
-        position: relative;
-        bottom: auto;
-        left: auto;
-        min-width: 0;
-        width: 100%;
         padding: 4px;
-        max-width: none;
+        margin-top: 0;
     }
 
     #inventory-panel h3 {
@@ -409,37 +322,30 @@ body {
     }
 
     #inventory-grid {
-        grid-template-columns: repeat(3, 28px);
+        grid-template-columns: repeat(3, 26px);
         gap: 2px;
     }
 
     .inventory-slot {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
     }
 
     .item-icon, .item-emoji {
-        font-size: 16px;
+        font-size: 15px;
     }
 
     #day-counter {
-        position: relative;
-        top: auto;
-        right: auto;
         padding: 4px 6px;
         font-size: 10px;
     }
 
     #time-display {
-        position: relative;
-        top: auto;
-        right: auto;
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
         padding: 4px 6px;
         font-size: 9px;
-        max-width: none;
     }
 
     #weather-display {
@@ -450,34 +356,14 @@ body {
     }
 
     #equip-panel {
-        position: relative;
-        top: auto;
-        right: auto;
-        max-width: none;
-        width: 100%;
         padding: 4px 6px;
         font-size: 9px;
     }
 
-    #attraction-indicator {
-        margin-top: 0;
-        padding-top: 6px;
-    }
-
-    #attraction-indicator .meter-bar {
-        max-width: 92px;
-    }
-
     #message-log {
-        position: relative;
-        bottom: auto;
-        right: auto;
-        width: 100%;
-        flex: 1 1 auto;
-        min-height: 48px;
-        max-height: 120px;
-        padding: 4px;
+        max-height: 100px;
         font-size: 8px;
+        margin-top: 6px;
     }
 
     #pause-btn {
