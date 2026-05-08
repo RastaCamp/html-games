@@ -90,7 +90,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (btn) btn.textContent = '⏸ Pause';
         const gameCanvas = document.getElementById('game-canvas');
         const sceneBg = document.getElementById('scene-background');
-        const uiOverlay = document.getElementById('ui-overlay');
+        const gamePlayRoot = document.getElementById('game-play-root');
         const optionsMenu = document.getElementById('options-menu');
         const tipJarMenu = document.getElementById('tip-jar-menu');
         const inventoryPanel = document.getElementById('inventory-panel');
@@ -101,7 +101,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const deathScreenEl = document.getElementById('death-screen');
         if (sceneBg) sceneBg.classList.add('hidden');
         if (gameCanvas) gameCanvas.classList.add('hidden');
-        if (uiOverlay) uiOverlay.classList.add('hidden');
+        if (gamePlayRoot) gamePlayRoot.classList.add('hidden');
         if (optionsMenu) optionsMenu.classList.add('hidden');
         if (tipJarMenu) tipJarMenu.classList.add('hidden');
         if (inventoryPanel) inventoryPanel.classList.add('hidden');
@@ -287,10 +287,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (loadingScreen) loadingScreen.classList.add('hidden');
         const sceneBg = document.getElementById('scene-background');
         const gameCanvas = document.getElementById('game-canvas');
-        const uiOverlay = document.getElementById('ui-overlay');
+        const gamePlayRoot = document.getElementById('game-play-root');
+        if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
-        if (uiOverlay) uiOverlay.classList.remove('hidden');
         setupGameHandlers();
         await game.start();
         game.addMessage('Welcome to 7 Days... Survive 7 days in the basement.');
@@ -326,10 +326,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (loadingScreen) loadingScreen.classList.add('hidden');
         const sceneBg = document.getElementById('scene-background');
         const gameCanvas = document.getElementById('game-canvas');
-        const uiOverlay = document.getElementById('ui-overlay');
+        const gamePlayRoot = document.getElementById('game-play-root');
+        if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
-        if (uiOverlay) uiOverlay.classList.remove('hidden');
 
         const result = game.saveSystem.load(game);
         if (result.success) {
@@ -353,10 +353,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (loadingScreen) loadingScreen.classList.add('hidden');
         const sceneBg = document.getElementById('scene-background');
         const gameCanvas = document.getElementById('game-canvas');
-        const uiOverlay = document.getElementById('ui-overlay');
+        const gamePlayRoot = document.getElementById('game-play-root');
+        if (gamePlayRoot) gamePlayRoot.classList.remove('hidden');
         if (sceneBg) sceneBg.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.remove('hidden');
-        if (uiOverlay) uiOverlay.classList.remove('hidden');
         setupGameHandlers();
         await game.start();
         game.addMessage('New game started. Survive 7 days in the basement.');
@@ -367,7 +367,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (loadingScreen) loadingScreen.classList.add('hidden');
         const gameCanvas = document.getElementById('game-canvas');
         const sceneBg = document.getElementById('scene-background');
-        const uiOverlay = document.getElementById('ui-overlay');
+        const gamePlayRoot = document.getElementById('game-play-root');
         const menuPanel = document.getElementById('menu-panel');
         const optionsMenu = document.getElementById('options-menu');
         const tipJarMenu = document.getElementById('tip-jar-menu');
@@ -383,7 +383,7 @@ window.addEventListener('DOMContentLoaded', () => {
         window.game = null;
         if (sceneBg) sceneBg.classList.add('hidden');
         if (gameCanvas) gameCanvas.classList.add('hidden');
-        if (uiOverlay) uiOverlay.classList.add('hidden');
+        if (gamePlayRoot) gamePlayRoot.classList.add('hidden');
         if (menuPanel) {
             menuPanel.classList.add('hidden');
             menuPanel.style.setProperty('display', 'none', 'important');
@@ -466,17 +466,17 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         canvas.addEventListener('touchstart', onGameAreaTouch, { passive: false });
 
-        // Forward overlay background clicks to canvas so Adam moves
-        const uiOverlay = document.getElementById('ui-overlay');
-        if (uiOverlay) {
-            uiOverlay.addEventListener('click', (e) => {
-                if (e.target !== uiOverlay) return;
+        // Taps on scroll viewport chrome (outside the 1280×720 inner) still move the character
+        const playViewport = document.getElementById('game-play-viewport');
+        if (playViewport) {
+            playViewport.addEventListener('click', (e) => {
+                if (e.target !== playViewport) return;
                 const g = window.game || game;
                 if (!g || g.gameState.isPaused || g.gameState.isGameOver) return;
                 canvas.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: e.clientX, clientY: e.clientY }));
             });
-            uiOverlay.addEventListener('touchstart', (e) => {
-                if (e.target !== uiOverlay) return;
+            playViewport.addEventListener('touchstart', (e) => {
+                if (e.target !== playViewport) return;
                 const g = window.game || game;
                 if (!g || g.gameState.isPaused || g.gameState.isGameOver) return;
                 if (!e.touches || e.touches.length !== 1) return;

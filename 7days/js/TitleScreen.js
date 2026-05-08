@@ -51,11 +51,11 @@ class TitleScreen {
     show() {
         const titleScreen = document.getElementById('title-screen');
         const gameCanvas = document.getElementById('game-canvas');
-        const uiOverlay = document.getElementById('ui-overlay');
-        
+        const gamePlayRoot = document.getElementById('game-play-root');
+
         if (titleScreen) titleScreen.classList.remove('hidden');
         if (gameCanvas) gameCanvas.classList.add('hidden');
-        if (uiOverlay) uiOverlay.classList.add('hidden');
+        if (gamePlayRoot) gamePlayRoot.classList.add('hidden');
         
         // Update stats
         this.updateStats();

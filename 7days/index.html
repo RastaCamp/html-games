@@ -204,10 +204,10 @@
             <p id="loading-screen-text">Loading...</p>
         </div>
 
-        <img id="scene-background" src="" alt="" width="1280" height="720" class="hidden">
-        <canvas id="game-canvas" width="1280" height="720" class="hidden"></canvas>
-        <div id="ui-overlay" class="hidden">
-            <button type="button" id="closet-back-btn" class="closet-back-btn hidden" aria-label="Return to basement">← Basement</button>
+        <!-- Gameplay: side HUD columns + scrollable 1280×720 playfield (mobile); desktop uses same DOM with absolute sidebars -->
+        <div id="game-play-root" class="hidden">
+            <aside id="hud-sidebar-left" class="hud-sidebar hud-sidebar-left" aria-label="Status and inventory">
+                <div class="hud-left-top">
             <div id="meters-panel">
                 <div class="meter">
                     <label>Health</label>
@@ -286,6 +286,23 @@
                     <button type="button" id="rest-wake-btn" class="hidden">Wake up</button>
                 </div>
             </div>
+                </div>
+            <div id="inventory-panel">
+                <h3>Inventory</h3>
+                <div id="inventory-grid"></div>
+            </div>
+            </aside>
+            <div id="game-play-viewport">
+                <div id="game-play-inner">
+        <img id="scene-background" src="" alt="" width="1280" height="720" class="hidden">
+        <canvas id="game-canvas" width="1280" height="720" class="hidden"></canvas>
+            <button type="button" id="closet-back-btn" class="closet-back-btn hidden" aria-label="Return to basement">← Basement</button>
+        <div id="interaction-hint" class="hidden"></div>
+        <div id="proximity-hand-hint" class="hidden" aria-hidden="true">🖐</div>
+                </div>
+            </div>
+            <aside id="hud-sidebar-right" class="hud-sidebar hud-sidebar-right" aria-label="Time and messages">
+                <div class="hud-right-top">
             <div id="day-counter">Day <span id="day-number">1</span> of 7</div>
             <div id="time-display">
                 <span id="time-text">Morning</span>
@@ -309,16 +326,12 @@
                 </div>
                 <span id="attraction-level-text">Low</span>
             </div>
-        </div>
-        <div id="inventory-panel">
-            <h3>Inventory</h3>
-            <div id="inventory-grid"></div>
-        </div>
+                </div>
         <div id="message-log">
             <div id="message-content"></div>
         </div>
-        <div id="interaction-hint" class="hidden"></div>
-        <div id="proximity-hand-hint" class="hidden" aria-hidden="true">🖐</div>
+            </aside>
+        </div>
         <div id="crafting-panel" class="hidden">
             <h3>Crafting</h3>
             <div id="crafting-slots">

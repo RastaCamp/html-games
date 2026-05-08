@@ -34,8 +34,8 @@ body {
     min-height: 0;
     width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 /* Bottom ad strip: black bar; inner zone matches --ad-banner-width × --ad-banner-height */
@@ -126,9 +126,12 @@ body {
 
 #scene-background {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    left: 0;
+    top: 0;
+    width: 1280px;
+    height: 720px;
+    max-width: none;
+    object-fit: fill;
     z-index: 0;
     pointer-events: none;
 }
@@ -170,9 +173,8 @@ body {
     background: transparent;
     cursor: crosshair;
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    left: 0;
+    top: 0;
     z-index: 1;
     pointer-events: auto; /* ensure canvas receives clicks so Adam moves */
 }
@@ -180,19 +182,319 @@ body {
     display: block !important;
 }
 
-#ui-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+/* Gameplay shell: two HUD sidebars + scrollable center (see mobile + desktop rules below) */
+#game-play-root {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
     width: 100%;
-    height: 100%;
-    z-index: 10;
-    pointer-events: none; /* clicks pass through to canvas so Adam moves on click */
+    z-index: 5;
 }
-#ui-overlay > * {
-    pointer-events: auto; /* panels and buttons still receive clicks */
+
+#game-play-root.hidden {
+    display: none !important;
+}
+
+#game-play-viewport {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    background: #050505;
+}
+
+#game-play-inner {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    flex-shrink: 0;
+}
+
+.hud-sidebar {
+    flex-shrink: 0;
+    background: rgba(8, 8, 8, 0.92);
+    border: 1px solid #333;
+    box-sizing: border-box;
+    z-index: 10;
+}
+
+.hud-left-top {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.hud-right-top {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
+
+/* Desktop: HUD in side margins; center viewport shows full basement with scroll if window is small */
+@media (min-width: 1025px) {
+    #game-play-root:not(.hidden) {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        display: block;
+    }
+
+    #hud-sidebar-left {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        bottom: 10px;
+        width: auto;
+        max-width: min(340px, 32vw);
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    #hud-sidebar-right {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        bottom: 10px;
+        width: auto;
+        max-width: min(340px, 32vw);
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    #hud-sidebar-right #message-log {
+        max-width: none;
+        width: 100%;
+    }
+
+    #hud-sidebar-right .hud-right-top {
+        flex: 0 0 auto;
+    }
+
+    #inventory-panel {
+        margin-top: auto;
+    }
+
+    #message-log {
+        margin-top: 12px;
+        flex: 1 1 auto;
+        min-height: 80px;
+    }
+
+    #game-play-viewport {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    #game-play-inner {
+        box-shadow: 0 0 24px rgba(0, 0, 0, 0.65);
+    }
+}
+
+/* Mobile / tablet: fixed-width side rails; pan the basement in the center */
+@media (max-width: 1024px) {
+    #game-play-root:not(.hidden) {
+        display: flex !important;
+        flex-direction: row;
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+    }
+
+    #hud-sidebar-left {
+        flex: 0 0 100px;
+        width: 100px;
+        min-width: 72px;
+        max-width: 120px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #hud-sidebar-right {
+        flex: 0 0 108px;
+        width: 108px;
+        min-width: 88px;
+        max-width: 130px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .hud-left-top {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    #game-play-viewport {
+        flex: 1 1 auto;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    #inventory-panel {
+        margin-top: 0;
+    }
+
+    #meters-panel {
+        position: relative;
+        top: auto;
+        left: auto;
+        min-width: 0;
+        width: 100%;
+        padding: 4px;
+        font-size: 9px;
+    }
+
+    .meter-bar {
+        width: 100%;
+        max-width: 92px;
+    }
+
+    .rest-wrap {
+        position: relative;
+        top: auto;
+        left: auto;
+    }
+
+    .rest-btn {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+
+    #inventory-panel {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        min-width: 0;
+        width: 100%;
+        padding: 4px;
+        max-width: none;
+    }
+
+    #inventory-panel h3 {
+        font-size: 10px;
+        margin-bottom: 4px;
+    }
+
+    #inventory-grid {
+        grid-template-columns: repeat(3, 28px);
+        gap: 2px;
+    }
+
+    .inventory-slot {
+        width: 28px;
+        height: 28px;
+    }
+
+    .item-icon, .item-emoji {
+        font-size: 16px;
+    }
+
+    #day-counter {
+        position: relative;
+        top: auto;
+        right: auto;
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+
+    #time-display {
+        position: relative;
+        top: auto;
+        right: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 4px 6px;
+        font-size: 9px;
+        max-width: none;
+    }
+
+    #weather-display {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        flex-wrap: wrap;
+    }
+
+    #equip-panel {
+        position: relative;
+        top: auto;
+        right: auto;
+        max-width: none;
+        width: 100%;
+        padding: 4px 6px;
+        font-size: 9px;
+    }
+
+    #attraction-indicator {
+        margin-top: 0;
+        padding-top: 6px;
+    }
+
+    #attraction-indicator .meter-bar {
+        max-width: 92px;
+    }
+
+    #message-log {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 48px;
+        max-height: 120px;
+        padding: 4px;
+        font-size: 8px;
+    }
+
+    #pause-btn {
+        touch-action: manipulation;
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    #ticker-text {
+        font-size: clamp(12px, 3.5vw, 20px);
+    }
+
+    .closet-back-btn {
+        left: 4px;
+        padding: 10px 8px;
+        font-size: 12px;
+    }
 }
 
 /* Closet: explicit return control for touch / small screens */
@@ -228,9 +530,9 @@ body {
 }
 
 #meters-panel {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+    position: relative;
+    top: auto;
+    left: auto;
     background: rgba(0, 0, 0, 0.7);
     padding: 10px;
     border-radius: 5px;
@@ -346,9 +648,9 @@ body {
 }
 
 #day-counter {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    position: relative;
+    top: auto;
+    right: auto;
     background: rgba(0, 0, 0, 0.7);
     padding: 10px 15px;
     border-radius: 5px;
@@ -359,9 +661,9 @@ body {
 }
 
 #time-display {
-    position: absolute;
-    top: 50px;
-    right: 10px;
+    position: relative;
+    top: auto;
+    right: auto;
     background: rgba(0, 0, 0, 0.7);
     padding: 10px 15px;
     border-radius: 5px;
@@ -371,6 +673,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 #weather-display {
@@ -410,11 +713,11 @@ body {
     background: #555;
 }
 
-/* Rest button and dropdown: Nap / Full sleep / Wake up. Positioned next to meters panel. */
+/* Rest button and dropdown: Nap / Full sleep / Wake up. */
 .rest-wrap {
-    position: absolute;
-    top: 10px;
-    left: 222px;
+    position: relative;
+    top: auto;
+    left: auto;
     z-index: 15;
 }
 .rest-btn {
@@ -461,9 +764,9 @@ body {
 }
 
 .equip-panel {
-    position: absolute;
-    top: 100px;
-    right: 10px;
+    position: relative;
+    top: auto;
+    right: auto;
     background: rgba(0, 0, 0, 0.7);
     padding: 8px 12px;
     border-radius: 5px;
@@ -498,15 +801,15 @@ body {
 .equip-take-off:hover { background: #555; }
 
 #inventory-panel {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
+    position: relative;
+    bottom: auto;
+    left: auto;
     background: rgba(0, 0, 0, 0.8);
     padding: 15px;
     border-radius: 5px;
     border: 1px solid #444;
     z-index: 10;
-    min-width: 300px;
+    min-width: 200px;
 }
 
 #inventory-panel h3 {
@@ -567,10 +870,11 @@ body {
 }
 
 #message-log {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    width: 300px;
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+    max-width: 300px;
     max-height: 150px;
     background: #000;
     color: #fff;
@@ -580,6 +884,7 @@ body {
     overflow-y: auto;
     font-size: 11px;
     z-index: 10;
+    box-sizing: border-box;
 }
 
 #message-content {
@@ -618,10 +923,10 @@ body {
 }
 
 #proximity-hand-hint {
-    position: absolute;
+    position: fixed;
     transform: translate(-50%, -50%);
     font-size: 24px;
-    z-index: 21;
+    z-index: 10050;
     pointer-events: none;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
     filter: drop-shadow(0 0 4px rgba(255, 230, 120, 0.8));
@@ -1418,123 +1723,3 @@ body {
     font-style: italic;
     line-height: 1.6;
 }
-
-/* —— Mobile / narrow viewports: keep playfield tappable; compact HUD —— */
-@media (max-width: 1024px) {
-    #meters-panel {
-        top: 4px;
-        left: 4px;
-        padding: 6px;
-        min-width: 0;
-        max-width: min(200px, 46vw);
-        font-size: 10px;
-    }
-    .meter-bar {
-        width: 100%;
-        max-width: 160px;
-    }
-    .meter label {
-        font-size: 10px;
-    }
-    .meter span {
-        font-size: 9px;
-    }
-
-    #day-counter {
-        top: 4px;
-        right: 4px;
-        padding: 6px 8px;
-        font-size: 11px;
-        pointer-events: none;
-    }
-
-    #time-display {
-        top: 44px;
-        right: 4px;
-        bottom: auto;
-        left: auto;
-        max-width: min(280px, calc(100vw - 12px));
-        flex-wrap: wrap;
-        row-gap: 4px;
-        padding: 6px 8px;
-        font-size: 10px;
-        pointer-events: none;
-    }
-    #pause-btn {
-        pointer-events: auto;
-        touch-action: manipulation;
-    }
-
-    .rest-wrap {
-        left: min(200px, 52vw);
-        top: 4px;
-    }
-    .rest-btn {
-        font-size: 11px;
-        padding: 4px 8px;
-    }
-
-    #equip-panel {
-        top: 118px;
-        right: 4px;
-        bottom: auto;
-        left: auto;
-        max-width: min(200px, 44vw);
-        font-size: 10px;
-        pointer-events: none;
-    }
-    #equip-panel * {
-        pointer-events: auto;
-    }
-
-    #inventory-panel {
-        bottom: 4px;
-        left: 4px;
-        padding: 6px;
-        min-width: 0;
-        max-width: calc(100vw - 12px);
-        pointer-events: none;
-    }
-    #inventory-panel h3 {
-        pointer-events: auto;
-        font-size: 12px;
-        margin-bottom: 6px;
-    }
-    #inventory-grid {
-        pointer-events: auto;
-        grid-template-columns: repeat(5, 34px);
-        gap: 3px;
-    }
-    .inventory-slot {
-        width: 34px;
-        height: 34px;
-    }
-    .item-icon, .item-emoji {
-        font-size: 20px;
-    }
-
-    #message-log {
-        bottom: 4px;
-        right: 4px;
-        width: min(150px, 38vw);
-        max-height: 90px;
-        padding: 6px;
-        font-size: 9px;
-        pointer-events: none;
-    }
-    #message-log #message-content {
-        pointer-events: auto;
-        touch-action: pan-y;
-    }
-
-    #ticker-text {
-        font-size: clamp(12px, 3.5vw, 20px);
-    }
-
-    .closet-back-btn {
-        left: 4px;
-        padding: 12px 10px;
-        font-size: 13px;
-    }
-}
-
