@@ -277,6 +277,25 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     requestAnimationFrame(updateGameViewportLayout);
 
+    // Title music loop: start on first user interaction (autoplay-safe), stop when gameplay begins.
+    const maybeStartTitleLoop = () => {
+        const titleEl = document.getElementById('title-screen');
+        if (titleEl && !titleEl.classList.contains('hidden') && window.audioSystem) {
+            if (window.audioSystem.playTitleMusic) window.audioSystem.playTitleMusic();
+            else if (window.audioSystem.playTitleLoop) window.audioSystem.playTitleLoop();
+        }
+    };
+    const unlockOnce = () => {
+        try {
+            if (window.audioSystem && window.audioSystem.ensureUnlocked) window.audioSystem.ensureUnlocked();
+        } catch (_) {}
+        maybeStartTitleLoop();
+        document.removeEventListener('pointerdown', unlockOnce, true);
+        document.removeEventListener('keydown', unlockOnce, true);
+    };
+    document.addEventListener('pointerdown', unlockOnce, true);
+    document.addEventListener('keydown', unlockOnce, true);
+
     // Pause menu: always show/hide panel; toggle game only if game exists
     window.doPauseToggle = function () {
         const panel = document.getElementById('menu-panel');
@@ -481,6 +500,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Global handlers for inline onclick (so New Game and season buttons always work)
     window.doNewGame = function () {
+        if (window.audioSystem) {
+            if (window.audioSystem.stopTitleLoop) window.audioSystem.stopTitleLoop();
+            if (window.audioSystem.stopMusic) window.audioSystem.stopMusic();
+        }
         const titleEl = document.getElementById('title-screen');
         if (titleEl && window.TransitionSystem) {
             window.TransitionSystem.fadeOut(titleEl, 500, function () {
@@ -524,6 +547,10 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     window.startGameplay = async () => {
+        if (window.audioSystem) {
+            if (window.audioSystem.stopTitleLoop) window.audioSystem.stopTitleLoop();
+            if (window.audioSystem.stopMusic) window.audioSystem.stopMusic();
+        }
         game = new Game(canvas);
         window.game = game;
         if (game.tipJar) window.tipJar = game.tipJar;
@@ -567,6 +594,10 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     window.loadGameAndStart = async () => {
+        if (window.audioSystem) {
+            if (window.audioSystem.stopTitleLoop) window.audioSystem.stopTitleLoop();
+            if (window.audioSystem.stopMusic) window.audioSystem.stopMusic();
+        }
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) loadingScreen.classList.remove('hidden');
         game = new Game(canvas);
@@ -597,6 +628,10 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     window.restartGame = async () => {
+        if (window.audioSystem) {
+            if (window.audioSystem.stopTitleLoop) window.audioSystem.stopTitleLoop();
+            if (window.audioSystem.stopMusic) window.audioSystem.stopMusic();
+        }
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) loadingScreen.classList.remove('hidden');
         if (game) game.stop();
@@ -620,6 +655,7 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     window.returnToMenu = () => {
+        // When returning to menu, allow title loop to resume on next interaction.
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) loadingScreen.classList.add('hidden');
         const gameCanvas = document.getElementById('game-canvas');
@@ -665,6 +701,8 @@ window.addEventListener('DOMContentLoaded', () => {
             titleScreenEl.style.removeProperty('display');
         }
         if (titleScreen) titleScreen.show();
+        // If audio is already unlocked (e.g. returning from gameplay), restart title loop immediately.
+        maybeStartTitleLoop();
     };
 
     function setupGameHandlers() {

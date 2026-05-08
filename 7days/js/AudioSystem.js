@@ -36,6 +36,7 @@ class AudioSystem {
     constructor() {
         this.sounds = {}; // Cache of loaded Audio objects
         this.music = null; // Current background music
+        this.titleLoop = null; // WebAudio title loop (no file needed)
         this.musicVolume = 0.3; // Background music volume (30%)
         this.sfxVolume = 0.7; // Sound effects volume (70%)
         this.enabled = true; // Master audio toggle
@@ -66,12 +67,31 @@ class AudioSystem {
             'enemy_battle': 'sounds/enemy_battle.mp3',
             
             // Background Music
+            'title': 'sounds/title.mp3',
             'crunk_track': 'sounds/crunk_track.mp3',
             'crunks_track': 'sounds/crunks_track.mp3'
         };
         
         // Preload sounds
         this.preloadSounds();
+    }
+
+    ensureUnlocked() {
+        // Create/resume AudioContext only on user gesture
+        if (this._audioCtx) {
+            if (this._audioCtx.state === 'suspended') {
+                try { this._audioCtx.resume(); } catch (_) {}
+            }
+            return this._audioCtx;
+        }
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        try {
+            this._audioCtx = new AC();
+            return this._audioCtx;
+        } catch (_) {
+            return null;
+        }
     }
 
     preloadSounds() {
@@ -154,6 +174,92 @@ class AudioSystem {
         }
     }
 
+    playTitleLoop() {
+        // Ambient title loop using Web Audio (no asset file required)
+        if (!this.enabled || !this.musicEnabled) return;
+        if (this.titleLoop) return;
+        const ctx = this.ensureUnlocked();
+        if (!ctx) return;
+
+        const master = ctx.createGain();
+        master.gain.value = Math.max(0, Math.min(1, this.musicVolume)) * 0.8;
+        master.connect(ctx.destination);
+
+        // Drone oscillator + subtle detune + lowpass for “basement hum”
+        const oscA = ctx.createOscillator();
+        const oscB = ctx.createOscillator();
+        oscA.type = 'sawtooth';
+        oscB.type = 'triangle';
+        oscA.frequency.value = 55; // A1
+        oscB.frequency.value = 110; // A2
+        oscB.detune.value = -9;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 420;
+        filter.Q.value = 0.8;
+
+        const trem = ctx.createOscillator();
+        trem.type = 'sine';
+        trem.frequency.value = 0.18; // slow pulse
+        const tremGain = ctx.createGain();
+        tremGain.gain.value = 0.12;
+        trem.connect(tremGain);
+
+        const amp = ctx.createGain();
+        amp.gain.value = 0.0;
+
+        // Tremolo modulates amplitude slightly
+        tremGain.connect(amp.gain);
+
+        const mix = ctx.createGain();
+        mix.gain.value = 0.24;
+
+        oscA.connect(filter);
+        oscB.connect(filter);
+        filter.connect(mix);
+        mix.connect(amp);
+        amp.connect(master);
+
+        const t0 = ctx.currentTime;
+        amp.gain.setValueAtTime(0.0, t0);
+        amp.gain.linearRampToValueAtTime(0.18, t0 + 1.2);
+
+        oscA.start();
+        oscB.start();
+        trem.start();
+
+        this.titleLoop = { ctx, master, oscA, oscB, trem, filter, mix, amp };
+    }
+
+    playTitleMusic() {
+        // Prefer the actual title track if present; otherwise fall back to synth loop.
+        if (!this.enabled || !this.musicEnabled) return;
+        if (this.sounds && this.sounds.title) {
+            this.playMusic('title', true);
+            return;
+        }
+        this.playTitleLoop();
+    }
+
+    stopTitleLoop() {
+        const tl = this.titleLoop;
+        if (!tl) return;
+        try {
+            const t0 = tl.ctx.currentTime;
+            tl.master.gain.cancelScheduledValues(t0);
+            tl.master.gain.setValueAtTime(tl.master.gain.value, t0);
+            tl.master.gain.linearRampToValueAtTime(0.0, t0 + 0.25);
+            setTimeout(() => {
+                try { tl.oscA.stop(); } catch (_) {}
+                try { tl.oscB.stop(); } catch (_) {}
+                try { tl.trem.stop(); } catch (_) {}
+                try { tl.master.disconnect(); } catch (_) {}
+            }, 300);
+        } catch (_) {}
+        this.titleLoop = null;
+    }
+
     setVolume(sfxVolume, musicVolume) {
         // 🔊 SET VOLUME: Adjust volume levels
         this.sfxVolume = Math.max(0, Math.min(1, sfxVolume));
@@ -162,6 +268,9 @@ class AudioSystem {
         // Update current music volume
         if (this.music) {
             this.music.volume = this.musicVolume;
+        }
+        if (this.titleLoop && this.titleLoop.master) {
+            this.titleLoop.master.gain.value = Math.max(0, Math.min(1, this.musicVolume)) * 0.8;
         }
         
         // Update all cached sounds
@@ -175,6 +284,7 @@ class AudioSystem {
         this.enabled = enabled;
         if (!enabled) {
             this.stopMusic();
+            this.stopTitleLoop();
         }
     }
 
@@ -183,6 +293,7 @@ class AudioSystem {
         this.musicEnabled = enabled;
         if (!enabled) {
             this.stopMusic();
+            this.stopTitleLoop();
         }
     }
 
