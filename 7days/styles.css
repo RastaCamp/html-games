@@ -196,10 +196,25 @@ body {
     width: 100%;
     height: 100%;
     z-index: 1;
-    pointer-events: auto;
+    pointer-events: none;
     display: block;
     box-sizing: border-box;
     touch-action: none;
+}
+
+/* Full inner hit target: pan/tap/click attach here so the whole transformed playfield receives pointers (not only canvas quirks). */
+.game-play-pointer-layer,
+#game-play-pointer-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 12;
+    pointer-events: auto;
+    touch-action: none;
+    cursor: crosshair;
+    background: transparent;
 }
 #game-canvas:not(.hidden) {
     display: block !important;
@@ -243,20 +258,21 @@ body {
 }
 
 .hud-sidebar-scroll {
-    flex: 1 1 auto;
+    flex: 1 1 0%;
     min-height: 0;
     min-width: 0;
     width: 100%;
+    max-width: 100%;
     padding: 8px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
-    overscroll-behavior-x: contain;
-    touch-action: pan-x pan-y;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
 }
 
 #hud-sidebar-left {
@@ -269,6 +285,10 @@ body {
 
 #inventory-panel {
     margin-top: auto;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #game-play-viewport {
@@ -299,6 +319,9 @@ body {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
 }
 
 .hud-right-top {
@@ -307,6 +330,9 @@ body {
     align-items: stretch;
     gap: 8px;
     flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
 }
 
 @media (max-width: 1024px) {
@@ -485,7 +511,7 @@ body {
 
 .meter-bar {
     width: 100%;
-    max-width: min(200px, 100%);
+    max-width: 100%;
     height: 12px;
     background: #333;
     border: 1px solid #555;
@@ -683,6 +709,11 @@ body {
     flex-direction: column;
     gap: 6px;
 }
+.hud-sidebar-scroll .rest-panel {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
 .rest-panel button {
     padding: 6px 12px;
     background: #444;
@@ -690,7 +721,9 @@ body {
     border: 1px solid #666;
     border-radius: 3px;
     cursor: pointer;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
+    max-width: 100%;
 }
 .rest-panel button:hover {
     background: #555;
@@ -700,6 +733,9 @@ body {
     position: relative;
     top: auto;
     right: auto;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     background: rgba(0, 0, 0, 0.7);
     padding: 8px 12px;
     border-radius: 5px;

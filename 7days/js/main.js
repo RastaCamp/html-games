@@ -120,6 +120,9 @@ function initGameViewportPanning() {
     if (!playViewport || playViewport.dataset.panInit === '1') return;
     playViewport.dataset.panInit = '1';
 
+    /** Full inner-sized surface (moves with transform); falls back to viewport if missing. */
+    const surface = document.getElementById('game-play-pointer-layer') || playViewport;
+
     let activePointerId = null;
     let startX = 0;
     let startY = 0;
@@ -129,7 +132,7 @@ function initGameViewportPanning() {
 
     function releaseCaptureSafe(id) {
         try {
-            playViewport.releasePointerCapture(id);
+            surface.releasePointerCapture(id);
         } catch (_) {}
     }
 
@@ -147,7 +150,7 @@ function initGameViewportPanning() {
         dragging = false;
     }
 
-    playViewport.addEventListener(
+    surface.addEventListener(
         'pointerdown',
         (e) => {
             if (e.button != null && e.button !== 0) return;
@@ -157,7 +160,7 @@ function initGameViewportPanning() {
                 e.preventDefault();
                 if (gameViewPanEnabled) {
                     try {
-                        playViewport.setPointerCapture(e.pointerId);
+                        surface.setPointerCapture(e.pointerId);
                     } catch (_) {}
                 }
             }
@@ -171,7 +174,7 @@ function initGameViewportPanning() {
         { capture: true, passive: false }
     );
 
-    playViewport.addEventListener(
+    surface.addEventListener(
         'pointermove',
         (e) => {
             if (e.pointerId !== activePointerId || !gameViewPanEnabled) return;
@@ -185,7 +188,7 @@ function initGameViewportPanning() {
                 dragging = true;
                 if (!touchLike) {
                     try {
-                        playViewport.setPointerCapture(e.pointerId);
+                        surface.setPointerCapture(e.pointerId);
                     } catch (_) {}
                 }
             }
@@ -197,8 +200,8 @@ function initGameViewportPanning() {
         true
     );
 
-    playViewport.addEventListener('pointerup', cleanupPointer, true);
-    playViewport.addEventListener('pointercancel', cleanupPointer, true);
+    surface.addEventListener('pointerup', cleanupPointer, true);
+    surface.addEventListener('pointercancel', cleanupPointer, true);
 }
 
 let gameViewportResizeObserver = null;
@@ -681,9 +684,10 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        canvas.addEventListener('click', onGameAreaClick);
+        const pointerSurface = document.getElementById('game-play-pointer-layer') || canvas;
+        pointerSurface.addEventListener('click', onGameAreaClick);
 
-        /** Touch/pen taps (after pan-vs-tap in initGameViewportPanning); mouse uses canvas click only. */
+        /** Touch/pen taps (after pan-vs-tap on #game-play-pointer-layer); mouse uses same surface as canvas. */
         window.__gamePerformWorldClick = function (clientX, clientY) {
             onGameAreaClick({ clientX, clientY });
         };
@@ -724,8 +728,8 @@ window.addEventListener('DOMContentLoaded', () => {
             if (g.sceneRenderer) g.sceneRenderer.setDebugMode(g.showHitboxCalibration);
         });
         
-        // Canvas hover handler
-        canvas.addEventListener('mousemove', (e) => {
+        // Hover: use pointer layer when present so coords match the same hit target as pan/tap
+        pointerSurface.addEventListener('mousemove', (e) => {
             if (!game) return;
             const p = toCanvasCoords(e, canvas);
             game.calibrationMouseX = p.x;
@@ -738,7 +742,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 game.sceneRenderer.updateHover(x, y);
                 const location = game.sceneRenderer.getLocationAt(x, y);
                 if (location) {
-                    canvas.style.cursor = 'pointer';
+                    pointerSurface.style.cursor = 'pointer';
                     const hintEl = document.getElementById('interaction-hint');
                     if (hintEl) {
                         hintEl.textContent = location.name;
@@ -773,14 +777,14 @@ window.addEventListener('DOMContentLoaded', () => {
             // Update cursor
             const obj = game.interactables ? game.interactables.getObjectAt(x, y) : null;
             if (obj) {
-                canvas.style.cursor = 'pointer';
+                pointerSurface.style.cursor = 'pointer';
                 const hintEl = document.getElementById('interaction-hint');
                 if (hintEl) {
                     hintEl.textContent = obj.name;
                     hintEl.classList.remove('hidden');
                 }
             } else {
-                canvas.style.cursor = 'crosshair';
+                pointerSurface.style.cursor = 'crosshair';
                 const hintEl = document.getElementById('interaction-hint');
                 if (hintEl) {
                     hintEl.classList.add('hidden');
