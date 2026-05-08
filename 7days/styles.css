@@ -299,6 +299,7 @@ body {
     max-width: 100%;
     width: 100%;
     box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 #game-play-viewport {
@@ -404,17 +405,31 @@ body {
     }
 
     #inventory-grid {
-        grid-template-columns: repeat(3, 26px);
-        gap: 2px;
+        gap: 4px;
     }
 
     .inventory-slot {
-        width: 26px;
-        height: 26px;
+        min-height: 36px;
+        padding: 3px 4px;
     }
 
-    .item-icon, .item-emoji {
-        font-size: 15px;
+    .inventory-slot-inner {
+        gap: 6px;
+    }
+
+    .item-emoji {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        font-size: 18px;
+    }
+
+    .inventory-slot-name {
+        font-size: 9px;
+    }
+
+    .inventory-slot .item-count {
+        font-size: 9px;
     }
 
     #day-counter {
@@ -792,7 +807,10 @@ body {
     border-radius: 5px;
     border: 1px solid #444;
     z-index: 10;
-    min-width: 200px;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 #inventory-panel h3 {
@@ -800,22 +818,63 @@ body {
     font-size: 14px;
 }
 
+/* Single column: full-width rows inside narrow sidebar; scroll on .hud-sidebar-scroll */
 #inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(10, 40px);
-    gap: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .inventory-slot {
-    width: 40px;
-    height: 40px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    height: auto;
+    box-sizing: border-box;
     border: 2px solid #555;
     background: #222;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     cursor: pointer;
     position: relative;
+    flex-shrink: 0;
+    padding: 6px 8px;
+}
+
+.inventory-slot-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+}
+
+.inventory-slot-meta {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+}
+
+.inventory-slot-name {
+    font-size: 11px;
+    line-height: 1.25;
+    color: #ddd;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    max-width: 100%;
 }
 
 .inventory-slot:hover {
@@ -825,6 +884,8 @@ body {
 
 .inventory-slot.empty {
     border-style: dashed;
+    min-height: 32px;
+    padding: 4px;
 }
 
 .inventory-slot.selected {
@@ -834,22 +895,29 @@ body {
 }
 
 .item-icon, .item-emoji {
-    width: 100%;
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
     line-height: 1;
 }
 
-.item-count {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
+.inventory-slot .item-emoji {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    font-size: 26px;
+}
+
+.inventory-slot .item-count {
+    position: static;
+    align-self: flex-start;
     font-size: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 1px 3px;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.75);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #fff;
 }
 
 #message-log {

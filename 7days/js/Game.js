@@ -571,10 +571,26 @@ class Game {
                 const item = this.inventory.items[i];
                 slot.classList.remove('empty');
                 const emoji = item.icon || item.emoji || '❓';
-                slot.innerHTML = `
-                    <div class="item-emoji">${emoji}</div>
-                    ${item.quantity > 1 ? `<div class="item-count">${item.quantity}</div>` : ''}
-                `;
+                const inner = document.createElement('div');
+                inner.className = 'inventory-slot-inner';
+                const emojiEl = document.createElement('div');
+                emojiEl.className = 'item-emoji';
+                emojiEl.textContent = emoji;
+                const meta = document.createElement('div');
+                meta.className = 'inventory-slot-meta';
+                const nameEl = document.createElement('div');
+                nameEl.className = 'inventory-slot-name';
+                nameEl.textContent = item.name || item.id;
+                meta.appendChild(nameEl);
+                if (item.quantity > 1) {
+                    const cnt = document.createElement('span');
+                    cnt.className = 'item-count';
+                    cnt.textContent = String(item.quantity);
+                    meta.appendChild(cnt);
+                }
+                inner.appendChild(emojiEl);
+                inner.appendChild(meta);
+                slot.appendChild(inner);
                 slot.title = `${item.name || item.id}${item.condition ? ` (${item.condition})` : ''} — click to examine, double-click to use`;
                 const slotIndex = i;
                 let lastClick = 0;
