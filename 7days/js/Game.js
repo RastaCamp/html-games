@@ -38,9 +38,12 @@ class Game {
         this.containerRandomizer = new ContainerRandomizer(this.itemSystem);
         this.interactables = new InteractableObjects(this.itemSystem, this.containerRandomizer);
         this.saveSystem = new SaveSystem();
-        this.achievements = new AchievementSystem(this.tipJar);
-        this.deathMarkerSystem = new DeathMarkerSystem();
         this.tipJar = new TipJarSystem();
+        this.achievements = new AchievementSystem(this.tipJar);
+        // One shared instance with title screen so death markers stay in sync without reload.
+        this.deathMarkerSystem = (typeof window !== 'undefined' && window.deathMarkerSystem)
+            ? window.deathMarkerSystem
+            : new DeathMarkerSystem();
         this.deathScreen = new DeathScreen(this.deathMarkerSystem);
         this.endingSequence = new EndingSequence();
         this.actionTracker = new ActionTracker();
@@ -121,6 +124,10 @@ class Game {
         this.showHitboxCalibration = false; // H toggles hitbox overlay (yellow zones) when needed
         this.calibrationMouseX = 0;
         this.calibrationMouseY = 0;
+        /** Scratching / mongrel-at-window cue: show dog in window well until this time (ms epoch). */
+        this.windowDogVisibleUntil = 0;
+        this._autosaveTimerId = null;
+        this._onVisibilitySave = null;
         this.adamMinY = 360; // Adam cannot move above halfway (bottom-half playable area only)
         this.adamMaxY = 720;
         
@@ -283,11 +290,56 @@ class Game {
         }
         this.updateUI();
         this.render();
+        this.setupAutosave();
         this.gameLoop();
     }
 
     stop() {
         this.isRunning = false;
+        this.teardownAutosave();
+    }
+
+    getAutosaveSettings() {
+        const s = this.loadSettings();
+        return {
+            enabled: s.autosaveEnabled !== false,
+            intervalMs: Math.max(30_000, (parseInt(s.autosaveIntervalMinutes, 10) || 2) * 60_000)
+        };
+    }
+
+    setupAutosave() {
+        this.teardownAutosave();
+        const { enabled, intervalMs } = this.getAutosaveSettings();
+        if (!enabled) return;
+        this._autosaveTimerId = setInterval(() => {
+            if (!this.isRunning || this.gameState.isPaused || this.gameState.isGameOver) return;
+            try {
+                this.saveSystem.save(this);
+            } catch (e) {
+                console.warn('Autosave failed', e);
+            }
+        }, intervalMs);
+        this._onVisibilitySave = () => {
+            if (document.visibilityState !== 'hidden') return;
+            if (!this.isRunning || this.gameState.isGameOver) return;
+            try {
+                this.saveSystem.save(this);
+            } catch (e) {
+                console.warn('Background autosave failed', e);
+            }
+        };
+        document.addEventListener('visibilitychange', this._onVisibilitySave);
+    }
+
+    teardownAutosave() {
+        if (this._autosaveTimerId) {
+            clearInterval(this._autosaveTimerId);
+            this._autosaveTimerId = null;
+        }
+        if (this._onVisibilitySave) {
+            document.removeEventListener('visibilitychange', this._onVisibilitySave);
+            this._onVisibilitySave = null;
+        }
     }
 
     /**
@@ -636,6 +688,11 @@ class Game {
 
     addMessage(text) {
         this.messages.push(text);
+        const low = (text || '').toLowerCase();
+        if ((low.includes('scratch') || low.includes('mongrel') || low.includes('sniff')) &&
+            (low.includes('window') || low.includes('well'))) {
+            this.windowDogVisibleUntil = Date.now() + 10000;
+        }
         if (this.messages.length > 50) {
             this.messages.shift(); // Keep only last 50 messages
         }
@@ -669,6 +726,34 @@ class Game {
                  lowerText.includes('wrong')) {
             window.audioSystem.playSound('negative');
         }
+    }
+
+    /**
+     * Equip clothing from a bag slot: swaps previous piece into inventory when possible,
+     * removes this stack entry from inventory.
+     * @returns {boolean}
+     */
+    equipClothingFromInventory(item) {
+        if (!this.equipSystem || !item) return false;
+        const slot = this.equipSystem.getSlotForItem(item.id);
+        if (!slot) return false;
+        if (!this.inventory.hasItem(item.id, 1, item.condition)) return false;
+        const prevId = this.equipSystem.slots[slot];
+        if (prevId) {
+            this.equipSystem.unequip(slot);
+            const prevItem = this.itemSystem.createItem(prevId);
+            if (prevItem && !this.inventory.addItem(prevItem, 1)) {
+                this.equipSystem.equip(prevId, slot);
+                this.addMessage('Inventory full — make space to swap clothes.');
+                return false;
+            }
+        }
+        this.equipSystem.equip(item.id, slot);
+        this.inventory.removeItem(item.id, 1, item.condition);
+        this.addMessage('Equipped ' + (item.name || item.id) + '.');
+        this.updateEquipDisplay();
+        this.updateInventoryDisplay();
+        return true;
     }
 
     /**
@@ -722,6 +807,45 @@ class Game {
         if (item.id === 'coffee' || item.id === 'energy_drink' || item.id === 'caffeine_pills') {
             if (!this.inventory.hasItem(item.id, 1)) return false;
             this.consumeCaffeine(item);
+            this.updateInventoryDisplay();
+            return true;
+        }
+        if (this.equipSystem && item.type === 'clothing' && this.equipSystem.canEquip(item.id)) {
+            return this.equipClothingFromInventory(item);
+        }
+        if (item.type === 'container' && item.backpackType && this.inventory) {
+            if (!this.inventory.hasItem(item.id, 1)) return false;
+            this.inventory.equipBackpack(item.backpackType);
+            this.inventory.removeItem(item.id, 1);
+            this.addMessage('Equipped ' + (item.name || 'backpack') + '.');
+            this.updateInventoryDisplay();
+            return true;
+        }
+        if (item.id === 'pain_killers' && this.inventory.hasItem('pain_killers', 1)) {
+            if (this.meters.injury) {
+                const r = this.meters.treatInjury('pain_killers', this);
+                if (r.success) {
+                    this.inventory.removeItem('pain_killers', 1);
+                    this.updateInventoryDisplay();
+                    return true;
+                }
+            } else {
+                this.meters.painLevel = Math.max(0, (this.meters.painLevel || 0) - 15);
+                this.inventory.removeItem('pain_killers', 1);
+                this.addMessage('You take the painkillers. Minor relief.');
+                this.updateInventoryDisplay();
+                return true;
+            }
+        }
+        if ((item.id === 'pepper_spray' || item.id === 'bear_spray') && this.inventory.hasItem(item.id, 1)) {
+            if (this.combatSystem && this.combatSystem.inCombat) {
+                const r = this.combatSystem.useScareItem(item.id, this);
+                this.updateInventoryDisplay();
+                return r.success;
+            }
+            this.inventory.removeItem(item.id, 1);
+            if (this.attractionSystem) this.attractionSystem.addAttraction(-8);
+            this.addMessage('You spray toward the window well. Whatever was out there backs off… for now.');
             this.updateInventoryDisplay();
             return true;
         }
@@ -835,12 +959,63 @@ class Game {
             equipBtn.className = 'action-btn';
             equipBtn.textContent = 'Equip';
             equipBtn.addEventListener('click', () => {
-                this.equipSystem.equip(item.id, slot);
-                this.addMessage('Equipped ' + (item.name || item.id) + '.');
-                this.updateEquipDisplay();
-                this.closeExaminePanel();
+                if (this.equipClothingFromInventory(item)) {
+                    this.closeExaminePanel();
+                }
             });
             actionsEl.appendChild(equipBtn);
+        }
+
+        if (item.type === 'container' && item.backpackType) {
+            const wearBtn = document.createElement('button');
+            wearBtn.className = 'action-btn';
+            wearBtn.textContent = 'Equip as backpack';
+            wearBtn.addEventListener('click', () => {
+                if (!this.inventory.hasItem(item.id, 1)) return;
+                this.inventory.equipBackpack(item.backpackType);
+                this.inventory.removeItem(item.id, 1);
+                this.addMessage('Equipped ' + (item.name || 'backpack') + '.');
+                this.updateInventoryDisplay();
+                this.closeExaminePanel();
+            });
+            actionsEl.appendChild(wearBtn);
+        }
+
+        if (item.id === 'pain_killers' && item.quantity > 0) {
+            const pkBtn = document.createElement('button');
+            pkBtn.className = 'action-btn';
+            pkBtn.textContent = 'Use';
+            pkBtn.addEventListener('click', () => {
+                if (!this.inventory.hasItem('pain_killers', 1)) return;
+                if (this.meters.injury) {
+                    const r = this.meters.treatInjury('pain_killers', this);
+                    if (r.success) this.inventory.removeItem('pain_killers', 1);
+                } else {
+                    this.meters.painLevel = Math.max(0, (this.meters.painLevel || 0) - 15);
+                    this.inventory.removeItem('pain_killers', 1);
+                    this.addMessage('You take the painkillers. Minor relief.');
+                }
+                this.closeExaminePanel();
+            });
+            actionsEl.appendChild(pkBtn);
+        }
+
+        if (item.id === 'pepper_spray' || item.id === 'bear_spray') {
+            const sprayBtn = document.createElement('button');
+            sprayBtn.className = 'action-btn';
+            sprayBtn.textContent = this.combatSystem && this.combatSystem.inCombat ? 'Use in combat' : 'Spray at window';
+            sprayBtn.addEventListener('click', () => {
+                if (!this.inventory.hasItem(item.id, 1)) return;
+                if (this.combatSystem && this.combatSystem.inCombat) {
+                    this.combatSystem.useScareItem(item.id, this);
+                } else {
+                    this.inventory.removeItem(item.id, 1);
+                    if (this.attractionSystem) this.attractionSystem.addAttraction(-8);
+                    this.addMessage('You spray toward the window well. Whatever was out there backs off… for now.');
+                }
+                this.closeExaminePanel();
+            });
+            actionsEl.appendChild(sprayBtn);
         }
         
         // Hand sanitizer - Use (especially after bathroom to avoid extra penalty)

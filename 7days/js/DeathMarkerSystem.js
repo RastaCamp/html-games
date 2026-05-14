@@ -58,11 +58,25 @@ class DeathMarkerSystem {
 
     getSurvivorCounter() {
         try {
-            const counter = localStorage.getItem('sublevelblue_survivor_counter');
-            return counter ? parseInt(counter) : 0;
+            let counter = localStorage.getItem('7days_survivor_counter');
+            if (counter == null) {
+                counter = localStorage.getItem('sublevelblue_survivor_counter');
+            }
+            return counter ? parseInt(counter, 10) : 0;
         } catch (e) {
             return 0;
         }
+    }
+
+    /** Reload markers from disk (e.g. after another run died while title stayed open). */
+    reloadFromStorage() {
+        this.markers = this.loadMarkers();
+        this.survivorCounter = this.getSurvivorCounter();
+    }
+
+    /** Alias for save/load code paths. */
+    getAllMarkers() {
+        return this.getMarkers();
     }
 
     incrementSurvivorCounter() {

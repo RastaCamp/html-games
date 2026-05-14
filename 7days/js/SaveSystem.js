@@ -42,7 +42,7 @@ class SaveSystem {
             achievements: game.achievements ? game.achievements.getState() : {},
             actionTracker: game.actionTracker ? game.actionTracker.getState() : {},
             attractionSystem: game.attractionSystem ? game.attractionSystem.getState() : {},
-            deathMarkers: game.deathMarkers ? game.deathMarkers.getAllMarkers() : [],
+            deathMarkers: game.deathMarkerSystem ? game.deathMarkerSystem.getAllMarkers() : [],
             tipJar: game.tipJar ? game.tipJar.tipsData : { currentTips: 0, earnedTips: [] },
             weatherSystem: game.weatherSystem ? game.weatherSystem.getState() : null,
             temperatureSystem: game.temperatureSystem ? { warmthSources: game.temperatureSystem.warmthSources } : null,
@@ -93,8 +93,8 @@ class SaveSystem {
             if (game.attractionSystem && saveData.attractionSystem) {
                 game.attractionSystem.setState(saveData.attractionSystem);
             }
-            if (game.deathMarkers && saveData.deathMarkers) {
-                game.deathMarkers.markers = saveData.deathMarkers;
+            if (game.deathMarkerSystem && saveData.deathMarkers) {
+                game.deathMarkerSystem.markers = saveData.deathMarkers;
             }
             if (game.tipJar && saveData.tipJar) {
                 game.tipJar.tipsData = saveData.tipJar;

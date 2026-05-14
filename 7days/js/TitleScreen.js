@@ -45,6 +45,7 @@ class TitleScreen {
         this.titleBasementImage.onerror = function () { this.onerror = null; this.src = 'visuals/scenes/day_lights_off.png'; };
         this.titleBasementImage.src = 'VISUALS/scenes/day_lights_off.png';
         this.setupButtons();
+        this.setupPersistedGameOptionsOnce();
         this.checkContinueButton();
     }
 
@@ -60,6 +61,9 @@ class TitleScreen {
         // Update stats
         this.updateStats();
         
+        if (this.deathMarkerSystem && typeof this.deathMarkerSystem.reloadFromStorage === 'function') {
+            this.deathMarkerSystem.reloadFromStorage();
+        }
         // Render death markers
         this.renderDeathMarkers();
     }
@@ -153,6 +157,56 @@ class TitleScreen {
     hide() {
         const titleScreen = document.getElementById('title-screen');
         if (titleScreen) titleScreen.classList.add('hidden');
+    }
+
+    /** One-time bindings for autosave / save-now / restart so opening Options repeatedly does not stack listeners. */
+    setupPersistedGameOptionsOnce() {
+        if (this._persistedGameOptsOnce) return;
+        this._persistedGameOptsOnce = true;
+
+        const autosaveEn = document.getElementById('autosave-enabled');
+        const autosaveIv = document.getElementById('autosave-interval');
+        const manualSave = document.getElementById('manual-save-options-btn');
+        const restartRun = document.getElementById('restart-game-options-btn');
+
+        if (autosaveEn) {
+            autosaveEn.addEventListener('change', (e) => {
+                this.saveSettings({ autosaveEnabled: !!e.target.checked });
+                if (window.game && typeof window.game.setupAutosave === 'function') {
+                    window.game.setupAutosave();
+                }
+            });
+        }
+        if (autosaveIv) {
+            autosaveIv.addEventListener('change', (e) => {
+                const n = parseInt(e.target.value, 10) || 2;
+                this.saveSettings({ autosaveIntervalMinutes: n });
+                if (window.game && typeof window.game.setupAutosave === 'function') {
+                    window.game.setupAutosave();
+                }
+            });
+        }
+        if (manualSave) {
+            manualSave.addEventListener('click', () => {
+                const g = window.game;
+                if (!g) {
+                    alert('Start or continue a game first, then use Save Now while playing.');
+                    return;
+                }
+                const result = g.saveSystem.save(g);
+                alert(result.message);
+            });
+        }
+        if (restartRun) {
+            restartRun.addEventListener('click', () => {
+                if (!window.game) {
+                    alert('Nothing to restart — start a game from the main menu first.');
+                    return;
+                }
+                if (!confirm('Abandon this run and start a fresh basement? Unsaved progress since last save will be lost.')) return;
+                if (window.restartGame) window.restartGame();
+            });
+        }
     }
 
     setupButtons() {
@@ -339,6 +393,16 @@ class TitleScreen {
             interactionHintToggle.addEventListener('change', (e) => {
                 this.saveSettings({ showInteractionHint: !!e.target.checked });
             });
+        }
+
+        const autosaveEnabled = document.getElementById('autosave-enabled');
+        if (autosaveEnabled) {
+            autosaveEnabled.checked = settings.autosaveEnabled !== false;
+        }
+        const autosaveInterval = document.getElementById('autosave-interval');
+        if (autosaveInterval) {
+            const m = settings.autosaveIntervalMinutes || 2;
+            autosaveInterval.value = ['1', '2', '5', '10'].includes(String(m)) ? String(m) : '2';
         }
 
         const clearDeathMarkersBtn = document.getElementById('clear-death-markers-btn');

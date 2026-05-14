@@ -1028,6 +1028,8 @@ class SceneRenderer {
                 characterRenderer.render(this.ctx);
             }
         }
+
+        this.renderWindowDogOverlay(game);
         
         // LAYER 3: Item overlays not drawn on scene (items only visible in inventory panel)
         
@@ -1098,6 +1100,27 @@ class SceneRenderer {
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText(tooltipText, tooltipX + 5, tooltipY + tooltipHeight / 2);
+    }
+
+    /** Dog / mongrel silhouette in window well when scratching events fire (scene A). */
+    renderWindowDogOverlay(game) {
+        if (!game || !game.windowDogVisibleUntil || Date.now() > game.windowDogVisibleUntil) return;
+        if (this.currentScene !== 'A' || this.currentSceneType !== 'main') return;
+        const win = this.clickableLocations['A'] && this.clickableLocations['A']['L24'];
+        if (!win || win.width <= 0) return;
+        const ctx = this.ctx;
+        const cx = win.x + win.width * 0.72;
+        const cy = win.y + win.height * 0.55;
+        ctx.save();
+        ctx.globalAlpha = 0.28;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(win.x + win.width * 0.55, win.y + win.height * 0.15, win.width * 0.4, win.height * 0.75);
+        ctx.globalAlpha = 0.95;
+        ctx.font = `${Math.max(22, Math.floor(win.height * 0.9))}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🐕', cx, cy);
+        ctx.restore();
     }
     
     /**
