@@ -1674,7 +1674,7 @@ body {
 }
 
 /* Options Menu */
-#options-menu, #credits-screen {
+#options-menu {
     position: fixed;
     inset: 0;
     width: 100%;
@@ -1686,10 +1686,10 @@ body {
     z-index: 10001;
     color: #e0e0e0;
 }
-#options-menu.hidden, #credits-screen.hidden { display: none; }
-#options-menu:not(.hidden), #credits-screen:not(.hidden) { display: flex; }
+#options-menu.hidden { display: none; }
+#options-menu:not(.hidden) { display: flex; }
 
-#options-menu h2, #credits-screen h2 {
+#options-menu h2 {
     font-size: 48px;
     margin-bottom: 40px;
     color: #4488ff;
@@ -1729,18 +1729,6 @@ body {
 #interaction-hint-toggle {
     width: 18px;
     height: 18px;
-}
-
-/* Credits */
-#credits-content {
-    text-align: center;
-    font-size: 20px;
-    line-height: 2;
-    margin-bottom: 40px;
-}
-
-#credits-content p {
-    margin-bottom: 20px;
 }
 
 /* Achievement Notification */

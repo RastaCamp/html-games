@@ -2,7 +2,7 @@
  * 7 DAYS... - TITLE SCREEN
  * 
  * 🎬 WHAT IS THIS FILE?
- * This manages the main menu! New Game, Continue, Options, Credits, etc.
+ * This manages the main menu! New Game, Continue, Options, etc.
  * Also renders death markers on the title screen (spooky!).
  * 
  * 🎯 WHAT IT DOES:
@@ -21,7 +21,6 @@
  * - New Game button (starts fresh)
  * - Continue button (loads save, only shows if save exists)
  * - Options menu (volume, difficulty, game speed)
- * - Credits screen
  * - Death markers (skull icons showing where others died)
  * - Tip jar count
  * 
@@ -213,7 +212,6 @@ class TitleScreen {
         const newGameBtn = document.getElementById('new-game-btn');
         const continueBtn = document.getElementById('continue-btn');
         const optionsBtn = document.getElementById('options-btn');
-        const creditsBtn = document.getElementById('credits-btn');
         const exitBtn = document.getElementById('exit-btn');
 
         if (newGameBtn) {
@@ -234,13 +232,6 @@ class TitleScreen {
             optionsBtn.addEventListener('click', () => {
                 if (window.audioSystem) window.audioSystem.playSound('click');
                 this.onOptions();
-            });
-        }
-
-        if (creditsBtn) {
-            creditsBtn.addEventListener('click', () => {
-                if (window.audioSystem) window.audioSystem.playSound('click');
-                this.onCredits();
             });
         }
 
@@ -302,13 +293,6 @@ class TitleScreen {
         if (optionsMenu) {
             optionsMenu.classList.remove('hidden');
             this.setupOptions();
-        }
-    }
-
-    onCredits() {
-        const creditsScreen = document.getElementById('credits-screen');
-        if (creditsScreen) {
-            creditsScreen.classList.remove('hidden');
         }
     }
 

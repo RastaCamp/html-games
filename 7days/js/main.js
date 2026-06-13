@@ -1181,16 +1181,4 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Credits back: global so inline onclick works
-    window.doCreditsBack = function () {
-        const creditsScreen = document.getElementById('credits-screen');
-        if (creditsScreen) creditsScreen.classList.add('hidden');
-    };
-    const creditsBackBtn = document.getElementById('credits-back-btn');
-    if (creditsBackBtn) {
-        creditsBackBtn.addEventListener('click', () => {
-            if (window.doCreditsBack) window.doCreditsBack();
-        });
-    }
-
 });
