@@ -34,6 +34,12 @@
                     <button id="new-game-btn" class="menu-btn" onclick="if(window.doNewGame)window.doNewGame();">NEW GAME</button>
                     <button id="continue-btn" class="menu-btn hidden">CONTINUE</button>
                     <button id="options-btn" class="menu-btn">OPTIONS</button>
+                    <a
+                      id="beta-signup-btn"
+                      class="menu-btn menu-btn-link"
+                      href="/beta"
+                      title="Connect for updates and join our testing labs"
+                    >CONNECT FOR UPDATES</a>
                     <button id="exit-btn" class="menu-btn">EXIT</button>
                 </div>
             </div>
@@ -202,6 +208,29 @@
             </div>
         </div>
 
+        <!-- Item Found Notification: previously only a message-log line, easy to miss -->
+        <div id="item-found-notification" class="hidden">
+            <div class="item-found-icon">🎒</div>
+            <div class="achievement-text">
+                <div class="item-found-title">FOUND</div>
+                <div class="item-found-name"></div>
+            </div>
+        </div>
+
+        <!-- Easy Mode Tutorial: skippable walkthrough of the survival bars -->
+        <div id="easy-tutorial-overlay" class="hidden">
+            <div id="easy-tutorial-card">
+                <div id="easy-tutorial-header">
+                    <span>HOW TO SURVIVE</span>
+                    <button id="easy-tutorial-skip-btn" type="button">Skip</button>
+                </div>
+                <h3 id="easy-tutorial-title"></h3>
+                <p id="easy-tutorial-body"></p>
+                <div id="easy-tutorial-dots"></div>
+                <button id="easy-tutorial-next-btn" type="button">NEXT</button>
+            </div>
+        </div>
+
         <!-- Loading screen (shown until placement/scene data is ready) -->
         <div id="loading-screen" class="hidden">
             <img id="loading-screen-img" src="VISUALS/marauder_loading.png" alt="Loading">
@@ -358,11 +387,12 @@
             <button id="examine-close-btn" type="button" class="action-btn" style="margin-top: 15px;">Close</button>
         </div>
         <div id="menu-panel" class="hidden">
-            <button id="pause-resume-btn" type="button" onclick="if(window.doPauseResume)window.doPauseResume();">Resume</button>
+            <button id="pause-resume-btn" type="button">Resume</button>
             <button id="pause-tip-jar-btn" type="button">Tip Jar (<span id="pause-tip-count">0</span>)</button>
-            <button id="pause-save-btn" type="button" onclick="if(window.doPauseSave)window.doPauseSave();">Save Game</button>
+            <button id="pause-save-btn" type="button">Save Game</button>
             <button id="pause-options-btn" type="button">Options</button>
-            <button id="pause-quit-btn" type="button" onclick="if(window.doQuitToMenu)window.doQuitToMenu();">Quit to Menu</button>
+            <button id="pause-restart-btn" type="button">Restart</button>
+            <button id="pause-quit-btn" type="button">Quit to Menu</button>
         </div>
         
         <!-- Tip Jar Menu -->
@@ -439,7 +469,9 @@
     <script src="js/MasterCraftingRecipes.js"></script>
     <script src="js/ContainerRandomizer.js"></script>
     <script src="js/Game.js"></script>
+    <script src="js/EasyModeTutorial.js"></script>
     <script src="js/AdBannerRotator.js"></script>
     <script src="js/main.js"></script>
+<script>window.RASTACAMP_SITE={appId:"7days",name:"7 Days"};</script><script src="/rastacamp-analytics.js" defer></script>
 </body>
 </html>

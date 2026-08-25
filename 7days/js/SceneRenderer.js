@@ -46,6 +46,14 @@ class SceneRenderer {
             this.sleepImage.src = (this.getBaseUrl()) + 'visuals/adam/sleep.PNG';
         };
         this.sleepImage.src = (this.getBaseUrl()) + 'VISUALS/adam/sleep.PNG';
+        // Mongrel-at-window silhouette (was rendering a 🐕 emoji placeholder —
+        // real sprite existed in VISUALS/mongrel/ but was never wired up here).
+        this.mongrelWindowImage = new Image();
+        this.mongrelWindowImage.onerror = () => {
+            this.mongrelWindowImage.onerror = null;
+            this.mongrelWindowImage.src = (this.getBaseUrl()) + 'visuals/mongrel/mongrel_run_right.PNG';
+        };
+        this.mongrelWindowImage.src = (this.getBaseUrl()) + 'VISUALS/mongrel/mongrel_run_right.PNG';
     }
 
     loadPlacementOverrides() {
@@ -1116,10 +1124,19 @@ class SceneRenderer {
         ctx.fillStyle = '#000';
         ctx.fillRect(win.x + win.width * 0.55, win.y + win.height * 0.15, win.width * 0.4, win.height * 0.75);
         ctx.globalAlpha = 0.95;
-        ctx.font = `${Math.max(22, Math.floor(win.height * 0.9))}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🐕', cx, cy);
+        const img = this.mongrelWindowImage;
+        if (img && img.complete && img.naturalWidth > 0) {
+            const h = win.height * 0.85;
+            const w = h * (img.naturalWidth / img.naturalHeight);
+            ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+        } else {
+            // Preload still in flight (or failed) — emoji fallback so the cue
+            // never disappears entirely.
+            ctx.font = `${Math.max(22, Math.floor(win.height * 0.9))}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🐕', cx, cy);
+        }
         ctx.restore();
     }
     

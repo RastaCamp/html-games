@@ -156,7 +156,9 @@ class InteractableObjects {
                 emoji: '🚰',
                 description: 'A shop sink. Pipes might have trapped water.',
                 interactions: ['examine', 'drain_pipes', 'dismantle'],
-                hasWater: true
+                hasWater: true,
+                waterLevel: 20,
+                dismantled: false
             },
             {
                 id: 'workbench',
@@ -183,6 +185,7 @@ class InteractableObjects {
                 description: 'Metal shelving. Full of random basement junk.',
                 interactions: ['examine', 'search', 'dismantle'],
                 searched: false,
+                dismantled: false,
                 contains: ['cardboard', 'crackers', 'seeds', 'battery']
             },
             {
@@ -309,6 +312,43 @@ class InteractableObjects {
                 }
                 return { success: false, message: 'No water available' };
             
+            case 'drain_pipes':
+                if (obj.id === 'sink' && obj.waterLevel > 0) {
+                    const container = game.inventory.getItem('bucket') || game.inventory.getItem('bottle');
+                    if (container) {
+                        const water = game.itemSystem.createItem('water');
+                        if (game.inventory.addItem(water, container.capacity || 1)) {
+                            obj.waterLevel -= 10;
+                            return { success: true, message: 'Drained trapped water from the pipes!' };
+                        }
+                    }
+                    return { success: false, message: 'Need a container to collect water' };
+                }
+                return { success: false, message: 'No water available' };
+
+            case 'dismantle':
+                if (obj.dismantled) {
+                    return { success: false, message: `The ${obj.name.toLowerCase()} has already been dismantled.` };
+                }
+                if (!['water_heater', 'furnace', 'sink', 'shelving'].includes(obj.id)) {
+                    return { success: false, message: 'Cannot dismantle this object' };
+                }
+                obj.dismantled = true;
+                const salvage = [];
+                const metal = game.itemSystem.createItem('metal');
+                if (metal && game.inventory.addItem(metal, 2)) salvage.push('2x Metal Scrap');
+                if (obj.id === 'water_heater' || obj.id === 'sink') {
+                    const pipe = game.itemSystem.createItem('copper_pipe');
+                    if (pipe && game.inventory.addItem(pipe, 1)) salvage.push('Copper Pipe');
+                }
+                if (game.actionTracker) game.actionTracker.recordAction('dismantle');
+                return {
+                    success: salvage.length > 0,
+                    message: salvage.length > 0
+                        ? `Dismantled the ${obj.name}. Salvaged: ${salvage.join(', ')}.`
+                        : 'Dismantled it, but your inventory is full — nothing salvaged.'
+                };
+
             case 'search':
                 if (obj.contains && !obj.searched) {
                     obj.searched = true;

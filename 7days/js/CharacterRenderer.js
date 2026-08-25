@@ -179,11 +179,13 @@ class CharacterRenderer {
             return;
         }
 
-        // Draw character at quarter sprite size (half the previous display size); ensure non-zero so drawImage doesn't throw
+        // Draw character at quarter sprite size, then 10% smaller on top of that
+        // (4 / 0.9): ensure non-zero so drawImage doesn't throw
         const srcW = Math.max(1, sprite.naturalWidth || sprite.width || 100);
         const srcH = Math.max(1, sprite.naturalHeight || sprite.height || 100);
-        const spriteWidth = Math.max(1, srcW / 4);
-        const spriteHeight = Math.max(1, srcH / 4);
+        const ADAM_SCALE_DIVISOR = 4 / 0.9;
+        const spriteWidth = Math.max(1, srcW / ADAM_SCALE_DIVISOR);
+        const spriteHeight = Math.max(1, srcH / ADAM_SCALE_DIVISOR);
         const drawX = this.characterX - spriteWidth / 2;
         const drawY = this.characterY - spriteHeight;
 

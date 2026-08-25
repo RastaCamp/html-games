@@ -1455,6 +1455,21 @@ body {
     transform: scale(1.05);
 }
 
+.menu-btn-link {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    line-height: normal;
+}
+
+.menu-btn-link:hover {
+    color: inherit;
+}
+
 /* Intro Sequence — above ad strip (z-index 100) so Skip stays visible and clickable */
 #intro-screen {
     position: absolute;
@@ -1748,6 +1763,127 @@ body {
 }
 #achievement-notification.hidden { display: none; }
 #achievement-notification:not(.hidden) { display: flex; }
+
+#item-found-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #6fcf97;
+    padding: 15px 20px;
+    border-radius: 5px;
+    align-items: center;
+    gap: 15px;
+    z-index: 200;
+    animation: slideIn 0.5s ease-out;
+    min-width: 300px;
+}
+#item-found-notification.hidden { display: none; }
+#item-found-notification:not(.hidden) { display: flex; }
+/* Stack below the achievement notification when both are visible at once */
+#achievement-notification:not(.hidden) ~ #item-found-notification:not(.hidden) {
+    top: 100px;
+}
+
+.item-found-icon {
+    font-size: 40px;
+}
+
+.item-found-title {
+    font-size: 12px;
+    color: #6fcf97;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.item-found-name {
+    font-size: 16px;
+    color: #e0e0e0;
+    font-weight: bold;
+}
+
+#easy-tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 400;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+#easy-tutorial-overlay.hidden { display: none; }
+#easy-tutorial-overlay:not(.hidden) { display: flex; }
+
+#easy-tutorial-card {
+    background: #1b1b1b;
+    border: 2px solid #6fcf97;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 380px;
+    width: 100%;
+    color: #e0e0e0;
+}
+
+#easy-tutorial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #6fcf97;
+    font-weight: bold;
+    margin-bottom: 14px;
+}
+
+#easy-tutorial-skip-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#easy-tutorial-title {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #fff;
+}
+
+#easy-tutorial-body {
+    margin: 0 0 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ccc;
+}
+
+#easy-tutorial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.easy-tutorial-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #444;
+}
+.easy-tutorial-dot.active {
+    background: #6fcf97;
+}
+
+#easy-tutorial-next-btn {
+    width: 100%;
+    padding: 10px;
+    background: #6fcf97;
+    color: #10241a;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
 
 @keyframes slideIn {
     from {

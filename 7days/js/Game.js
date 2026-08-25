@@ -292,6 +292,20 @@ class Game {
         this.render();
         this.setupAutosave();
         this.gameLoop();
+        this.maybeShowEasyModeTutorial();
+    }
+
+    /** Skippable walkthrough of the survival bars — easy mode only, once ever, day 1 only. */
+    maybeShowEasyModeTutorial() {
+        try {
+            const settings = this.loadSettings();
+            if (settings.difficulty !== 'easy') return;
+            if (this.dayCycle && this.dayCycle.currentDay > 1) return;
+            if (localStorage.getItem('7days_easyTutorialSeen') === '1') return;
+        } catch (e) {
+            return;
+        }
+        if (window.showEasyModeTutorial) window.showEasyModeTutorial();
     }
 
     stop() {
@@ -1329,9 +1343,32 @@ class Game {
         if (!locationId || !this.locationSystem) return;
         const result = this.locationSystem.searchLocation(locationId, this);
         if (result.message) this.addMessage(result.message);
-        if (result.success && result.items && result.items.length > 0 && this.locationSystem.syncFromSceneLoot) {
-            this.locationSystem.syncFromSceneLoot(this);
+        if (result.success && result.items && result.items.length > 0) {
+            this.showItemFoundNotification(result.items);
+            if (this.locationSystem.syncFromSceneLoot) {
+                this.locationSystem.syncFromSceneLoot(this);
+            }
         }
+    }
+
+    /**
+     * Visual pickup confirmation — before this, a find only showed up as a
+     * line in the scrolling message log, easy to miss during play.
+     * Mirrors the existing #achievement-notification toast pattern.
+     */
+    showItemFoundNotification(foundItems) {
+        const notification = document.getElementById('item-found-notification');
+        const nameEl = document.querySelector('.item-found-name');
+        if (!notification || !nameEl || !foundItems || foundItems.length === 0) return;
+        const text = foundItems
+            .map((f) => (f.quantity > 1 ? f.quantity + 'x ' : '') + (f.item.name || f.item.id))
+            .join(', ');
+        nameEl.textContent = text;
+        notification.classList.remove('hidden');
+        clearTimeout(this._itemFoundHideTimer);
+        this._itemFoundHideTimer = setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 3200);
     }
 
     getNearbySearchableLocation() {

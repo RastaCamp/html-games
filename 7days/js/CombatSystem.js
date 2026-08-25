@@ -252,4 +252,26 @@ class CombatSystem {
             return { success: false, message: 'Scare item failed' };
         }
     }
+
+    // Missing entirely before — SaveSystem calls getState()/setState() on
+    // every system (see comment in SaveSystem.js), and CombatSystem's absence
+    // threw "getState is not a function" on every save. Since that save call
+    // happens synchronously before the pause menu's Quit-to-Menu / Restart
+    // handlers can hide the game UI and show the title screen, the thrown
+    // error silently aborted the whole handler — so those buttons appeared
+    // to just do nothing.
+    getState() {
+        return {
+            inCombat: this.inCombat,
+            currentThreat: this.currentThreat,
+            combatRound: this.combatRound,
+        };
+    }
+
+    setState(state) {
+        if (!state) return;
+        this.inCombat = !!state.inCombat;
+        this.currentThreat = state.currentThreat || null;
+        this.combatRound = state.combatRound || 0;
+    }
 }

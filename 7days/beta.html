@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Testing labs</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1118;
+      --text: #eef2ff;
+      --muted: #a8b0c8;
+      --accent: #6ea8ff;
+      --accent-bg: rgba(110, 168, 255, 0.14);
+      --border: rgba(255, 255, 255, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 1.5rem;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(900px 420px at 50% -10%, rgba(110, 168, 255, 0.12), transparent 60%), var(--bg);
+      color: var(--text);
+    }
+    main {
+      width: min(100%, 26rem);
+      padding: 1.75rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: 1.35rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.98rem;
+    }
+    .actions {
+      margin-top: 1.35rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.25rem;
+      border-radius: 10px;
+      border: 1px solid rgba(110, 168, 255, 0.45);
+      background: var(--accent-bg);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { background: rgba(110, 168, 255, 0.22); }
+    .back {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Connect for updates!<br>Join our testing labs!</h1>
+    <p>Get play-test invites, release notes, and early access news.</p>
+    <div class="actions">
+      <a class="btn" href="/join">Submit email</a>
+      <a class="back" href="/">← Back to app</a>
+    </div>
+  </main>
+<script>window.RASTACAMP_SITE={appId:"7days",name:"7 Days"};</script><script src="/rastacamp-analytics.js" defer></script>
+</body>
+</html>

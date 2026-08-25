@@ -339,12 +339,35 @@ window.addEventListener('DOMContentLoaded', () => {
             alert(result.message);
         }
     };
+    window.doPauseRestart = function () {
+        if (!confirm('Restart from Day 1? Current progress will be lost.')) return;
+        const panel = document.getElementById('menu-panel');
+        const btn = document.getElementById('pause-btn');
+        if (panel) {
+            panel.classList.add('hidden');
+            panel.style.setProperty('display', 'none', 'important');
+        }
+        if (btn) btn.textContent = '⏸ Pause';
+        if (window.restartGame) window.restartGame();
+    };
+
     window.doQuitToMenu = function () {
         if (!confirm('Return to main menu? Progress will be saved.')) return;
         const g = window.game;
         if (g) {
-            g.saveSystem.save(g);
-            g.stop();
+            // A save failure must never block returning to the title screen —
+            // it already did once (CombatSystem missing getState()) and left
+            // the player stuck with no visible error.
+            try {
+                g.saveSystem.save(g);
+            } catch (err) {
+                console.error('Save failed while quitting to menu:', err);
+            }
+            try {
+                g.stop();
+            } catch (err) {
+                console.error('game.stop() failed while quitting to menu:', err);
+            }
         }
         window.game = null;
         game = null;
@@ -963,6 +986,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const pauseResumeBtn = document.getElementById('pause-resume-btn');
         const pauseSaveBtn = document.getElementById('pause-save-btn');
         const pauseOptionsBtn = document.getElementById('pause-options-btn');
+        const pauseRestartBtn = document.getElementById('pause-restart-btn');
         const pauseQuitBtn = document.getElementById('pause-quit-btn');
 
         if (pauseResumeBtn) {
@@ -999,6 +1023,14 @@ window.addEventListener('DOMContentLoaded', () => {
                     optionsMenu.classList.remove('hidden');
                     titleScreen.setupOptions();
                 }
+            });
+        }
+
+        if (pauseRestartBtn) {
+            pauseRestartBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window.doPauseRestart) window.doPauseRestart();
             });
         }
 
