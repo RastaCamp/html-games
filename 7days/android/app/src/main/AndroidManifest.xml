@@ -9,6 +9,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- Android 16 ignores the landscape lock below on large screens (tablets/foldables)
+             unless this compat property is declared. This is a canvas-rendered game with a
+             fixed-aspect landscape layout that isn't adaptive to arbitrary window sizes/portrait
+             yet, so this keeps the current behavior everywhere rather than letting the OS force
+             free rotation/resizing and break the canvas layout. Documented interim fix, removed
+             in Android 17 - revisit with real adaptive rendering before then. -->
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"
