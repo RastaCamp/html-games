@@ -1,0 +1,6 @@
+node_modules/
+.wrangler/
+
+# Regenerable storefront upload zips — large, rebuild via
+# server/src/games/packageManual.mjs. Keep the listing .md drafts though.
+manual-uploads/*.zip
