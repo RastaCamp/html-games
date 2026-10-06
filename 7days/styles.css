@@ -747,6 +747,19 @@ body {
 .hud-sidebar-scroll .rest-panel {
     max-width: 100%;
     box-sizing: border-box;
+    /* Span the whole sidebar: shrink-to-fit made the menu one word wide on phone landscape,
+       wrapping "Nap (2–4 hrs)" over four lines and only half-covering the inventory below. */
+    right: 0;
+    min-width: 0;
+}
+.hud-sidebar-scroll .rest-wrap {
+    width: 100%; /* so the dropdown below can span the sidebar, not just the Rest button */
+}
+.hud-sidebar-scroll .rest-panel button {
+    width: 100%;
+    padding: 6px 4px;
+    font-size: 0.8rem;
+    line-height: 1.2;
 }
 
 .rest-panel button {
