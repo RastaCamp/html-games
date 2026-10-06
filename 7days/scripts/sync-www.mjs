@@ -42,6 +42,14 @@ async function main() {
             console.warn('sync-www: skip missing folder', d);
         }
     }
+    // The website's analytics loader (and its RASTACAMP_SITE config) is web-only: the file isn't
+    // bundled into the app and the Play listing declares no data collection. Strip the tags.
+    const indexPath = path.join(dest, 'index.html');
+    let html = await fs.readFile(indexPath, 'utf8');
+    html = html
+        .replace(/<script>window\.RASTACAMP_SITE=[^<]*<\/script>/g, '')
+        .replace(/<script[^>]*rastacamp-analytics\.js[^>]*><\/script>/g, '');
+    await fs.writeFile(indexPath, html);
     console.log('sync-www: OK →', dest);
 }
 

@@ -419,10 +419,10 @@ class InteractableObjects {
             
             case 'board_up':
                 if (obj.id === 'window') {
-                    if (game.inventory.hasItem('wood', 3)) {
+                    if (game.inventory.hasItem('wood_planks', 3)) { // 'wood' was never an item
                         obj.isBoarded = true;
                         obj.isOpen = false;
-                        game.inventory.removeItem('wood', 3);
+                        game.inventory.removeItem('wood_planks', 3);
                         if (game.actionTracker) {
                             game.actionTracker.recordAction('window_board');
                             game.actionTracker.recordAction('hammering');

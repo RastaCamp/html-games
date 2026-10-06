@@ -1646,6 +1646,227 @@ class MasterItemList {
                 description: 'Small basement window. Can ventilate or be boarded.',
                 icon: '🪟',
                 stackable: false
+            },
+            // ========== CRAFTED OUTPUTS (were referenced by recipes but never defined — crafting consumed the
+            // ingredients and then failed with "unknown error") ==========
+            'water_filter': {
+                id: 'water_filter',
+                name: 'Water Filter',
+                type: 'tool',
+                description: 'Layered sand, charcoal and cloth. Filters dirty water.',
+                icon: '🚰',
+                stackable: false
+            },
+            'charcoal_powder': {
+                id: 'charcoal_powder',
+                name: 'Charcoal Powder',
+                type: 'material',
+                description: 'Crushed charcoal. Used in filters and stomach remedies.',
+                icon: '⚫',
+                stackable: true,
+                maxStack: 10
+            },
+            'rain_catchment_active': {
+                id: 'rain_catchment_active',
+                name: 'Rain Catchment',
+                type: 'structure',
+                description: 'Collects rainwater through the window when it rains.',
+                icon: '🌧️',
+                stackable: false
+            },
+            'set_mouse_trap': {
+                id: 'set_mouse_trap',
+                name: 'Set Mouse Trap',
+                type: 'tool',
+                description: 'A baited mouse trap, ready to catch something.',
+                icon: '🪤',
+                stackable: true,
+                maxStack: 5
+            },
+            'set_rabbit_snare': {
+                id: 'set_rabbit_snare',
+                name: 'Set Rabbit Snare',
+                type: 'tool',
+                description: 'A snare set for rabbits outside the window.',
+                icon: '🪢',
+                stackable: true,
+                maxStack: 3
+            },
+            'processed_meat': {
+                id: 'processed_meat',
+                name: 'Processed Meat',
+                type: 'food',
+                description: 'Cleaned raw meat. Cook it before eating.',
+                icon: '🥩',
+                stackable: true,
+                maxStack: 5,
+                nutrition: 15,
+                condition: 'Fresh',
+                expiresIn: 2,
+                hygieneCost: 5
+            },
+            'sprout_garden_active': {
+                id: 'sprout_garden_active',
+                name: 'Sprout Garden',
+                type: 'structure',
+                description: 'Seeds sprouting in a container. Check back for sprouts.',
+                icon: '🌱',
+                stackable: false
+            },
+            'candle_heater': {
+                id: 'candle_heater',
+                name: 'Candle Heater',
+                type: 'tool',
+                description: 'Terra cotta pot over candles. Radiates a little warmth.',
+                icon: '🕯️',
+                stackable: false
+            },
+            'tinder': {
+                id: 'tinder',
+                name: 'Tinder',
+                type: 'material',
+                description: 'Dry fluff that catches a spark easily.',
+                icon: '🪶',
+                stackable: true,
+                maxStack: 10
+            },
+            'boarded_window': {
+                id: 'boarded_window',
+                name: 'Boarded Window',
+                type: 'structure',
+                description: 'Planks nailed over the window. Harder to break in.',
+                icon: '🪵',
+                stackable: false
+            },
+            'reinforced_barricade': {
+                id: 'reinforced_barricade',
+                name: 'Reinforced Barricade',
+                type: 'structure',
+                description: 'Extra planks and nails. Much harder to break through.',
+                icon: '🛡️',
+                stackable: false
+            },
+            'window_alarm': {
+                id: 'window_alarm',
+                name: 'Window Alarm',
+                type: 'tool',
+                description: 'Tin cans on a string. Rattles if the window moves.',
+                icon: '🔔',
+                stackable: true,
+                maxStack: 3
+            },
+            'tripwire_alarm': {
+                id: 'tripwire_alarm',
+                name: 'Tripwire Alarm',
+                type: 'tool',
+                description: 'A tripwire strung with cans and nails. Warns of intruders.',
+                icon: '🧵',
+                stackable: true,
+                maxStack: 3
+            },
+            'gasoline_defense_ready': {
+                id: 'gasoline_defense_ready',
+                name: 'Gasoline Defense',
+                type: 'tool',
+                description: 'A last-resort fire trap. Extremely dangerous indoors.',
+                icon: '⛽',
+                stackable: false
+            },
+            'spear': {
+                id: 'spear',
+                name: 'Spear',
+                type: 'tool',
+                description: 'A knife lashed to a stick. Keeps threats at a distance.',
+                icon: '🗡️',
+                stackable: false
+            },
+            'charcoal_medicine': {
+                id: 'charcoal_medicine',
+                name: 'Charcoal Remedy',
+                type: 'consumable',
+                description: 'Activated charcoal in water. An old stomach remedy.',
+                icon: '🧪',
+                stackable: true,
+                maxStack: 5
+            },
+            'cleaned_wound': {
+                id: 'cleaned_wound',
+                name: 'Clean Dressing',
+                type: 'consumable',
+                description: 'A cleaned and dressed wound kit, ready to apply.',
+                icon: '🩹',
+                stackable: true,
+                maxStack: 5
+            },
+            'toy_robot': {
+                id: 'toy_robot',
+                name: 'Toy Robot',
+                type: 'tool',
+                description: 'A repaired toy robot. It still beeps. Good for morale.',
+                icon: '🤖',
+                stackable: false
+            },
+            'tin_can_cup': {
+                id: 'tin_can_cup',
+                name: 'Tin Can Cup',
+                type: 'tool',
+                description: 'A cup made from a tin can.',
+                icon: '🥫',
+                stackable: true,
+                maxStack: 3
+            },
+            'hot_meal': {
+                id: 'hot_meal',
+                name: 'Hot Meal',
+                type: 'food',
+                description: 'A hot, home-cooked meal. Warms you up and lifts your spirits.',
+                icon: '🍲',
+                stackable: true,
+                maxStack: 3,
+                nutrition: 60,
+                condition: 'Fresh',
+                expiresIn: 2,
+                hygieneCost: 0,
+                moraleBoost: 20
+            },
+            'sleeping_bag': {
+                id: 'sleeping_bag',
+                name: 'Sleeping Bag',
+                type: 'tool',
+                description: 'Insulated sleeping bag. The best rest you can get down here.',
+                icon: '🛌',
+                stackable: false
+            },
+            'bone': {
+                id: 'bone',
+                name: 'Bone',
+                type: 'material',
+                description: 'A cleaned animal bone. Could make a tool.',
+                icon: '🦴',
+                stackable: true,
+                maxStack: 10
+            },
+            'rabbit_pelt': {
+                id: 'rabbit_pelt',
+                name: 'Rabbit Pelt',
+                type: 'material',
+                description: 'Soft rabbit fur. Could line clothes for warmth.',
+                icon: '🐇',
+                stackable: true,
+                maxStack: 5
+            },
+            'rabbit_organs': {
+                id: 'rabbit_organs',
+                name: 'Rabbit Organs',
+                type: 'food',
+                description: 'Edible organ meat. Cook before eating.',
+                icon: '🫀',
+                stackable: true,
+                maxStack: 5,
+                nutrition: 10,
+                condition: 'Fresh',
+                expiresIn: 1,
+                hygieneCost: 5
             }
         };
     }

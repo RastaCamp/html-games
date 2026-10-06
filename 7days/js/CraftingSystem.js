@@ -117,7 +117,7 @@ class CraftingSystem {
             
             // Fortification
             {
-                inputs: [{ id: 'wood', quantity: 3 }, { id: 'metal', quantity: 1 }],
+                inputs: [{ id: 'wood_planks', quantity: 3 }, { id: 'metal', quantity: 1 }],
                 output: { id: 'barricade', quantity: 1 },
                 successChance: 0.9,
                 description: 'Create a barricade'

@@ -257,10 +257,12 @@ class EventSystem {
                 type: 'random',
                 trigger: (game) => Math.random() < 0.05,
                 execute: (game) => {
-                    const treasures = ['candle', 'battery', 'medicine', 'canned_food'];
+                    const treasures = ['candle', 'battery', 'medicine', 'canned_beans']; // 'canned_food' never existed
                     const treasure = treasures[Math.floor(Math.random() * treasures.length)];
-                    game.addMessage(`You find something useful: ${game.itemSystem.getItem(treasure).name}`);
-                    game.inventory.addItem(game.itemSystem.createItem(treasure), 1);
+                    const found = game.itemSystem.createItem(treasure);
+                    if (!found) return;
+                    game.addMessage(`You find something useful: ${found.name}`);
+                    game.inventory.addItem(found, 1);
                     game.meters.adjustMorale(5);
                 }
             }
