@@ -487,15 +487,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (coverArtScreen) coverArtScreen.classList.add('hidden');
                 return;
             }
-            TransitionSystem.fadeIn(coverArtImg, 1200, function () {
+            TransitionSystem.fadeIn(coverArtImg, 700, function () {
                 setTimeout(function () {
-                    TransitionSystem.fadeOut(coverArtScreen, 800, function () {
+                    TransitionSystem.fadeOut(coverArtScreen, 600, function () {
                         if (coverArtScreen) coverArtScreen.classList.add('hidden');
                         if (titleScreenEl) titleScreenEl.classList.remove('hidden');
                         if (titleScreen) titleScreen.show();
                         maybeStartTitleLoop();
                     });
-                }, 2500);
+                }, 900);
             });
         }
         if (coverArtImg.complete && coverArtImg.naturalWidth) {
@@ -546,6 +546,43 @@ window.addEventListener('DOMContentLoaded', () => {
             else if (window.introSequence) window.introSequence.start();
         }
     };
+
+    // PLAY: random season, saved (or morning) start time, intro only on the very first game.
+    window.doQuickPlay = function () {
+        if (!window.weatherSystem || !window.introSequence) { window.doNewGame(); return; }
+        if (window.audioSystem) {
+            if (window.audioSystem.stopTitleLoop) window.audioSystem.stopTitleLoop();
+            if (window.audioSystem.stopMusic) window.audioSystem.stopMusic();
+        }
+        const season = ['spring', 'summer', 'fall', 'winter'][Math.floor(Math.random() * 4)];
+        window.weatherSystem.setSeason(season);
+        if (typeof window.weatherSystem.rollDailyWeather === 'function') window.weatherSystem.rollDailyWeather();
+        let introSeen = false;
+        try { introSeen = localStorage.getItem('7days_introSeen') === '1'; } catch (e) {}
+        const go = function () {
+            if (introSeen) {
+                window.introSequence._handedOff = false;
+                window.introSequence._skipRequested = true;
+                window.introSequence.transitionToGameplay();
+            } else {
+                window.introSequence.start();
+            }
+        };
+        const titleEl = document.getElementById('title-screen');
+        if (titleEl && window.TransitionSystem) {
+            window.TransitionSystem.fadeOut(titleEl, 400, function () { titleEl.classList.add('hidden'); go(); });
+        } else {
+            if (titleEl) titleEl.classList.add('hidden');
+            go();
+        }
+    };
+
+    // EXIT can't close a browser tab; only show it in the Android app.
+    try {
+        const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        const exitBtn = document.getElementById('exit-btn');
+        if (exitBtn && !native) exitBtn.classList.add('hidden');
+    } catch (e) {}
 
     window.doSeasonChoice = function (season) {
         if (!window.weatherSystem || !window.seasonSelection || !window.introSequence) return;

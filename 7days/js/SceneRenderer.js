@@ -401,6 +401,67 @@ class SceneRenderer {
         this.hoveredLocation = this.getLocationAt(x, y);
     }
 
+    /**
+     * New players don't know the basement is clickable. Until they've searched SEARCH_HINT_LIMIT spots,
+     * draw a soft pulsing ring on every unsearched spot and a goal line at the top of the scene.
+     * Respects Options > interaction hints.
+     */
+    renderSearchHints(game) {
+        const SEARCH_HINT_LIMIT = 3;
+        if (!game || !game.locationSystem || !game.gameState || game.gameState.isGameOver || game.gameState.isPaused) return;
+        if ((game.searchesDone || 0) >= SEARCH_HINT_LIMIT) return;
+        if (typeof game.loadSettings === 'function' && game.loadSettings().showInteractionHint === false) return;
+        const locations = this.clickableLocations[this.currentScene] || {};
+        const ctx = this.ctx;
+        const t = (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000;
+        const pulse = 0.5 + 0.5 * Math.sin(t * 3);
+        // Only the few closest unsearched spots that actually hold something, so the first clicks pay off.
+        const loot = (game.gameState.sceneLoot && game.gameState.sceneLoot[this.currentScene]) || {};
+        const cr = game.characterRenderer;
+        const px = cr ? cr.characterX : this.logicalWidth / 2, py = cr ? cr.characterY : this.logicalHeight / 2;
+        const spots = Object.entries(locations)
+            .filter(([id, loc]) => {
+                const state = game.locationSystem.locations && game.locationSystem.locations[id];
+                const hasLoot = (loot[id] && loot[id].length) || (state && state.items && state.items.length);
+                return loc && loc.width > 0 && loc.height > 0 && state && !state.searched && hasLoot;
+            })
+            .map(([id, loc]) => ({ id, loc, d: Math.hypot(loc.x + loc.width / 2 - px, loc.y + loc.height / 2 - py) }))
+            .sort((a, b) => a.d - b.d)
+            .slice(0, 4);
+        ctx.save();
+        for (const { loc } of spots) {
+            const cx = loc.x + loc.width / 2;
+            const cy = loc.y + loc.height / 2;
+            const r = 14 + pulse * 6;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 210, 90, ${0.12 + pulse * 0.12})`;
+            ctx.fill();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = `rgba(255, 220, 120, ${0.55 + pulse * 0.4})`;
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255, 236, 170, 0.95)';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('?', cx, cy + 1);
+        }
+        const w = this.logicalWidth;
+        const text = 'Day 1 goal: search the basement for food and water. Click a glowing spot.';
+        ctx.font = 'bold 22px Arial';
+        const tw = ctx.measureText(text).width + 40;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
+        ctx.fillRect((w - tw) / 2, 14, tw, 40);
+        ctx.strokeStyle = 'rgba(255, 210, 90, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect((w - tw) / 2, 14, tw, 40);
+        ctx.fillStyle = '#ffe9a8';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, w / 2, 34);
+        ctx.restore();
+    }
+
     renderSceneA() {
         const ctx = this.ctx;
         const w = this.logicalWidth;
@@ -1061,6 +1122,9 @@ class SceneRenderer {
             ctx.fillText('(click to return)', boxX + boxW / 2, boxY + boxH / 2 + 14);
         }
         
+        // First-minute guidance: pulse unsearched spots + a goal line until the player has searched a few.
+        this.renderSearchHints(game);
+
         // Hover: only show tooltip (zones are invisible — no highlight drawn)
         if (this.hoveredLocation) {
             this.renderHoverTooltipOnly(this.hoveredLocation);

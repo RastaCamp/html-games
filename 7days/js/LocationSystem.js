@@ -517,7 +517,9 @@ class LocationSystem {
         if (location.searched) {
             return { success: false, message: 'Already searched this location' };
         }
-        
+        // Counts toward the first-minute hints (SceneRenderer.renderSearchHints).
+        game.searchesDone = (game.searchesDone || 0) + 1;
+
         const sceneLoot = game.gameState && game.gameState.sceneLoot;
         const sceneId = game.sceneRenderer ? game.sceneRenderer.currentScene : 'A';
         const lootIds = sceneLoot && sceneLoot[sceneId] && sceneLoot[sceneId][locationId];

@@ -1468,6 +1468,23 @@ body {
     transform: scale(1.05);
 }
 
+/* PLAY: the one obvious first click */
+.menu-btn.menu-btn-primary {
+    font-size: 22px;
+    padding: 16px 56px;
+    min-width: 260px;
+    background: #c62828;
+    border-color: #ff8a65;
+    color: #fff;
+    box-shadow: 0 0 24px rgba(198, 40, 40, 0.55);
+    letter-spacing: 0.12em;
+}
+
+.menu-btn.menu-btn-primary:hover {
+    background: #e53935;
+    box-shadow: 0 0 32px rgba(229, 57, 53, 0.7);
+}
+
 .menu-btn-link {
     display: block;
     box-sizing: border-box;

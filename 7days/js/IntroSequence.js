@@ -93,6 +93,9 @@ class IntroSequence {
         if (!introScreen) return;
 
         introScreen.classList.remove('hidden');
+        this._handedOff = false;
+        // Returning players skip the intro on PLAY (see doQuickPlay in main.js).
+        try { localStorage.setItem('7days_introSeen', '1'); } catch (e) {}
         this.loadNewsCasterImages();
         this.showEmergencyBroadcast();
         this.startCaptionRotation();
@@ -219,10 +222,11 @@ class IntroSequence {
                     this.showLivingRoom();
                 }, 1000);
             }
-        }, 15000);
+        }, 7000);
     }
 
     showLivingRoom() {
+        if (this._handedOff) return; // skipped: don't let the intro timers keep running
         const broadcast = document.getElementById('emergency-broadcast');
         const livingRoom = document.getElementById('living-room');
 
@@ -244,6 +248,7 @@ class IntroSequence {
     }
 
     showPowerOutage() {
+        if (this._handedOff) return;
         const tvStatic = document.getElementById('tv-static');
         const livingRoom = document.getElementById('living-room');
 
@@ -270,6 +275,9 @@ class IntroSequence {
     }
 
     transitionToGameplay() {
+        // Skip and the intro's own timers both lead here; start the game only once.
+        if (this._handedOff) return;
+        this._handedOff = true;
         this.stopNewsCasterFlashing();
         this.stopCaptionRotation();
         const introScreen = document.getElementById('intro-screen');

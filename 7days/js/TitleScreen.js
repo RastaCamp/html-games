@@ -253,7 +253,11 @@ class TitleScreen {
     }
 
     onNewGame() {
-        // Use global handler so inline onclick and addEventListener share one path
+        // PLAY: quick start (random season, straight in). CUSTOM GAME keeps the season picker.
+        if (window.doQuickPlay) {
+            window.doQuickPlay();
+            return;
+        }
         if (window.doNewGame) {
             window.doNewGame();
             return;
