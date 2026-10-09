@@ -243,16 +243,19 @@ class Game {
         // Give essential starting items from emergency kit location (L10 or L11)
         // These are items the player "finds immediately" - like they had an emergency kit
         const emergencyKitLocations = ['L10', 'L11'];
+        const searchesBefore = this.searchesDone || 0;
+        let foundKit = false;
         for (const locId of emergencyKitLocations) {
             const location = this.locationSystem.getLocation(locId);
             if (location && location.items && location.items.length > 0) {
                 // Auto-search emergency kit locations (player starts with these)
                 const result = this.locationSystem.searchLocation(locId, this);
-                if (result.success && result.items.length > 0) {
-                    this.addMessage('You found your emergency kit!');
-                }
+                if (result.success && result.items.length > 0) foundKit = true;
             }
         }
+        if (foundKit) this.addMessage('You found your emergency kit!');
+        // The kit pickup isn't the player's own search; don't let it use up the first-minute hints.
+        this.searchesDone = searchesBefore;
         
         // Also give player their phone (they always have it)
         const phone = this.itemSystem.createItem('cell_phone');
@@ -1326,7 +1329,8 @@ class Game {
         this.moveTargetX = cx;
         this.moveTargetY = cy;
         this.moveTargetObject = null;
-        this.moveTargetInteractOnArrival = false;
+        // Clicking a spot means "go search it": search on arrival instead of needing a second click.
+        this.moveTargetInteractOnArrival = location.id != null;
         this.moveTargetLocationId = location.id != null ? location.id : (location.name || true);
     }
 
@@ -1438,15 +1442,13 @@ class Game {
             this.moveTargetY = null;
             const obj = this.moveTargetObject;
             const locId = this.moveTargetLocationId;
+            const interact = this.moveTargetInteractOnArrival;
             this.moveTargetObject = null;
             this.moveTargetLocationId = null;
             this.moveTargetInteractOnArrival = false;
-            if (locId) {
-                cr.setAnimation('idle', cr.currentDirection, 0);
-            } else {
-                cr.setAnimation('idle', cr.currentDirection, 0);
-            }
+            cr.setAnimation('idle', cr.currentDirection, 0);
             if (obj) this.showObjectActions(obj);
+            else if (interact && typeof locId === 'string') this.interactWithLocation(locId);
             return;
         }
         const dir = Math.atan2(dy, dx);

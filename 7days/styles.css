@@ -217,8 +217,8 @@ body {
     pointer-events: auto;
     touch-action: none;
     cursor: crosshair;
-    /* DEBUG: semi-transparent overlay — set background to transparent when verified on device */
-    background: rgba(0, 255, 100, 0.14);
+    /* Hit target only: transparent (the old green debug tint washed out the whole scene). */
+    background: transparent;
     box-sizing: border-box;
 }
 #game-canvas:not(.hidden) {
@@ -250,7 +250,8 @@ body {
 #hud-sidebar-left,
 #hud-sidebar-right {
     flex: 0 0 auto;
-    width: clamp(200px, 26vw, 320px);
+    /* Narrower panels so the basement gets most of the screen (was clamp(200px, 26vw, 320px)). */
+    width: clamp(180px, 17vw, 240px);
     min-width: 0;
     align-self: stretch;
     min-height: 0;
