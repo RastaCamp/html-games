@@ -401,6 +401,40 @@ class SceneRenderer {
         this.hoveredLocation = this.getLocationAt(x, y);
     }
 
+    /** Floating "+Item" labels that rise and fade over the spot that was searched. */
+    addFloaters(labels, x, y, good = true) {
+        this.floaters = this.floaters || [];
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        labels.slice(0, 4).forEach((text, i) => {
+            this.floaters.push({ text, x, y: y - 6 - i * 30, born: now, good });
+        });
+    }
+
+    renderFloaters() {
+        if (!this.floaters || !this.floaters.length) return;
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const LIFE = 1800;
+        const ctx = this.ctx;
+        ctx.save();
+        ctx.font = 'bold 22px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 4;
+        this.floaters = this.floaters.filter((f) => now - f.born < LIFE);
+        for (const f of this.floaters) {
+            const age = now - f.born;
+            if (age < 0) continue;
+            const k = age / LIFE;
+            const yy = f.y - 50 * k;
+            ctx.globalAlpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.strokeText(f.text, f.x, yy);
+            ctx.fillStyle = f.good ? '#ffe27a' : '#bbbbbb';
+            ctx.fillText(f.text, f.x, yy);
+        }
+        ctx.restore();
+    }
+
     /**
      * New players don't know the basement is clickable. Until they've searched SEARCH_HINT_LIMIT spots,
      * draw a soft pulsing ring on every unsearched spot and a goal line at the top of the scene.
@@ -1124,6 +1158,7 @@ class SceneRenderer {
         
         // First-minute guidance: pulse unsearched spots + a goal line until the player has searched a few.
         this.renderSearchHints(game);
+        this.renderFloaters();
 
         // Hover: only show tooltip (zones are invisible — no highlight drawn)
         if (this.hoveredLocation) {

@@ -499,7 +499,28 @@ class Game {
         
         this.updateSceneLighting();
         this.updateInteractionProximityHint();
+        this.checkDamageFlash();
         this.updateUI();
+    }
+
+    /** A sudden health drop (an attack, a fall), not slow hunger drain: flash the screen edges red. */
+    checkDamageFlash() {
+        const h = this.meters && this.meters.health ? this.meters.health.value : null;
+        if (h == null) return;
+        if (this._lastHealth != null && this._lastHealth - h >= 3 && !this.gameState.isGameOver) {
+            let el = document.getElementById('damage-flash');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'damage-flash';
+                el.setAttribute('aria-hidden', 'true');
+                document.body.appendChild(el);
+            }
+            el.classList.remove('show');
+            void el.offsetWidth; // restart the animation
+            el.classList.add('show');
+            if (window.audioSystem) window.audioSystem.playSound('danger');
+        }
+        this._lastHealth = h;
     }
 
     render() {
@@ -1347,7 +1368,19 @@ class Game {
         if (!locationId || !this.locationSystem) return;
         const result = this.locationSystem.searchLocation(locationId, this);
         if (result.message) this.addMessage(result.message);
-        if (result.success && result.items && result.items.length > 0) {
+        const found = result.success && result.items && result.items.length > 0;
+        // Feedback right where the player searched: a sound plus floating "+Item" labels.
+        if (result.success && window.audioSystem) window.audioSystem.playSound(found ? 'open_loot' : 'no');
+        if (result.success && this.sceneRenderer && typeof this.sceneRenderer.addFloaters === 'function') {
+            const area = (this.sceneRenderer.clickableLocations[this.sceneRenderer.currentScene] || {})[locationId];
+            if (area) {
+                const labels = found
+                    ? result.items.map((f) => '+' + (f.quantity > 1 ? f.quantity + ' ' : '') + (f.item.name || f.item.id))
+                    : ['Nothing here'];
+                this.sceneRenderer.addFloaters(labels, area.x + (area.width || 0) / 2, area.y, found);
+            }
+        }
+        if (found) {
             this.showItemFoundNotification(result.items);
             if (this.locationSystem.syncFromSceneLoot) {
                 this.locationSystem.syncFromSceneLoot(this);
