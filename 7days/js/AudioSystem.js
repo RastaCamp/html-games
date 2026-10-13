@@ -96,9 +96,12 @@ class AudioSystem {
 
     preloadSounds() {
         // 🔊 PRELOAD SOUNDS: Load all sound files into cache
+        // Long music tracks load only when first played ('none'); short effects load up front.
+        // Preloading the full songs made the first page load slow, especially on phones.
+        const LONG = new Set(['title', 'crunk_track', 'crunks_track', 'enemy_battle', 'survived_end']);
         for (const [key, path] of Object.entries(this.soundFiles)) {
             const audio = new Audio(path);
-            audio.preload = 'auto';
+            audio.preload = LONG.has(key) ? 'none' : 'auto';
             audio.volume = this.sfxVolume;
             this.sounds[key] = audio;
         }

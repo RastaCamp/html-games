@@ -531,6 +531,36 @@
         @media (max-width: 900px) {
             .game-container { grid-template-columns: 1fr; }
         }
+
+        /* ========== WALKTHROUGH TUTORIAL ========== */
+        .tutorial-overlay { position: fixed; inset: 0; z-index: 25000; }
+        .tutorial-overlay.hidden { display: none; }
+        .tutorial-spot {
+            position: fixed; border-radius: 8px; pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(6, 5, 10, 0.82);
+            border: 2px solid rgba(180, 160, 210, 0.8);
+            transition: all 0.3s ease; opacity: 0;
+        }
+        .tutorial-spot.visible { opacity: 1; }
+        .tutorial-box {
+            position: fixed; max-width: 360px; width: calc(100vw - 32px);
+            background: #17131f; border: 1px solid rgba(160, 140, 190, 0.55);
+            border-radius: 10px; padding: 20px 22px; z-index: 25001;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
+            transition: left 0.3s ease, top 0.3s ease, transform 0.3s ease;
+        }
+        .tutorial-box h3 { color: #c4b5d4; font-size: 1.15em; margin-bottom: 8px; border: none; padding: 0; }
+        .tutorial-box p { font-size: 0.95em; line-height: 1.55; white-space: pre-line; color: #ddd4e4; }
+        .tutorial-nav { display: flex; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .tutorial-nav .tut-progress { font-size: 0.8em; color: #8a7a9a; margin-right: auto; }
+        .tutorial-nav button {
+            padding: 8px 16px; font-family: inherit; font-size: 0.9em; cursor: pointer;
+            background: rgba(100, 80, 120, 0.3); border: 1px solid rgba(160, 140, 180, 0.45);
+            color: #e8e0e8; border-radius: 4px;
+        }
+        .tutorial-nav button:hover { background: rgba(120, 100, 150, 0.45); }
+        .tutorial-nav button.tut-skip { background: transparent; border-color: rgba(140, 120, 160, 0.3); color: #9a8aaa; }
     </style>
 </head>
 <body>
@@ -543,14 +573,14 @@
 
     <!-- INTRO CINEMA: dev card, studio card, title sequence, howl -->
     <div class="cinema" id="cinema">
-        <div class="screen" id="cinema-dev"><img src="visuals/dev.png" alt="Dev" id="img-dev" onerror="this.style.display='none'"></div>
-        <div class="screen white" id="cinema-white"><img src="visuals/dev.png" alt="Logo" class="logo-marquee" id="img-marquee" onerror="this.style.display='none'"></div>
-        <div class="screen" id="cinema-studio"><img src="visuals/studio.png" alt="Studio" id="img-studio" onerror="this.style.display='none'"></div>
+        <div class="screen" id="cinema-dev"><img src="visuals/dev.webp" alt="Dev" id="img-dev" onerror="this.style.display='none'"></div>
+        <div class="screen white" id="cinema-white"><img src="visuals/dev.webp" alt="Logo" class="logo-marquee" id="img-marquee" onerror="this.style.display='none'"></div>
+        <div class="screen" id="cinema-studio"><img src="visuals/studio.jpg" alt="Studio" id="img-studio" onerror="this.style.display='none'"></div>
         <div class="screen black" id="cinema-black"></div>
-        <div class="screen black" id="cinema-title-dark"><img src="visuals/title_dark.png" alt="Title" id="img-title-dark" onerror="this.style.display='none'"></div>
-        <div class="screen black" id="cinema-title-light"><img src="visuals/title_light.png" alt="Title" id="img-title-light" onerror="this.style.display='none'"></div>
-        <div class="screen black" id="cinema-title-desolation"><img src="visuals/title_desolation.png" alt="Desolation" id="img-title-desolation" onerror="this.style.display='none'"></div>
-        <div class="screen black" id="cinema-title-full"><img src="visuals/title_full.png" alt="Full Title" id="img-title-full" onerror="this.style.display='none'"></div>
+        <div class="screen black" id="cinema-title-dark"><img src="visuals/title_dark.jpg" alt="Title" id="img-title-dark" onerror="this.style.display='none'"></div>
+        <div class="screen black" id="cinema-title-light"><img src="visuals/title_light.jpg" alt="Title" id="img-title-light" onerror="this.style.display='none'"></div>
+        <div class="screen black" id="cinema-title-desolation"><img src="visuals/title_desolation.jpg" alt="Desolation" id="img-title-desolation" onerror="this.style.display='none'"></div>
+        <div class="screen black" id="cinema-title-full"><img src="visuals/title_full.jpg" alt="Full Title" id="img-title-full" onerror="this.style.display='none'"></div>
         <!-- Menu overlay: centered on top of title_full (hidden until intro ends) -->
         <div class="menu-overlay hidden" id="menu-overlay">
             <div class="menu-overlay-content">
@@ -561,6 +591,7 @@
                     <button class="menu-btn" id="btn-exhibition">Exhibition Match vs CPU</button>
                     <button class="menu-btn coming-soon" id="btn-multiplayer">Multiplayer (Coming Soon)</button>
                     <button class="menu-btn" id="btn-load-game">Load Game</button>
+                    <button class="menu-btn" id="btn-howto">How to Play</button>
                     <button class="menu-btn" id="btn-options">Options</button>
                 </div>
             </div>
@@ -648,6 +679,9 @@
         <div class="opt-row" id="opt-exception-row" style="display:none;">
             <label>Exception list (track filenames to exclude, comma-separated):</label>
             <input type="text" id="opt-exception-list" placeholder="e.g. beat_track.mp3, techno_track.mp3" style="padding:8px; min-width:220px; background:#1a1525; color:#e8e0e8; border:1px solid rgba(140,120,160,0.4); border-radius:4px;">
+        </div>
+        <div class="opt-row">
+            <button class="btn menu-btn" id="opt-howto">Replay walkthrough tutorial</button>
         </div>
         <div class="opt-row">
             <button class="btn menu-btn btn-danger" id="opt-delete-save">Delete saved game</button>
@@ -763,6 +797,21 @@
         </div>
     </div>
 
+    <!-- WALKTHROUGH TUTORIAL (skippable; auto-shows once on first game, replayable from menu/options) -->
+    <div class="tutorial-overlay hidden" id="tutorial-overlay">
+        <div class="tutorial-spot" id="tutorial-spot"></div>
+        <div class="tutorial-box" id="tutorial-box">
+            <h3 id="tutorial-title"></h3>
+            <p id="tutorial-body"></p>
+            <div class="tutorial-nav">
+                <span class="tut-progress" id="tutorial-progress"></span>
+                <button type="button" class="tut-skip" id="tutorial-skip">Skip</button>
+                <button type="button" id="tutorial-back">Back</button>
+                <button type="button" id="tutorial-next">Next</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================================
         // DESOLATION: TEARS OF THE MOON — Single-file edition
@@ -863,8 +912,10 @@
         }
 
         function runIntro() {
+            const introShow = (id) => { if (!window._introSkipped) showScreen(id); };
+            const introMenu = () => { if (!window._introSkipped) showMenuOverlay(); };
             const cinema = document.getElementById('cinema');
-            if (!cinema) { showMenuOverlay(); return; }
+            if (!cinema) { introMenu(); return; }
             cinema.classList.remove('hidden');
             cinema.style.display = 'block';
 
@@ -877,22 +928,22 @@
 
             function next() {
                 // 1) Fade in dev card, play bell, card stays visible for bell duration + 1s
-                showScreen('cinema-dev');
+                introShow('cinema-dev');
                 bell.play().catch(() => {});
                 const bellMs = getAudioDurationMs(bell, 3);
                 setTimeout(() => {
                     // 2) White screen, logo marquee flies in (no second bell)
-                    showScreen('cinema-white');
+                    introShow('cinema-white');
                     document.getElementById('img-marquee').classList.add('logo-marquee');
                     setTimeout(() => {
                         // 3) Fade in studio card, logo flashes briefly then remains, play studio.mp3, stay duration+1s
-                        showScreen('cinema-studio');
+                        introShow('cinema-studio');
                         document.getElementById('img-studio').classList.add('flash');
                         setTimeout(() => document.getElementById('img-studio').classList.remove('flash'), 400);
                         studioAudio.play().catch(() => {});
                         const studioMs = getAudioDurationMs(studioAudio, 3);
                         setTimeout(() => {
-                            showScreen('cinema-black');
+                            introShow('cinema-black');
                             if (musicOn()) { titleAudio.volume = 0; titleAudio.play().catch(() => {}); }
                             const fade = setInterval(() => {
                                 if (titleAudio.volume < 0.9) titleAudio.volume += 0.05;
@@ -900,11 +951,11 @@
                             }, 80);
                             setTimeout(() => {
                                 const flash = (screenId, nextScreenId, delay) => {
-                                    showScreen(screenId);
+                                    introShow(screenId);
                                     const img = document.querySelector('#' + screenId + ' img');
                                     if (img) { img.classList.add('flash'); setTimeout(() => img.classList.remove('flash'), 400); }
                                     setTimeout(() => {
-                                        if (nextScreenId) showScreen(nextScreenId);
+                                        if (nextScreenId) introShow(nextScreenId);
                                     }, delay || 800);
                                 };
                                 flash('cinema-title-dark', null, 800);
@@ -919,7 +970,7 @@
                                     function goToMenu() {
                                         if (howlDone) return;
                                         howlDone = true;
-                                        showMenuOverlay();
+                                        introMenu();
                                     }
                                     var contBtn = document.createElement('button');
                                     contBtn.className = 'menu-btn howl-continue';
@@ -1272,6 +1323,7 @@
             document.getElementById('game-container').style.display = 'grid';
             startInGameMusic();
             render();
+            try { if (!localStorage.getItem('desolation_tutorial_done')) setTimeout(startTutorial, 400); } catch (e) {}
             if (autoSaveInterval) clearInterval(autoSaveInterval);
             autoSaveInterval = setInterval(function() {
                 if (gameState && document.getElementById('game-container').style.display === 'grid') {
@@ -1504,7 +1556,7 @@
             { id: 'moon_beam', name: 'Moon Beam', element: 'light', effect: 'Healing, buff' },
         ];
         // Element advantage: attacker element -> { strongAgainst: [], weakAgainst: [] }. 1.5x strong, 0.75x weak.
-        var ELEMENT_ADVANTAGE = { fire: { strong: ['air', 'nature'], weak: ['water', 'earth'] }, air: { strong: ['earth', 'lightning'], weak: ['fire'] }, earth: { strong: ['fire', 'water'], weak: ['air', 'lightning'] }, water: { strong: ['fire', 'earth'], weak: ['earth', 'lightning'] }, lightning: { strong: ['water', 'earth'], weak: ['air', 'nature'] }, nature: { strong: ['earth', 'water'], weak: ['fire', 'physical'] }, light: { strong: ['dark', 'shadow'], weak: ['dark', 'physical'] }, dark: { strong: ['light', 'nature'], weak: ['light'] }, physical: { strong: [], weak: [] } };
+        var ELEMENT_ADVANTAGE = { fire: { strong: ['air', 'nature'], weak: ['water', 'earth'] }, air: { strong: ['earth', 'lightning'], weak: ['fire'] }, earth: { strong: ['fire', 'water'], weak: ['air', 'lightning'] }, water: { strong: ['fire', 'earth'], weak: ['nature', 'lightning'] }, lightning: { strong: ['water', 'earth'], weak: ['air', 'nature'] }, nature: { strong: ['earth', 'water'], weak: ['fire', 'physical'] }, light: { strong: ['dark', 'shadow'], weak: ['dark', 'physical'] }, dark: { strong: ['light', 'nature'], weak: ['light'] }, physical: { strong: [], weak: [] } };
         function getNextPetId(state) { var max = 0; (state.pack || []).forEach(function(p) { var n = parseInt((p.id || '').replace('pet_', ''), 10); if (!isNaN(n)) max = Math.max(max, n); }); return 'pet_' + (max + 1); }
         // Creates the default wolf object. data = overrides (e.g. from save file). New run = mostly defaults.
         function createPet(data = {}) {
@@ -1571,7 +1623,7 @@
             var currentDay = w.currentDay || 1;
             var allAbilities = [].concat(male.abilities || [], female.abilities || []);
             var pupAbility = [];
-            if (premium && selectedAbility && (male.abilities || []).indexOf(selectedAbility) >= 0 || (female.abilities || []).indexOf(selectedAbility) >= 0)
+            if (premium && selectedAbility && ((male.abilities || []).indexOf(selectedAbility) >= 0 || (female.abilities || []).indexOf(selectedAbility) >= 0))
                 pupAbility = [selectedAbility];
             else if (allAbilities.length > 0)
                 pupAbility = [allAbilities[Math.floor(Math.random() * allAbilities.length)]];
@@ -1713,8 +1765,8 @@
             const w = state.world;
             if (state.pack && state.pack.length) state.pet = getCurrentPet(state);
             state.pack = state.pack || [];
-            state.pack.forEach(function(p) { updatePetForm(p, w); });
             var prevForm = state.pet && state.pet.form;
+            state.pack.forEach(function(p) { updatePetForm(p, w); });
             if (state.pet && (state.pet.form === 'wolf' || state.pet.form === 'hybrid') && prevForm === 'human') {
                 state.stats = state.stats || {};
                 state.stats.transformationsWitnessed = (state.stats.transformationsWitnessed || 0) + 1;
@@ -2381,8 +2433,11 @@
         function updateWolfConsecutiveDays(state, addStory) {
             var d = state.world.currentDay;
             var last = state.lastWolfFedDay || 0;
-            state.consecutiveDaysWolfFed = (d === last + 1) ? (state.consecutiveDaysWolfFed || 0) + 1 : 1;
-            state.lastWolfFedDay = d;
+            // Only advance the streak once per in-game day (feeding + watering the same day must not reset it).
+            if (d !== last) {
+                state.consecutiveDaysWolfFed = (d === last + 1) ? (state.consecutiveDaysWolfFed || 0) + 1 : 1;
+                state.lastWolfFedDay = d;
+            }
             checkAchievement(state, 'calm_wolf', addStory);
         }
         function doFeedRawMeat(state, addStory) {
@@ -2489,8 +2544,11 @@
         function updateGardenConsecutiveDays(state, addStory) {
             var d = state.world.currentDay;
             var last = state.lastGardenTendedDay || 0;
-            state.consecutiveDaysGardenTended = (d === last + 1) ? (state.consecutiveDaysGardenTended || 0) + 1 : 1;
-            state.lastGardenTendedDay = d;
+            // Only advance the streak once per in-game day (multiple garden actions must not reset it).
+            if (d !== last) {
+                state.consecutiveDaysGardenTended = (d === last + 1) ? (state.consecutiveDaysGardenTended || 0) + 1 : 1;
+                state.lastGardenTendedDay = d;
+            }
             checkAchievement(state, 'old_mac', addStory);
         }
         function doWaterGarden(state, addStory) {
@@ -2571,8 +2629,11 @@
             state.rabbit = r;
             var d = state.world.currentDay;
             var lastR = state.lastRabbitCareDay || 0;
-            state.consecutiveDaysRabbitFed = (d === lastR + 1) ? (state.consecutiveDaysRabbitFed || 0) + 1 : 1;
-            state.lastRabbitCareDay = d;
+            // Only advance the streak once per in-game day (feeding + watering the same day must not reset it).
+            if (d !== lastR) {
+                state.consecutiveDaysRabbitFed = (d === lastR + 1) ? (state.consecutiveDaysRabbitFed || 0) + 1 : 1;
+                state.lastRabbitCareDay = d;
+            }
             checkAchievement(state, 'rabid_routine', addStory);
             addStory('Rabbit fed.');
         }
@@ -2600,8 +2661,11 @@
             state.rabbit = r;
             var d = state.world.currentDay;
             var lastR = state.lastRabbitCareDay || 0;
-            state.consecutiveDaysRabbitFed = (d === lastR + 1) ? (state.consecutiveDaysRabbitFed || 0) + 1 : 1;
-            state.lastRabbitCareDay = d;
+            // Only advance the streak once per in-game day (feeding + watering the same day must not reset it).
+            if (d !== lastR) {
+                state.consecutiveDaysRabbitFed = (d === lastR + 1) ? (state.consecutiveDaysRabbitFed || 0) + 1 : 1;
+                state.lastRabbitCareDay = d;
+            }
             checkAchievement(state, 'rabid_routine', addStory);
             addStory('Rabbit watered.');
         }
@@ -2916,8 +2980,8 @@
             howlingsSfx.play().catch(function() {});
         }
 
-        function tryLevelUp(state, addStory) {
-            const pet = state.pet;
+        function tryLevelUp(state, addStory, petOverride) {
+            const pet = petOverride || state.pet;
             if (!pet || pet.xp < pet.xpToNext) return;
             pet.xp -= pet.xpToNext;
             pet.level++;
@@ -3012,7 +3076,7 @@
                 if (plants) parts.push('plants'); if (seeds) parts.push('seeds'); if (herbs) parts.push('herbs'); if (mat) parts.push('material');
                 addStory(pet.name + ' returns from foraging.' + (parts.length ? ' Found: ' + parts.join(', ') + '.' : ' Found nothing.'));
                 showLootPopup([].concat(plants ? [{ type: 'plants', img: 'farm_crop.PNG' }] : [], seeds ? [{ type: 'seeds', img: 'farm_sprouts.PNG' }] : [], herbs ? [{ type: 'herbs', img: 'health_potion.PNG' }] : [], mat ? [{ type: 'materials', img: 'wood_bundle.PNG' }] : []));
-                tryLevelUp(state, addStory);
+                tryLevelUp(state, addStory, pet);
                 if (Math.random() < (CONFIG.RABBIT_ENCOUNTER_CHANCE || 0.3)) {
                     var rabbitCount = 1 + Math.floor(Math.random() * 3);
                     state.encounterPrompt = { isWildRabbits: true, rabbitCount: rabbitCount };
@@ -3034,7 +3098,7 @@
                 pet.xp += 20;
                 addStory(pet.name + ' completes the mission without conflict.' + (gotMeat ? ' Found raw meat.' : ''));
                 if (gotMeat) showLootPopup([{ type: 'rawMeat', img: 'fresh_meat.PNG' }]);
-                tryLevelUp(state, addStory);
+                tryLevelUp(state, addStory, pet);
                 if (Math.random() < (CONFIG.WEREWOLF_ENCOUNTER_CHANCE || 0.3) && (state.pack || []).length < (CONFIG.MAX_PACK_SIZE || 6)) {
                     state.encounterPrompt = { isWildWerewolf: true, captureBonus: (state.rabbitCount || 0) > 0 ? (CONFIG.CAPTURE_BONUS_WITH_RABBITS || 0.1) : 0 };
                     addStory('Your ' + missionType + ' party encountered a wild werewolf!', 'high');
@@ -3157,7 +3221,7 @@
             animateCombatLog(combatLines, function() {
                 addStory(outcomeStory);
                 if (outcomeLoot.length) showLootPopup(outcomeLoot);
-                if (outcomeLevelUp) tryLevelUp(state, addStory);
+                if (outcomeLevelUp) tryLevelUp(state, addStory, pet);
                 state.currentEnemy = null;
                 state.combatInProgress = false;
                 state.starPotionActiveThisCombat = false;
@@ -3746,6 +3810,8 @@
                 }
                 var unconscious = !pet || (pet.sleep ?? 100) <= 0;
                 var pupOrElder = !pet || (pet.lifeStage === 'pup' || pet.lifeStage === 'elder');
+                // Hunt/patrol need a wolf that isn't starving or parched (matches the Troubleshooting report and tooltip).
+                var needsTooHigh = !!pet && ((pet.hunger || 0) > 50 || (pet.thirst != null ? pet.thirst : 50) > 50);
                 var allActions = {
                     rest: { id: 'rest', label: 'Rest', cls: 'btn-care', fn: () => { startAction(gameState, 'rest', addStory); render(); }, dis: unconscious || false },
                     bond: { id: 'bond', label: 'Spend time', cls: 'btn-care', fn: () => { startAction(gameState, 'bond', addStory); render(); }, dis: unconscious || !!gameState.petEscaped || (pet ? (pet.stamina ?? 100) < (STAMINA_COST.bond || 5) : true) },
@@ -3759,8 +3825,8 @@
                     ritual: { id: 'ritual', label: 'Ritual', cls: 'btn-train', fn: () => { startAction(gameState, 'ritual', addStory); render(); }, dis: unconscious || gameState.petEscaped || (inv.materials || 0) < 1 },
                     sleep: { id: 'sleep', label: 'Sleep', cls: 'btn-care', fn: () => { startAction(gameState, 'sleep', addStory); render(); }, dis: !!gameState.petEscaped || (pet ? (pet.sleep ?? 100) >= 95 : true) },
                     forage: { id: 'forage', label: 'Forage', cls: 'btn-mission', fn: () => { startAction(gameState, 'forage', addStory); render(); }, dis: unconscious || (pet ? (pet.stamina ?? 100) < (STAMINA_COST.forage || 20) : true) },
-                    patrol: { id: 'patrol', label: 'Patrol', cls: 'btn-mission', fn: () => { startAction(gameState, 'patrol', addStory); render(); }, dis: unconscious || pupOrElder || (pet ? (pet.stamina ?? 100) < (STAMINA_COST.patrol || 20) : true) },
-                    hunt: { id: 'hunt', label: 'Hunt', cls: 'btn-mission', fn: () => { startAction(gameState, 'hunt', addStory); render(); }, dis: unconscious || pupOrElder || (pet ? (pet.stamina ?? 100) < (STAMINA_COST.hunt || 25) : true) },
+                    patrol: { id: 'patrol', label: 'Patrol', cls: 'btn-mission', fn: () => { startAction(gameState, 'patrol', addStory); render(); }, dis: unconscious || pupOrElder || needsTooHigh || (pet ? (pet.stamina ?? 100) < (STAMINA_COST.patrol || 20) : true) },
+                    hunt: { id: 'hunt', label: 'Hunt', cls: 'btn-mission', fn: () => { startAction(gameState, 'hunt', addStory); render(); }, dis: unconscious || pupOrElder || needsTooHigh || (pet ? (pet.stamina ?? 100) < (STAMINA_COST.hunt || 25) : true) },
                     water_garden: { id: 'water_garden', label: 'Water garden', cls: 'btn-care', fn: () => { startAction(gameState, 'water_garden', addStory); render(); }, dis: false },
                     plant: { id: 'plant', label: 'Plant', cls: 'btn-care', fn: () => { startAction(gameState, 'plant', addStory); render(); }, dis: (inv.seeds || 0) < 1 || ((gameState.garden || {}).crops || []).length > 0 },
                     add_compost: { id: 'add_compost', label: 'Add Compost', cls: 'btn-care', fn: () => { startAction(gameState, 'add_compost', addStory); render(); }, dis: !((gameState.garden || {}).crops || []).length || ((inv.compostUnits || 0) < 1 && ((gameState.compost && gameState.compost.readyInDays > 0) || ((gameState.compost && gameState.compost.level) || 0) < 25)) },
@@ -4545,6 +4611,114 @@
             if (confirm('Start an exhibition match vs CPU? (Uses same game for now)')) startGame();
         });
 
+        // ============================================================================
+        // WALKTHROUGH TUTORIAL — skippable guided tour of the HUD. Spotlights real
+        // elements when the game screen is up; falls back to plain cards from the menu.
+        // Marks localStorage 'desolation_tutorial_done' so it only auto-shows once.
+        // ============================================================================
+        var TUTORIAL_STEPS = [
+            { target: null, title: 'Welcome to Desolation', body: 'You run an isolated forest facility caring for the last surviving werewolf. Keep her alive, keep your staff from breaking, and survive each full moon.\n\nThis walkthrough points out every part of the screen. Press Skip any time — you can replay it from the menu or Options.' },
+            { target: '#top-bar', title: 'The top bar', body: 'Time of day, the day counter, and current weather.\n\nThe moon on the right shows the phase and days until the next full moon. On a full moon the wolf forces toward wolf form, fear spikes, and staff panic — prepare ahead of time.\n\nSpeed 1× / 2× / 4× fast-forwards while you wait on timed actions.' },
+            { target: '#pet-card-container', title: 'Companion stats', body: 'HP, Energy, Stamina, Sleep — her physical condition. Rest and Sleep in the Kennel restore these.\n\nHunger and Thirst rise on their own; feed and water her daily.\n\nSickness slowly drains HP (cure with Heal / medicine). Fear high + Bond low = she may escape. Spirit drifts Dark when you kill in combat, Light when you spare. Shift shows how close she is to turning.' },
+            { target: '#travel-row', title: 'Travelling the facility', body: 'Move between locations: Clearing (hunt, forage, patrol, train), Garden (grow food), Rabbit Farm (raise food), Kennel (all wolf care), Crafting (cook meat, craft medicine, nets, traps, bait), and Command (staff, security, helicopter ETA, achievements).\n\nEach location has its own action queue.' },
+            { target: '#action-buttons', title: 'Action buttons', body: 'These are the things you can do at the current location. Some happen instantly; timed ones queue up (max 3 per location) and run in real time — use the speed controls to skip ahead.\n\nA greyed-out button still works: tap it and the Story feed tells you exactly what it needs.' },
+            { target: '#stats-list', title: 'Stats & inventory', body: 'Her level and XP, plus every resource you hold: meat, plants, seeds, water, herbs, meds, materials, traps, nets and bait.\n\nCook raw meat for her human/hybrid form — in full wolf form she can only stomach raw meat, and the wrong diet makes her sick.' },
+            { target: '#story-feed', title: 'The story feed', body: 'Events, warnings and flavor, newest first. Watch here for staff "on the edge", sick or starving rabbits, escapes, equipment breaking, and the full-moon howl.' },
+            { target: '#action-queue-section', title: 'Action queue', body: 'Shows what is running now and what is lined up for this location, with a countdown. "Clear queue" cancels everything queued here if you change your mind.' },
+            { target: null, title: 'What to watch out for', body: '• Feed and water the wolf AND the rabbits every day — rabbits die after ~2 days of neglect, and warn you first.\n• Keep worker Fear down: bond with the wolf, keep Security up, repair fast. At 90 fear workers quit or sabotage.\n• Repair damaged equipment quickly — materials come from foraging, hunting and the helicopter drop every 28 days.\n• Before every full moon: fill her needs, push Bond up and Fear down.\n• Options holds audio settings, music tracks and volume. Save often. Good luck.' },
+        ];
+        var _tutIndex = 0;
+        var _tutActive = false;
+        function _tutPlaceBox(rect) {
+            var box = document.getElementById('tutorial-box');
+            if (!box) return;
+            if (!rect) { box.style.left = '50%'; box.style.top = '50%'; box.style.transform = 'translate(-50%, -50%)'; return; }
+            var bw = Math.min(360, window.innerWidth - 32);
+            var bh = box.offsetHeight || 220;
+            var margin = 14;
+            var left = rect.left + rect.width / 2 - bw / 2;
+            left = Math.max(16, Math.min(left, window.innerWidth - bw - 16));
+            var top;
+            if (rect.bottom + margin + bh < window.innerHeight) top = rect.bottom + margin;
+            else if (rect.top - margin - bh > 0) top = rect.top - margin - bh;
+            else top = Math.max(16, window.innerHeight - bh - 16);
+            box.style.left = left + 'px';
+            box.style.top = top + 'px';
+            box.style.transform = 'none';
+        }
+        function _tutRenderStep() {
+            var step = TUTORIAL_STEPS[_tutIndex];
+            if (!step) { endTutorial(); return; }
+            document.getElementById('tutorial-title').textContent = step.title;
+            document.getElementById('tutorial-body').textContent = step.body;
+            document.getElementById('tutorial-progress').textContent = (_tutIndex + 1) + ' / ' + TUTORIAL_STEPS.length;
+            var backBtn = document.getElementById('tutorial-back');
+            var nextBtn = document.getElementById('tutorial-next');
+            backBtn.style.visibility = _tutIndex === 0 ? 'hidden' : 'visible';
+            nextBtn.textContent = _tutIndex === TUTORIAL_STEPS.length - 1 ? 'Done' : 'Next';
+            var spot = document.getElementById('tutorial-spot');
+            var el = step.target ? document.querySelector(step.target) : null;
+            var visible = el && el.offsetParent !== null;
+            if (visible) {
+                var r = el.getBoundingClientRect();
+                if (r.width < 2 || r.height < 2) visible = false;
+            }
+            if (visible) {
+                var r2 = el.getBoundingClientRect();
+                var pad = 6;
+                spot.style.left = (r2.left - pad) + 'px';
+                spot.style.top = (r2.top - pad) + 'px';
+                spot.style.width = (r2.width + pad * 2) + 'px';
+                spot.style.height = (r2.height + pad * 2) + 'px';
+                spot.classList.add('visible');
+                try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+                _tutPlaceBox(r2);
+            } else {
+                spot.classList.remove('visible');
+                spot.style.width = '0px'; spot.style.height = '0px';
+                _tutPlaceBox(null);
+            }
+        }
+        function startTutorial() {
+            if (_tutActive) return;
+            _tutActive = true;
+            _tutIndex = 0;
+            var ov = document.getElementById('tutorial-overlay');
+            ov.classList.remove('hidden');
+            _tutRenderStep();
+        }
+        function endTutorial() {
+            _tutActive = false;
+            var ov = document.getElementById('tutorial-overlay');
+            if (ov) ov.classList.add('hidden');
+            try { localStorage.setItem('desolation_tutorial_done', '1'); } catch (e) {}
+        }
+        (function wireTutorial() {
+            var next = document.getElementById('tutorial-next');
+            var back = document.getElementById('tutorial-back');
+            var skip = document.getElementById('tutorial-skip');
+            if (next) next.addEventListener('click', function() {
+                if (_tutIndex >= TUTORIAL_STEPS.length - 1) { endTutorial(); return; }
+                _tutIndex++; _tutRenderStep();
+            });
+            if (back) back.addEventListener('click', function() { if (_tutIndex > 0) { _tutIndex--; _tutRenderStep(); } });
+            if (skip) skip.addEventListener('click', endTutorial);
+            window.addEventListener('resize', function() { if (_tutActive) _tutRenderStep(); });
+            document.addEventListener('keydown', function(e) {
+                if (!_tutActive) return;
+                if (e.key === 'Escape') endTutorial();
+                else if (e.key === 'ArrowRight' || e.key === 'Enter') document.getElementById('tutorial-next').click();
+                else if (e.key === 'ArrowLeft') document.getElementById('tutorial-back').click();
+            });
+            var menuBtn = document.getElementById('btn-howto');
+            if (menuBtn) menuBtn.addEventListener('click', function() { startTutorial(); });
+            var optBtn = document.getElementById('opt-howto');
+            if (optBtn) optBtn.addEventListener('click', function() {
+                document.getElementById('options-panel').classList.remove('visible');
+                startTutorial();
+            });
+        })();
+
         // First: show "Click to start" so audio can play after user gesture. Then run intro.
         (function init() {
             const clickStart = document.getElementById('click-to-start');
@@ -4574,6 +4748,7 @@
                         skip.style.cssText = 'opacity:0.8;';
                         skip.addEventListener('click', function() {
                             sessionStorage.setItem('desolation_skip_intro', '1');
+                            window._introSkipped = true;
                             showScreen('cinema-title-full');
                             showMenuOverlay();
                         });
