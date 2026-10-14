@@ -892,8 +892,10 @@
         }
 
         function runIntro() {
+            const introShow = (id) => { if (!window._introSkipped) showScreen(id); };
+            const introMenu = () => { if (!window._introSkipped) showMenuOverlay(); };
             const cinema = document.getElementById('cinema');
-            if (!cinema) { showMenuOverlay(); return; }
+            if (!cinema) { introMenu(); return; }
             cinema.classList.remove('hidden');
             cinema.style.display = 'block';
 
@@ -906,22 +908,22 @@
 
             function next() {
                 // 1) Fade in dev card, play bell, card stays visible for bell duration + 1s
-                showScreen('cinema-dev');
+                introShow('cinema-dev');
                 bell.play().catch(() => {});
                 const bellMs = getAudioDurationMs(bell, 3);
                 setTimeout(() => {
                     // 2) White screen, logo marquee flies in (no second bell)
-                    showScreen('cinema-white');
+                    introShow('cinema-white');
                     document.getElementById('img-marquee').classList.add('logo-marquee');
                     setTimeout(() => {
                         // 3) Fade in studio card, logo flashes briefly then remains, play studio.mp3, stay duration+1s
-                        showScreen('cinema-studio');
+                        introShow('cinema-studio');
                         document.getElementById('img-studio').classList.add('flash');
                         setTimeout(() => document.getElementById('img-studio').classList.remove('flash'), 400);
                         studioAudio.play().catch(() => {});
                         const studioMs = getAudioDurationMs(studioAudio, 3);
                         setTimeout(() => {
-                            showScreen('cinema-black');
+                            introShow('cinema-black');
                             if (musicOn()) { titleAudio.volume = 0; titleAudio.play().catch(() => {}); }
                             const fade = setInterval(() => {
                                 if (titleAudio.volume < 0.9) titleAudio.volume += 0.05;
@@ -929,11 +931,11 @@
                             }, 80);
                             setTimeout(() => {
                                 const flash = (screenId, nextScreenId, delay) => {
-                                    showScreen(screenId);
+                                    introShow(screenId);
                                     const img = document.querySelector('#' + screenId + ' img');
                                     if (img) { img.classList.add('flash'); setTimeout(() => img.classList.remove('flash'), 400); }
                                     setTimeout(() => {
-                                        if (nextScreenId) showScreen(nextScreenId);
+                                        if (nextScreenId) introShow(nextScreenId);
                                     }, delay || 800);
                                 };
                                 flash('cinema-title-dark', null, 800);
@@ -948,7 +950,7 @@
                                     function goToMenu() {
                                         if (howlDone) return;
                                         howlDone = true;
-                                        showMenuOverlay();
+                                        introMenu();
                                     }
                                     var contBtn = document.createElement('button');
                                     contBtn.className = 'menu-btn howl-continue';
@@ -4726,6 +4728,7 @@
                         skip.style.cssText = 'opacity:0.8;';
                         skip.addEventListener('click', function() {
                             sessionStorage.setItem('desolation_skip_intro', '1');
+                            window._introSkipped = true;
                             showScreen('cinema-title-full');
                             showMenuOverlay();
                         });
