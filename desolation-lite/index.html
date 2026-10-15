@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desolation: Idle Pack, a free werewolf sanctuary idle game</title>
+<meta name="description" content="Rebuild a werewolf sanctuary: feed and train your wolves, explore at night, fight in the arena and grow your pack while you are away. Free in your browser, no download.">
+<link rel="canonical" href="https://desolationlite.rastacamp.com/">
+<meta property="og:title" content="Desolation: Idle Pack">
+<meta property="og:description" content="Raise a werewolf pack, send fighters into the arena, and keep the sanctuary running while you are away. Free in your browser.">
+<meta property="og:image" content="https://desolationlite.rastacamp.com/visuals/og-cover.jpg">
+<meta property="og:url" content="https://desolationlite.rastacamp.com/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+/* ============================================================================
+   DESOLATION: IDLE PACK — the "lite" edition. One file, same as the original.
+   FOR MODDERS: balance numbers live in CONFIG / BUILDINGS / WORKER_ROLES / ENEMIES
+   near the top of the <script>. Colors & spacing live here in :root.
+   ============================================================================ */
+:root{
+  --bg:#0a0712; --bg2:#140d20; --panel:#18101f; --panel2:#1f1830;
+  --line:rgba(170,140,210,0.25); --text:#ece3f5; --muted:#a393bd;
+  --accent:#b78bea; --accent-dim:#7c5aa6; --good:#6fbf85; --warn:#d9a054; --bad:#d9646f;
+  --glow:0 0 18px rgba(183,139,234,0.3);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  font-family:'Georgia','Crimson Text',serif; color:var(--text); min-height:100vh;
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(120,80,160,0.25), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 110% 10%, rgba(80,50,120,0.2), transparent 60%),
+    var(--bg);
+  overflow-x:hidden;
+}
+button{font-family:inherit; cursor:pointer;}
+.hidden{display:none !important;}
+img{display:block;}
+
+/* ---------- Title screen ---------- */
+#title-screen{
+  position:fixed; inset:0; z-index:5000; display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(ellipse at 50% 30%, #1b1328 0%, #07050c 70%); flex-direction:column; text-align:center; padding:24px;
+}
+.title-art{max-width:min(90vw,420px); margin:0 auto 8px; filter:drop-shadow(0 0 30px rgba(170,130,220,0.35));}
+#title-screen h1{font-size:2.2em; letter-spacing:0.04em; color:var(--accent); text-shadow:0 0 30px rgba(180,140,220,0.45); margin-bottom:2px;}
+#title-screen h1 span{display:block; font-size:0.42em; letter-spacing:0.3em; color:var(--muted); font-weight:normal; margin-top:4px;}
+.menu-buttons{display:flex; flex-direction:column; gap:10px; min-width:270px; margin-top:28px;}
+.menu-btn{
+  padding:13px 22px; font-size:1em; background:rgba(100,70,130,0.3); border:1px solid var(--line);
+  color:var(--text); border-radius:6px; transition:all 0.2s ease;
+}
+.menu-btn:hover{background:rgba(130,95,165,0.45); border-color:rgba(190,160,220,0.6); transform:translateY(-1px);}
+.menu-btn:disabled{opacity:0.45; cursor:not-allowed; transform:none;}
+.menu-btn.danger{background:rgba(140,60,60,0.35); border-color:rgba(190,90,90,0.5);}
+
+/* ---------- Options panel (shared overlay style) ---------- */
+.overlay{position:fixed; inset:0; z-index:9000; background:rgba(6,4,10,0.92); display:flex; align-items:center; justify-content:center; padding:20px;}
+.overlay.hidden{display:none;}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px 26px; max-width:460px; width:100%; max-height:85vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+.card h2{color:var(--accent); margin-bottom:16px; font-size:1.3em;}
+.opt-row{display:flex; align-items:center; gap:10px; margin:10px 0; flex-wrap:wrap;}
+.opt-row label{cursor:pointer;}
+select,input[type=range],input[type=text]{padding:7px 10px; background:#140c1e; color:var(--text); border:1px solid var(--line); border-radius:5px;}
+
+/* ---------- Game shell ---------- */
+#game-root{min-height:100vh; display:flex; flex-direction:column;}
+#topbar{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 14px;
+  background:rgba(10,7,16,0.92); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:200;
+}
+.res-chip{display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.04); border:1px solid var(--line); border-radius:20px; padding:5px 12px; font-size:0.9em; white-space:nowrap;}
+.res-chip img{width:18px; height:18px; object-fit:contain;}
+.res-chip .rate{color:var(--good); font-size:0.78em; opacity:0.85;}
+.moon-chip{display:flex; align-items:center; gap:8px; margin-left:auto; font-size:0.85em; color:var(--muted);}
+.moon-dot{width:22px; height:22px; border-radius:50%; background:radial-gradient(circle at 32% 30%, #ece3f5, #8f7aad); box-shadow:var(--glow);}
+.topbar-actions{display:flex; gap:6px;}
+.icon-btn{background:rgba(255,255,255,0.05); border:1px solid var(--line); color:var(--text); border-radius:6px; padding:6px 10px; font-size:0.85em;}
+.icon-btn:hover{background:rgba(255,255,255,0.1);}
+
+#tabs{display:flex; gap:6px; padding:8px 14px; background:rgba(14,10,20,0.8); border-bottom:1px solid var(--line); overflow-x:auto;}
+.tab{background:transparent; border:1px solid transparent; color:var(--muted); padding:8px 16px; border-radius:20px; font-size:0.95em; white-space:nowrap;}
+.tab.active{background:rgba(140,100,180,0.25); border-color:var(--line); color:var(--text);}
+.tab:hover:not(.active){background:rgba(255,255,255,0.05);}
+
+#tab-content{flex:1; padding:16px; max-width:900px; width:100%; margin:0 auto;}
+.tab-panel{display:flex; flex-direction:column; gap:14px;}
+
+/* ---------- Den ---------- */
+.pack-strip{display:flex; gap:8px; flex-wrap:wrap;}
+.pack-chip{background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:8px; padding:6px 12px; font-size:0.85em;}
+.pack-chip.active{background:rgba(140,100,180,0.3); border-color:var(--accent-dim);}
+
+.wolf-card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; position:relative; overflow:hidden;}
+.wolf-scene{position:relative; height:180px; border-radius:10px; overflow:hidden; margin-bottom:14px; background:#1a1326;}
+.wolf-scene .scene-bg{position:absolute; inset:0; background-size:cover; background-position:center;}
+.wolf-scene .scene-weather{position:absolute; inset:0; background-size:cover; opacity:0.8; pointer-events:none;}
+.wolf-scene .scene-sprite{position:absolute; bottom:0; left:50%; transform:translateX(-50%); height:160px; object-fit:contain; filter:drop-shadow(0 8px 10px rgba(0,0,0,0.5));}
+.wolf-scene .busy-banner{position:absolute; top:8px; left:0; right:0; text-align:center; font-size:0.85em; background:rgba(0,0,0,0.5); padding:4px; color:var(--accent);}
+.wolf-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+.wolf-head .name{font-size:1.25em; color:var(--accent);}
+.form-tag{font-size:0.75em; padding:3px 9px; border-radius:10px; margin-left:8px; vertical-align:middle;}
+.form-human{background:rgba(90,110,150,0.35);}
+.form-hybrid{background:rgba(150,120,80,0.35);}
+.form-wolf{background:rgba(150,60,60,0.35);}
+.bar-row{margin:7px 0;}
+.bar-label{display:flex; justify-content:space-between; font-size:0.8em; margin-bottom:2px; color:var(--muted);}
+.bar-track{height:11px; background:rgba(0,0,0,0.45); border-radius:6px; overflow:hidden;}
+.bar-fill{height:100%; border-radius:6px; transition:width 0.3s ease;}
+.bar-hp{background:#6fbf85;} .bar-stamina{background:#6f9fbf;} .bar-hunger{background:#bf9a6f;}
+.bar-thirst{background:#6f9fbf;} .bar-bond{background:#9f7fbf;} .bar-fear{background:#bf6f6f;} .bar-xp{background:#bfa96f;}
+.wolf-actions{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; margin-top:12px;}
+.btn{padding:11px 14px; border-radius:7px; border:1px solid var(--line); background:rgba(70,50,95,0.4); color:var(--text); font-size:0.9em; transition:all 0.2s ease;}
+.btn:hover:not(:disabled){background:rgba(100,75,130,0.55); transform:translateY(-1px);}
+.btn:disabled{opacity:0.45; cursor:not-allowed; transform:none;}
+.btn-good{border-color:rgba(100,170,110,0.5); background:rgba(45,80,55,0.35);}
+.btn-bad{border-color:rgba(190,90,90,0.5); background:rgba(90,45,45,0.35);}
+
+/* ---------- Village ---------- */
+.section-title{color:var(--accent); font-size:1.05em; margin:4px 0 4px; letter-spacing:0.03em;}
+.grid-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px;}
+.b-card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px;}
+.b-card .b-head{display:flex; align-items:center; gap:10px;}
+.b-card img.icon{width:40px; height:40px; object-fit:contain; border-radius:6px; background:rgba(255,255,255,0.05); padding:4px;}
+.b-card .b-name{font-size:1em; color:var(--text);}
+.b-card .b-sub{font-size:0.78em; color:var(--muted);}
+.b-card .b-desc{font-size:0.82em; color:var(--muted); line-height:1.4;}
+.meter{height:8px; background:rgba(0,0,0,0.4); border-radius:5px; overflow:hidden;}
+.meter > div{height:100%; background:var(--accent-dim); border-radius:5px;}
+.worker-card{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+.worker-card img{width:44px; height:44px; object-fit:cover; border-radius:8px;}
+.worker-meta{flex:1; min-width:150px; font-size:0.9em;}
+.worker-meta .wname{color:var(--text);}
+.worker-meta .wrole{color:var(--muted); font-size:0.85em;}
+.threat-bar{display:flex; align-items:center; gap:8px; font-size:0.85em; color:var(--muted);}
+.threat-bar .meter{flex:1; min-width:100px;}
+
+/* ---------- Battle ---------- */
+.arena-card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px;}
+.vs-row{display:flex; align-items:center; justify-content:center; gap:18px; margin:14px 0; flex-wrap:wrap;}
+.fighter{text-align:center; width:110px;}
+.fighter img{width:90px; height:90px; object-fit:contain; margin:0 auto 6px;}
+.vs-txt{font-size:1.3em; color:var(--accent); font-weight:bold;}
+#battle-log{background:rgba(0,0,0,0.4); border-radius:8px; padding:10px; max-height:160px; overflow-y:auto; font-size:0.88em; margin-top:10px;}
+#battle-log div{padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04);}
+
+/* ---------- Story feed ---------- */
+#story-feed-wrap{background:rgba(10,7,14,0.92); border-top:1px solid var(--line); padding:10px 16px; max-height:120px; overflow-y:auto;}
+.story-line{font-size:0.86em; padding:4px 10px; margin:3px 0; border-left:3px solid rgba(150,120,180,0.5); background:rgba(255,255,255,0.03); border-radius:4px;}
+.story-line.critical{border-left-color:var(--bad);}
+.story-line.high{border-left-color:var(--warn);}
+.story-line.good{border-left-color:var(--good);}
+
+/* ---------- Tutorial (spotlight tour) ---------- */
+.tutorial-overlay{position:fixed; inset:0; z-index:25000;}
+.tutorial-overlay.hidden{display:none;}
+.tutorial-spot{position:fixed; border-radius:10px; pointer-events:none; box-shadow:0 0 0 9999px rgba(5,3,9,0.84); border:2px solid rgba(183,139,234,0.85); opacity:0; transition:all 0.3s ease;}
+.tutorial-spot.visible{opacity:1;}
+.tutorial-box{position:fixed; max-width:360px; width:calc(100vw - 32px); background:#17101f; border:1px solid var(--line); border-radius:10px; padding:20px 22px; z-index:25001; left:50%; top:50%; transform:translate(-50%,-50%); transition:left 0.3s ease, top 0.3s ease; box-shadow:0 14px 50px rgba(0,0,0,0.6);}
+.tutorial-box h3{color:var(--accent); margin-bottom:8px;}
+.tutorial-box p{font-size:0.93em; line-height:1.55; white-space:pre-line; color:#ded3ee;}
+.tutorial-nav{display:flex; align-items:center; gap:8px; margin-top:16px; flex-wrap:wrap;}
+.tutorial-nav .prog{font-size:0.78em; color:var(--muted); margin-right:auto;}
+
+@media (max-width:640px){
+  #title-screen h1{font-size:1.7em;}
+  .wolf-scene{height:150px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ TITLE SCREEN ============================ -->
+<div id="title-screen">
+  <img class="title-art" src="visuals/title_full.png" alt="Desolation" onerror="this.style.display='none'">
+  <h1>Desolation <span>Idle Pack</span></h1>
+  <div class="menu-buttons">
+    <button class="menu-btn" id="btn-new">New Game</button>
+    <button class="menu-btn" id="btn-continue">Continue</button>
+    <button class="menu-btn" id="btn-howto">How to Play</button>
+    <button class="menu-btn" id="btn-options">Options</button>
+  </div>
+</div>
+
+<!-- ============================ OPTIONS ============================ -->
+<div class="overlay hidden" id="options-overlay">
+  <div class="card">
+    <h2>Options</h2>
+    <p style="font-size:0.85em; color:var(--muted); margin-bottom:8px;">AUDIO</p>
+    <div class="opt-row"><label><input type="checkbox" id="opt-music" checked> Music</label></div>
+    <div class="opt-row"><label><input type="checkbox" id="opt-sfx" checked> Sound effects</label></div>
+    <div class="opt-row"><label><input type="checkbox" id="opt-ambient" checked> Ambient (rain/wind/crickets)</label></div>
+    <div class="opt-row"><label>Volume</label><input type="range" id="opt-volume" min="0" max="100" value="45"><span id="opt-volume-val">45%</span></div>
+    <div class="opt-row">
+      <label>Track mode</label>
+      <select id="opt-track-mode">
+        <option value="all" selected>All tracks (random)</option>
+        <option value="one">One track (below)</option>
+      </select>
+    </div>
+    <div class="opt-row">
+      <label>Track</label>
+      <select id="opt-track"></select>
+    </div>
+    <hr style="border-color:var(--line); margin:12px 0; width:100%;">
+    <div class="opt-row"><button class="menu-btn" id="opt-howto">Replay walkthrough tutorial</button></div>
+    <div class="opt-row"><button class="menu-btn danger" id="opt-delete-save">Delete saved game</button></div>
+    <button class="menu-btn" id="opt-back" style="margin-top:6px;">Back</button>
+  </div>
+</div>
+
+<!-- ============================ GAME ============================ -->
+<div id="game-root" class="hidden">
+  <header id="topbar">
+    <div class="res-chip" title="Food"><img src="visuals/fresh_meat.PNG" onerror="this.style.display='none'"><span id="res-food">0</span><span class="rate" id="rate-food"></span></div>
+    <div class="res-chip" title="Water"><img src="visuals/water_canteen.PNG" onerror="this.style.display='none'"><span id="res-water">0</span><span class="rate" id="rate-water"></span></div>
+    <div class="res-chip" title="Materials"><img src="visuals/wood_bundle.PNG" onerror="this.style.display='none'"><span id="res-materials">0</span><span class="rate" id="rate-materials"></span></div>
+    <div class="res-chip" title="Essence"><img src="visuals/health_potion.PNG" onerror="this.style.display='none'"><span id="res-essence">0</span></div>
+    <div class="moon-chip"><div class="moon-dot"></div><div><div id="day-label">Day 1</div><div id="moon-label">New Moon</div></div></div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="btn-save">Save</button>
+      <button class="icon-btn" id="btn-settings">Settings</button>
+      <button class="icon-btn" id="btn-quit">Menu</button>
+    </div>
+  </header>
+  <nav id="tabs">
+    <button class="tab active" data-tab="den">Den</button>
+    <button class="tab" data-tab="village">Village</button>
+    <button class="tab" data-tab="battle">Battle</button>
+  </nav>
+  <main id="tab-content">
+    <!-- DEN -->
+    <section class="tab-panel" id="tab-den">
+      <div class="pack-strip" id="pack-strip"></div>
+      <div class="wolf-card" id="wolf-card"></div>
+      <div id="achievements-strip" style="font-size:0.82em; color:var(--muted);"></div>
+    </section>
+    <!-- VILLAGE -->
+    <section class="tab-panel hidden" id="tab-village">
+      <div>
+        <div class="section-title">Buildings</div>
+        <div class="grid-cards" id="buildings-grid"></div>
+      </div>
+      <div>
+        <div class="section-title">Rabbit Hutch</div>
+        <div class="grid-cards" id="hutch-card"></div>
+      </div>
+      <div>
+        <div class="section-title">Workers</div>
+        <div class="threat-bar"><span>Threat</span><div class="meter"><div id="threat-fill" style="width:10%"></div></div><span id="threat-pct">10%</span></div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0;">
+          <label>Hire as:</label>
+          <select id="hire-role"></select>
+          <button class="btn btn-good" id="btn-hire">Hire worker</button>
+          <span id="hire-cost" style="font-size:0.85em; color:var(--muted);"></span>
+        </div>
+        <div id="workers-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+    </section>
+    <!-- BATTLE -->
+    <section class="tab-panel hidden" id="tab-battle">
+      <div class="arena-card">
+        <div class="section-title" style="margin-top:0;">Arena — Rank <span id="arena-rank">1</span></div>
+        <p style="font-size:0.85em; color:var(--muted);">Raise your pack, then send a fighter into the arena. Wins raise your Rank and earn Essence. Losses cost nothing but pride.</p>
+        <div class="opt-row">
+          <label>Fighter</label>
+          <select id="arena-fighter"></select>
+          <button class="btn" id="btn-find-opponent">Find opponent</button>
+        </div>
+        <div class="vs-row hidden" id="arena-vs">
+          <div class="fighter"><img id="arena-player-img" src=""><div id="arena-player-name"></div><div class="meter"><div id="arena-player-power"></div></div></div>
+          <div class="vs-txt">VS</div>
+          <div class="fighter"><img id="arena-enemy-img" src=""><div id="arena-enemy-name"></div><div class="meter"><div id="arena-enemy-power"></div></div></div>
+        </div>
+        <div class="opt-row hidden" id="arena-fight-row">
+          <button class="btn btn-good" id="btn-fight">Fight</button>
+          <button class="btn" id="btn-flee-arena">Back down</button>
+        </div>
+        <div id="battle-log"></div>
+        <p style="font-size:0.85em; color:var(--muted); margin-top:10px;">Record: <span id="arena-record">0W / 0L</span></p>
+        <button class="menu-btn" disabled style="margin-top:10px; opacity:0.6;">Multiplayer (Coming Soon)</button>
+      </div>
+    </section>
+  </main>
+  <div id="story-feed-wrap"><div id="story-feed"></div></div>
+</div>
+
+<!-- ============================ TUTORIAL ============================ -->
+<div class="tutorial-overlay hidden" id="tutorial-overlay">
+  <div class="tutorial-spot" id="tutorial-spot"></div>
+  <div class="tutorial-box" id="tutorial-box">
+    <h3 id="tutorial-title"></h3>
+    <p id="tutorial-body"></p>
+    <div class="tutorial-nav">
+      <span class="prog" id="tutorial-progress"></span>
+      <button type="button" class="menu-btn" id="tutorial-skip" style="padding:7px 14px;">Skip</button>
+      <button type="button" class="menu-btn" id="tutorial-back" style="padding:7px 14px;">Back</button>
+      <button type="button" class="menu-btn" id="tutorial-next" style="padding:7px 14px;">Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- Generic modal root for the achievements popup -->
+<div id="modal-root"></div>
+
+<script>
+/* ============================================================================
+   DESOLATION: IDLE PACK — engine
+   Train / feed / explore with your werewolves. Build a farm, a well, a
+   scavenger post and a rabbit hutch so they run themselves. Hire workers to
+   automate the busywork (they occasionally get scared off or eaten — hire
+   more). Fight in the arena to raise your Rank. Full moons raise the stakes.
+   ============================================================================ */
+
+// ---------- small helpers ----------
+function $(id){ return document.getElementById(id); }
+function loadAudio(src){ var a = new Audio(); a.preload='auto'; a.src=src; return a; }
+function clamp(v,lo,hi){ return Math.max(lo, Math.min(hi, v)); }
+function fmt(n){ n = Math.floor(n); return n.toLocaleString(); }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+const V = 'visuals/';
+
+// ============================================================================
+// CONFIG — tune the game here
+// ============================================================================
+const CONFIG = {
+  TICK_SEC: 1,
+  DAY_LENGTH_SEC: 300,        // 5 real minutes = 1 in-game day; 28 days per moon cycle
+  MAX_OFFLINE_SEC: 8*3600,    // offline progress cap
+  MAX_PACK: 6,
+  MAX_WORKERS: 8,
+  TRAIN_SEC: 18, TRAIN_STAMINA: 15,
+  EXPLORE_SEC: 28, EXPLORE_STAMINA: 20,
+  FEED_FOOD: 5, FEED_WATER: 5,
+  ENCOUNTER_CHANCE: 0.25,
+  RECRUIT_CHANCE: 0.12,
+  RECRUIT_COST_MATERIALS: 10,
+};
+
+const BUILDINGS = {
+  farm:   { name:'Farm', icon:'farm_sprouts.PNG', desc:'Grows food on its own.', res:'food', buildCost:{materials:10}, baseRate:0.12, rateStep:0.08, clickYield:3, clickStep:1, upCost:{materials:12}, upMult:1.55 },
+  well:   { name:'Rain Catcher', icon:'water_canteen.PNG', desc:'Collects water on its own.', res:'water', buildCost:{materials:10}, baseRate:0.12, rateStep:0.08, clickYield:3, clickStep:1, upCost:{materials:12}, upMult:1.55 },
+  quarry: { name:'Scavenger Post', icon:'wood_bundle.PNG', desc:'Gathers scrap and lumber.', res:'materials', buildCost:{food:12,water:12}, baseRate:0.08, rateStep:0.05, clickYield:2, clickStep:1, upCost:{food:10,water:10}, upMult:1.55 },
+  watchtower: { name:'Watchtower', icon:'security.PNG', desc:'Lowers Threat — fewer worker incidents.', buildCost:{materials:20}, upCost:{materials:18}, upMult:1.6 },
+  den:    { name:'Den', icon:'female_wolf_cage.PNG', desc:'Expands how many wolves you can keep.', buildCost:null, upCost:{materials:25, essence:2}, upMult:1.7 },
+};
+
+const WORKER_ROLES = {
+  farmer:        { name:'Farmer',        portrait:'cook.PNG',        action:'food',      baseInterval:9000,  baseYield:4 },
+  water_carrier: { name:'Water Carrier', portrait:'repair_man.PNG',  action:'water',     baseInterval:9000,  baseYield:4 },
+  quarrier:      { name:'Quarrier',      portrait:'commander.PNG',   action:'materials', baseInterval:11000, baseYield:3 },
+  rabbit_keeper: { name:'Rabbit Keeper', portrait:'doctor.PNG',      action:'harvest' },
+  trainer:       { name:'Trainer',       portrait:'security.PNG',    action:'train' },
+  scout:         { name:'Scout',         portrait:'commander.PNG',   action:'explore' },
+  guard:         { name:'Guard',         portrait:'security.PNG',    passive:true },
+};
+const WORKER_BASE_INTERVAL = { rabbit_keeper:15000, trainer:20000, scout:26000 };
+
+const ENEMIES = [
+  { name:'Wild Boar', img:'boar.PNG', power:11 },
+  { name:'Feral Werewolf', img:'mangy_wolf.png', power:18 },
+  { name:'Ghoul', img:'ghoul.PNG', power:26 },
+  { name:'Shadow Beast', img:'dark_vampire.PNG', power:34 },
+  { name:'Evil Succubus', img:'evil_succubus.PNG', power:42 },
+];
+
+const ACHIEVEMENTS = [
+  { id:'first_building', name:'Groundbreaking', desc:'Build your first structure.', check:s=>Object.keys(BUILDINGS).some(k=>k!=='den'&&s.buildings[k].built) },
+  { id:'first_litter', name:'First Litter', desc:'Grow the rabbit colony past 5.', check:s=>s.rabbits.count>=5 },
+  { id:'pack_of_three', name:'Pack of Three', desc:'Recruit a third werewolf.', check:s=>s.pack.length>=3 },
+  { id:'full_crew', name:'Full Crew', desc:'Hire 4 workers.', check:s=>s.workers.filter(w=>w.alive).length>=4 },
+  { id:'arena_regular', name:'Arena Regular', desc:'Win 5 arena battles.', check:s=>s.battle.wins>=5 },
+  { id:'blood_moon', name:'Blood Moon Survivor', desc:'Live through a full moon.', check:s=>s.flags.survivedFullMoon },
+  { id:'self_sufficient', name:'Self-Sufficient', desc:'Build the Farm, Rain Catcher and Scavenger Post.', check:s=>s.buildings.farm.built&&s.buildings.well.built&&s.buildings.quarry.built },
+  { id:'essence_hoard', name:'Essence Hoard', desc:'Hold 50 Essence at once.', check:s=>s.resources.essence>=50 },
+];
+
+const WOLF_NAMES = ['Luna','Shadow','Ember','Fang','Rust','Ash','Storm','Breeze','Mist','Onyx'];
+
+// ============================================================================
+// STATE
+// ============================================================================
+let state = null;
+const storyLog = [];
+const STORY_MAX = 16;
+function addStory(text, priority){
+  storyLog.unshift({ text, priority: priority||'medium', ts: Date.now() });
+  while (storyLog.length > STORY_MAX) storyLog.pop();
+}
+
+function createWolf(overrides){
+  overrides = overrides || {};
+  return Object.assign({
+    id: 'w' + Math.random().toString(36).slice(2,9),
+    name: overrides.name || pick(WOLF_NAMES),
+    level:1, xp:0, xpToNext:40,
+    hp:100, maxHp:100, stamina:100, maxStamina:100,
+    hunger:25, thirst:25, bond:40, fear:15,
+    str:10, spd:10, end:10,
+    form:'human',
+    busy:null, busyUntil:0,
+  }, overrides);
+}
+
+function createWorker(role){
+  var base = (state && state.simNow) ? state.simNow : Date.now();
+  return { id:'e'+Math.random().toString(36).slice(2,9), role, level:1, alive:true, nextActionAt: base+2000 };
+}
+
+function createState(){
+  return {
+    version:'1.0.0',
+    resources:{ food:15, water:15, materials:20, essence:0 },
+    rabbits:{ count:0, capBonus:0 },
+    buildings:{
+      farm:{built:false, level:0}, well:{built:false, level:0}, quarry:{built:false, level:0},
+      watchtower:{built:false, level:0}, den:{built:true, level:1},
+    },
+    workers: [],
+    pack: [ createWolf({ name:'Luna' }) ],
+    selectedWolf: 0,
+    world:{ day:1, t:0, timeOfDay:'dawn', moonPhase:'new', moonIllum:0, daysToFull:14, weather:'clear' },
+    threat: 10,
+    battle:{ wins:0, losses:0, rank:1 },
+    achievements:{},
+    flags:{},
+    lastSavedAt: Date.now(),
+    simNow: Date.now(),
+  };
+}
+
+function maxPack(){ return clamp(1 + (state.buildings.den.level-1), 1, CONFIG.MAX_PACK); }
+
+// ============================================================================
+// AUDIO
+// ============================================================================
+var musicAudio = null;
+var weatherAudio = null;
+var ambientCue = null;
+var trackPlayed = {};
+function pickTrack(){
+  var opts = Array.from($('opt-track').options).map(o=>o.value);
+  if (!opts.length) return null;
+  var avail = opts.filter(t=>!trackPlayed[t]);
+  if (!avail.length){ trackPlayed = {}; avail = opts; }
+  var t = pick(avail); trackPlayed[t] = true; return t;
+}
+function musicOn(){ return $('opt-music').checked; }
+function sfxOn(){ return $('opt-sfx').checked; }
+function ambientOn(){ return $('opt-ambient').checked; }
+function getVolume(){ return clamp(parseInt($('opt-volume').value,10)||45,0,100)/100; }
+function startMusic(){
+  if (!musicOn()) return;
+  if (musicAudio){ musicAudio.pause(); musicAudio = null; }
+  var mode = $('opt-track-mode').value;
+  var track = mode==='one' ? $('opt-track').value : pickTrack();
+  if (!track) return;
+  musicAudio = new Audio('tracks/' + track);
+  musicAudio.volume = getVolume();
+  musicAudio.play().catch(()=>{});
+  musicAudio.addEventListener('ended', function(){
+    if (!musicOn()) return;
+    var next = mode==='one' ? track : pickTrack();
+    if (next){ musicAudio.src='tracks/'+next; musicAudio.play().catch(()=>{}); }
+  });
+}
+function playSfx(src, vol){
+  if (!sfxOn()) return;
+  try { var a = loadAudio(src); a.volume = vol!=null?vol:0.5; a.play().catch(()=>{}); } catch(e){}
+}
+function playHowl(){ playSfx('howlings.mp3', 0.5); }
+
+// ============================================================================
+// RESOURCE / BUILDING LOGIC
+// ============================================================================
+function canAfford(cost){
+  if (!cost) return true;
+  for (var k in cost){ if ((state.resources[k]||0) < cost[k]) return false; }
+  return true;
+}
+function spend(cost){ for (var k in cost) state.resources[k] = (state.resources[k]||0) - cost[k]; }
+function costText(cost){
+  if (!cost) return 'Free';
+  return Object.keys(cost).map(k=>Math.ceil(cost[k])+' '+k).join(', ');
+}
+function scaledCost(base, mult, level){
+  var out = {}; for (var k in base) out[k] = Math.ceil(base[k]*Math.pow(mult, level));
+  return out;
+}
+function buildBuilding(key){
+  var def = BUILDINGS[key]; var b = state.buildings[key];
+  if (b.built || !canAfford(def.buildCost)) return;
+  spend(def.buildCost); b.built = true; b.level = 1;
+  addStory(def.name + ' built.', 'good');
+  if (key === 'hutch') { state.rabbits.count = 2; }
+  checkAchievements();
+  render();
+}
+function upgradeBuilding(key){
+  var def = BUILDINGS[key]; var b = state.buildings[key];
+  if (!b.built) return;
+  var cost = scaledCost(def.upCost, def.upMult, b.level-1);
+  if (!canAfford(cost)) return;
+  spend(cost); b.level++;
+  addStory(def.name + ' upgraded to level ' + b.level + '.', 'good');
+  render();
+}
+
+// ---------- rabbit hutch is tracked inline (not in BUILDINGS table: has custom growth logic) ----------
+function hutchBuilt(){ return !!(state.buildings.hutch && state.buildings.hutch.built); }
+function hutchLevel(){ return (state.buildings.hutch && state.buildings.hutch.level) || 0; }
+function hutchCapacity(){ return hutchBuilt() ? 6 + hutchLevel()*5 : 0; }
+function buildHutch(){
+  var cost = {materials:15};
+  if (state.buildings.hutch) return;
+  if (!canAfford(cost)) return;
+  spend(cost);
+  state.buildings.hutch = { built:true, level:1 };
+  state.rabbits.count = 2;
+  addStory('Rabbit Hutch built. A pair of rabbits moves in.', 'good');
+  checkAchievements(); render();
+}
+function upgradeHutch(){
+  if (!hutchBuilt()) return;
+  var cost = { materials: Math.ceil(15 * Math.pow(1.6, hutchLevel()-1)) };
+  if (!canAfford(cost)) return;
+  spend(cost); state.buildings.hutch.level++;
+  addStory('Rabbit Hutch upgraded — more room to breed.', 'good');
+  render();
+}
+function harvestRabbits(){
+  var r = state.rabbits;
+  var surplus = Math.floor(r.count) - 2;
+  if (surplus <= 0) return 0;
+  r.count -= surplus;
+  var food = surplus * 2;
+  state.resources.food += food;
+  return food;
+}
+
+// ============================================================================
+// WORKERS
+// ============================================================================
+function hireCost(){ return { materials: 15 + state.workers.filter(w=>w.alive).length*10 }; }
+function hireWorker(role){
+  var cost = hireCost();
+  if (state.workers.filter(w=>w.alive).length >= CONFIG.MAX_WORKERS) return;
+  if (!canAfford(cost)) return;
+  spend(cost);
+  state.workers.push(createWorker(role));
+  addStory('Hired a ' + WORKER_ROLES[role].name + '.', 'good');
+  checkAchievements(); render();
+}
+function workerUpgradeCost(w){ return { materials: 10*(w.level+1) }; }
+function upgradeWorker(id){
+  var w = state.workers.find(x=>x.id===id); if (!w || !w.alive) return;
+  var cost = workerUpgradeCost(w);
+  if (w.level >= 5 || !canAfford(cost)) return;
+  spend(cost); w.level++;
+  addStory((WORKER_ROLES[w.role].name) + ' is now level ' + w.level + '.', 'good');
+  render();
+}
+function dismissWorker(id){
+  var w = state.workers.find(x=>x.id===id); if (!w) return;
+  w.alive = false; state.workers = state.workers.filter(x=>x!==w);
+  render();
+}
+function workerInterval(w){
+  var base = WORKER_ROLES[w.role].baseInterval || WORKER_BASE_INTERVAL[w.role] || 10000;
+  return Math.round(base * (1 - 0.12*(w.level-1)));
+}
+function workerYield(w){
+  var base = WORKER_ROLES[w.role].baseYield || 0;
+  return base * (1 + 0.2*(w.level-1));
+}
+function runWorkerAction(w){
+  var role = WORKER_ROLES[w.role];
+  if (role.action === 'food' || role.action === 'water' || role.action === 'materials'){
+    state.resources[role.action] = (state.resources[role.action]||0) + workerYield(w);
+  } else if (role.action === 'harvest'){
+    if (Math.floor(state.rabbits.count) > hutchCapacity()*0.6) harvestRabbits();
+  } else if (role.action === 'train'){
+    var w2 = pickIdleWolf();
+    if (w2) startTrain(w2, true);
+  } else if (role.action === 'explore'){
+    var w3 = pickIdleWolf();
+    if (w3) startExplore(w3, true);
+  }
+}
+function pickIdleWolf(){
+  return state.pack.find(w => !w.busy && w.stamina > 25 && w.hunger < 85 && w.thirst < 85) || null;
+}
+
+// ============================================================================
+// WOLVES — feed / train / explore
+// ============================================================================
+function formMultiplier(form){ return form==='wolf' ? 1.2 : form==='hybrid' ? 1.1 : 1; }
+function updateWolfForm(w){
+  var shift = state.world.moonIllum*70 + (w.fear||0)*0.3;
+  w.form = shift < 30 ? 'human' : shift < 65 ? 'hybrid' : 'wolf';
+}
+function wolfPower(w){
+  return (w.str + w.spd + w.end + w.level*2) * formMultiplier(w.form) * (1 - Math.min(0.5, (w.fear||0)/200));
+}
+function feedWolf(w){
+  var costF = Math.min(CONFIG.FEED_FOOD, state.resources.food);
+  var costW = Math.min(CONFIG.FEED_WATER, state.resources.water);
+  if (costF<=0 && costW<=0){ addStory('No food or water to feed ' + w.name + '.'); render(); return; }
+  state.resources.food -= costF; state.resources.water -= costW;
+  w.hunger = clamp(w.hunger - 40*(costF/CONFIG.FEED_FOOD || 0), 0, 100);
+  w.thirst = clamp(w.thirst - 40*(costW/CONFIG.FEED_WATER || 0), 0, 100);
+  w.bond = clamp(w.bond + 3, 0, 100);
+  w.fear = clamp(w.fear - 2, 0, 100);
+  addStory('You feed ' + w.name + '. They settle, calmer.', 'good');
+  render();
+}
+function startTrain(w, auto){
+  if (w.busy) return;
+  if (w.stamina < CONFIG.TRAIN_STAMINA){ if(!auto){ addStory('Not enough stamina to train.'); render(); } return; }
+  if (w.hunger > 90 || w.thirst > 90){ if(!auto){ addStory(w.name+' is too hungry or thirsty to train.'); render(); } return; }
+  w.stamina -= CONFIG.TRAIN_STAMINA;
+  w.busy = 'train'; w.busyUntil = state.simNow + CONFIG.TRAIN_SEC*1000;
+  render();
+}
+function finishTrain(w){
+  w.busy = null;
+  w.xp += 10; w.fear = clamp(w.fear-1,0,100);
+  var stat = pick(['str','spd','end']);
+  w[stat] = Math.min(30, w[stat]+1);
+  addStory(w.name + ' trains. ' + stat.toUpperCase() + ' improves.', 'good');
+  tryLevelUp(w);
+}
+function startExplore(w, auto){
+  if (w.busy) return;
+  if (w.stamina < CONFIG.EXPLORE_STAMINA){ if(!auto){ addStory('Not enough stamina to explore.'); render(); } return; }
+  if (w.hunger > 90 || w.thirst > 90){ if(!auto){ addStory(w.name+' is too worn down to explore.'); render(); } return; }
+  w.stamina -= CONFIG.EXPLORE_STAMINA;
+  w.hunger = clamp(w.hunger+5,0,100); w.thirst = clamp(w.thirst+5,0,100);
+  w.busy = 'explore'; w.busyUntil = state.simNow + CONFIG.EXPLORE_SEC*1000;
+  w._autoExplore = !!auto;
+  render();
+}
+function finishExplore(w){
+  w.busy = null;
+  var auto = w._autoExplore; w._autoExplore = false;
+  var food = Math.floor(2+Math.random()*4), mat = Math.random()<0.6?Math.floor(1+Math.random()*2):0;
+  state.resources.food += food; state.resources.materials += mat;
+  w.xp += 15;
+  addStory(w.name + ' returns from exploring. +' + food + ' food' + (mat?', +'+mat+' materials':'') + '.');
+  if (Math.random() < CONFIG.ENCOUNTER_CHANCE){
+    var enemy = Object.assign({}, pick(ENEMIES.slice(0, clamp(1+Math.floor(w.level/2)+ (Math.random()<0.5?1:0), 1, ENEMIES.length))));
+    resolveSkirmish(w, enemy, auto);
+  } else {
+    maybeRecruit();
+    tryLevelUp(w);
+  }
+}
+function resolveSkirmish(w, enemy, auto){
+  var flee = auto && (w.hp < w.maxHp*0.3);
+  if (flee){ addStory(w.name + ' slips past a ' + enemy.name + ' in the dark.'); tryLevelUp(w); return; }
+  var pPow = wolfPower(w), ePow = enemy.power;
+  var pHp = 60, eHp = enemy.power*2.2;
+  var rounds = 0;
+  while (pHp>0 && eHp>0 && rounds<8){
+    rounds++;
+    var pDmg = Math.max(1, Math.floor(pPow*(0.8+Math.random()*0.4)*0.6));
+    eHp -= pDmg;
+    if (eHp<=0) break;
+    var eDmg = Math.max(1, Math.floor(ePow*(0.8+Math.random()*0.4)*0.4));
+    pHp -= eDmg;
+  }
+  if (pHp>0){
+    w.hp = Math.max(1, w.hp - Math.floor((60-pHp)*0.5));
+    var mat = 1+Math.floor(Math.random()*2);
+    state.resources.materials += mat;
+    addStory(w.name + ' fought off a ' + enemy.name + '. +' + mat + ' materials.', 'good');
+    maybeRecruit();
+    tryLevelUp(w);
+  } else {
+    w.hp = Math.max(5, w.hp - 25);
+    w.fear = clamp(w.fear+6,0,100);
+    addStory(w.name + ' was hurt by a ' + enemy.name + ' and retreated.', 'high');
+    tryLevelUp(w);
+  }
+}
+function maybeRecruit(){
+  if (state.pack.length >= maxPack()) return;
+  if (Math.random() >= CONFIG.RECRUIT_CHANCE) return;
+  if (state.resources.materials < CONFIG.RECRUIT_COST_MATERIALS) return;
+  state.resources.materials -= CONFIG.RECRUIT_COST_MATERIALS;
+  var pup = createWolf({ level:1, bond:20, fear:35 });
+  state.pack.push(pup);
+  addStory('A wild werewolf followed you home. ' + pup.name + ' joins the pack!', 'high');
+  checkAchievements();
+}
+function tryLevelUp(w){
+  if (w.xp < w.xpToNext) return;
+  w.xp -= w.xpToNext; w.level++;
+  w.xpToNext = 40 + w.level*18;
+  w.maxHp += 5; w.hp = w.maxHp;
+  w.maxStamina += 3; w.stamina = w.maxStamina;
+  addStory(w.name + ' reaches level ' + w.level + '!', 'good');
+  playHowl();
+  tryLevelUp(w);
+}
+
+// ============================================================================
+// ARENA (deliberate PvC battles — separate from the idle "explore" skirmishes)
+// ============================================================================
+var arenaEnemy = null;
+function findOpponent(){
+  var rank = state.battle.rank;
+  var power = 14 + rank*6 + Math.floor(Math.random()*6);
+  var art = pick(ENEMIES);
+  arenaEnemy = { name: 'Rival ' + art.name, img: art.img, power: power };
+  render();
+}
+function fighterWolf(){ var idx = parseInt($('arena-fighter').value,10)||0; return state.pack[idx]; }
+function arenaFight(){
+  if (!arenaEnemy) return;
+  var w = fighterWolf(); if (!w) return;
+  var log = $('battle-log'); log.innerHTML = '';
+  function line(t){ var d = document.createElement('div'); d.textContent = t; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+  var pPow = wolfPower(w), ePow = arenaEnemy.power;
+  var pHp = 80, eHp = arenaEnemy.power*2.4;
+  line(w.name + ' enters the arena against ' + arenaEnemy.name + '.');
+  var rounds = 0; var lines = [];
+  while (pHp>0 && eHp>0 && rounds<10){
+    rounds++;
+    var pDmg = Math.max(1, Math.floor(pPow*(0.8+Math.random()*0.4)*0.55));
+    eHp = Math.max(0, eHp-pDmg);
+    lines.push(w.name + ' hits for ' + pDmg + '. Enemy HP: ' + Math.ceil(eHp));
+    if (eHp<=0) break;
+    var eDmg = Math.max(1, Math.floor(ePow*(0.8+Math.random()*0.4)*0.4));
+    pHp = Math.max(0, pHp-eDmg);
+    lines.push(arenaEnemy.name + ' hits for ' + eDmg + '. ' + w.name + ' HP: ' + Math.ceil(pHp));
+  }
+  var won = pHp>0;
+  lines.push(won ? (w.name+' wins!') : (w.name+' is defeated.'));
+  var i=0;
+  (function step(){
+    if (i>=lines.length){
+      w.hp = Math.max(1, w.hp - Math.floor((80-pHp)*0.3));
+      if (won){
+        state.battle.wins++;
+        if (state.battle.wins % 3 === 0) state.battle.rank++;
+        var ess = 3+state.battle.rank, mat = 2+Math.floor(state.battle.rank/2);
+        state.resources.essence += ess; state.resources.materials += mat;
+        addStory('Arena victory! +' + ess + ' essence, +' + mat + ' materials.', 'good');
+      } else {
+        state.battle.losses++;
+        state.resources.essence += 1;
+        addStory('Arena defeat. ' + w.name + ' licks their wounds.', 'high');
+      }
+      arenaEnemy = null;
+      checkAchievements();
+      render();
+      return;
+    }
+    line(lines[i]); i++;
+    setTimeout(step, 550);
+  })();
+}
+
+// ============================================================================
+// ACHIEVEMENTS
+// ============================================================================
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(function(a){
+    if (state.achievements[a.id]) return;
+    if (a.check(state)){
+      state.achievements[a.id] = true;
+      state.resources.essence += 5;
+      addStory('Achievement: ' + a.name + '! +5 essence.', 'good');
+    }
+  });
+}
+
+// ============================================================================
+// TICK — the idle heart of the game. Called once per real second, and in a
+// tight loop (with a larger dt) to fast-forward offline progress on load.
+// ============================================================================
+function tick(dtSec){
+  // Use a simulated clock (state.simNow) rather than wall-clock Date.now() for busy/action
+  // timers, so offline catch-up (which calls tick() in a tight loop with large dtSec chunks)
+  // actually resolves wolf actions and worker ticks instead of comparing against real time.
+  state.simNow = (state.simNow || Date.now()) + dtSec*1000;
+  var w = state.world;
+  w.t += dtSec;
+  while (w.t >= CONFIG.DAY_LENGTH_SEC){
+    w.t -= CONFIG.DAY_LENGTH_SEC;
+    w.day++;
+  }
+  var progress = w.t / CONFIG.DAY_LENGTH_SEC;
+  var prevTod = w.timeOfDay;
+  w.timeOfDay = progress<0.25?'dawn':progress<0.5?'day':progress<0.75?'dusk':'night';
+  if (ambientOn() && prevTod!==w.timeOfDay){
+    if (w.timeOfDay==='night') playSfx('crickets.mp3', 0.3);
+    if (w.timeOfDay==='dawn') playSfx('rooster.mp3', 0.35);
+  }
+  var lunarDay = (w.day-1) % 28;
+  var wasFullBefore = w.moonPhase === 'full';
+  if (lunarDay<4){ w.moonPhase='new'; w.moonIllum=lunarDay/4*0.2; }
+  else if (lunarDay<10){ w.moonPhase='waxing'; w.moonIllum=0.2+(lunarDay-4)/6*0.4; }
+  else if (lunarDay<16){ w.moonPhase='full'; w.moonIllum=1; }
+  else if (lunarDay<22){ w.moonPhase='waning'; w.moonIllum=0.9-(lunarDay-16)/6*0.5; }
+  else { w.moonPhase='last'; w.moonIllum=Math.max(0,0.4-(lunarDay-22)/6*0.4); }
+  w.daysToFull = lunarDay<13 ? 13-lunarDay : (lunarDay>=16 ? 28-lunarDay+13 : 0);
+  if (w.moonPhase==='full' && !wasFullBefore){
+    addStory('The full moon rises. Threat spikes across the camp.', 'critical');
+    playHowl();
+  }
+  if (wasFullBefore && w.moonPhase!=='full'){ state.flags.survivedFullMoon = true; checkAchievements(); }
+
+  // weather roll every ~2 minutes
+  w._weatherT = (w._weatherT||0) + dtSec;
+  if (w._weatherT >= 120){
+    w._weatherT = 0;
+    var r = Math.random();
+    w.weather = r<0.2 ? 'rain' : r<0.35 ? 'snow' : 'clear';
+  }
+
+  // building passive production
+  ['farm','well','quarry'].forEach(function(key){
+    var b = state.buildings[key], def = BUILDINGS[key];
+    if (!b.built) return;
+    var rate = (def.baseRate + def.rateStep*(b.level-1)) * dtSec;
+    state.resources[def.res] = (state.resources[def.res]||0) + rate;
+  });
+
+  // rabbits
+  if (hutchBuilt()){
+    var r = state.rabbits, cap = hutchCapacity();
+    if (r.count < cap){
+      if (r.count >= 2){
+        var growth = r.count*0.004*(1+hutchLevel()*0.25)*dtSec + 0.01*dtSec;
+        r.count = Math.min(cap, r.count+growth);
+      }
+    }
+  }
+
+  // threat: recomputed from scratch each tick (not drifting/additive)
+  var base = 8;
+  if (w.timeOfDay==='night') base += 10;
+  if (w.moonPhase==='full') base += 35;
+  var guardCount = state.workers.filter(x=>x.alive && x.role==='guard').length;
+  base -= guardCount*6;
+  if (state.buildings.watchtower.built) base -= 6*state.buildings.watchtower.level;
+  state.threat = clamp(base, 0, 100);
+
+  // wolves: needs, busy timers, form
+  var now = state.simNow;
+  state.pack.forEach(function(wolf){
+    updateWolfForm(wolf);
+    wolf.hunger = clamp(wolf.hunger + 0.03*dtSec, 0, 100);
+    wolf.thirst = clamp(wolf.thirst + 0.035*dtSec, 0, 100);
+    if (wolf.hunger>70 || wolf.thirst>70) wolf.bond = clamp(wolf.bond - 0.01*dtSec, 0, 100);
+    if (wolf.hunger>85 || wolf.thirst>85 || state.threat>65) wolf.fear = clamp(wolf.fear + 0.02*dtSec, 0, 100);
+    else if (wolf.bond>60) wolf.fear = clamp(wolf.fear - 0.01*dtSec, 0, 100);
+    if (!wolf.busy){
+      wolf.stamina = clamp(wolf.stamina + 0.08*dtSec, 0, wolf.maxStamina);
+      wolf.hp = clamp(wolf.hp + 0.05*dtSec, 0, wolf.maxHp);
+    }
+    if (wolf.busy && wolf.busyUntil <= now){
+      if (wolf.busy==='train') finishTrain(wolf);
+      else if (wolf.busy==='explore') finishExplore(wolf);
+    }
+  });
+
+  // workers: auto-actions + incidents
+  state.workers.forEach(function(worker){
+    if (!worker.alive) return;
+    if (WORKER_ROLES[worker.role].passive) return;
+    if (now >= worker.nextActionAt){
+      runWorkerAction(worker);
+      worker.nextActionAt = now + workerInterval(worker);
+    }
+    var incidentChance = (0.00004 + state.threat*0.0000025) * dtSec;
+    if (Math.random() < incidentChance){
+      worker.alive = false;
+      var eaten = Math.random() < 0.35;
+      addStory((WORKER_ROLES[worker.role].name) + (eaten ? ' was dragged off in the night. Gone.' : ' got spooked and fled the camp.'), 'high');
+    }
+  });
+  state.workers = state.workers.filter(w=>w.alive);
+
+  checkAchievements();
+}
+
+// ============================================================================
+// SAVE / LOAD
+// ============================================================================
+const SAVE_KEY = 'desolation_lite_save';
+function saveGame(){
+  try {
+    state.lastSavedAt = Date.now();
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ state, story: storyLog.slice(0,10) }));
+    addStory('Game saved.');
+    render();
+  } catch(e){}
+}
+function hasSave(){ try { return !!localStorage.getItem(SAVE_KEY); } catch(e){ return false; } }
+function loadGame(){
+  try {
+    var raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    var data = JSON.parse(raw);
+    state = data.state;
+    state.world._weatherT = state.world._weatherT || 0;
+    storyLog.length = 0;
+    (data.story||[]).forEach(s=>storyLog.push(s));
+    var elapsed = Math.min(CONFIG.MAX_OFFLINE_SEC, Math.max(0, Math.floor((Date.now()-(state.lastSavedAt||Date.now()))/1000)));
+    if (elapsed > 5){
+      var step = 30, left = elapsed;
+      while (left > 0){ var d = Math.min(step, left); tick(d); left -= d; }
+      addStory('While you were away (' + Math.round(elapsed/60) + ' min): the camp kept itself running.', 'good');
+    }
+    return true;
+  } catch(e){ return false; }
+}
+
+// ============================================================================
+// RENDER
+// ============================================================================
+function sceneBgFor(timeOfDay, threat){
+  if (threat > 55) return 'dirty_cage.png';
+  return timeOfDay==='night'||timeOfDay==='dusk' ? 'clearing_lab_nightime.png' : 'clean_cage.png';
+}
+function wolfSprite(form){
+  return form==='wolf' ? 'female_werewolf.PNG' : form==='hybrid' ? 'female_turning.PNG' : 'human_female.PNG';
+}
+function renderTopbar(){
+  $('res-food').textContent = fmt(state.resources.food);
+  $('res-water').textContent = fmt(state.resources.water);
+  $('res-materials').textContent = fmt(state.resources.materials);
+  $('res-essence').textContent = fmt(state.resources.essence);
+  var fr=0,wr=0,mr=0;
+  ['farm'].forEach(k=>{ if(state.buildings[k].built) fr += BUILDINGS[k].baseRate+BUILDINGS[k].rateStep*(state.buildings[k].level-1); });
+  if (state.buildings.well.built) wr += BUILDINGS.well.baseRate+BUILDINGS.well.rateStep*(state.buildings.well.level-1);
+  if (state.buildings.quarry.built) mr += BUILDINGS.quarry.baseRate+BUILDINGS.quarry.rateStep*(state.buildings.quarry.level-1);
+  $('rate-food').textContent = fr>0 ? '+'+fr.toFixed(2)+'/s' : '';
+  $('rate-water').textContent = wr>0 ? '+'+wr.toFixed(2)+'/s' : '';
+  $('rate-materials').textContent = mr>0 ? '+'+mr.toFixed(2)+'/s' : '';
+  $('day-label').textContent = 'Day ' + state.world.day;
+  var moonNames = {new:'New Moon', waxing:'Waxing', full:'Full Moon', waning:'Waning', last:'Last Quarter'};
+  $('moon-label').textContent = (moonNames[state.world.moonPhase]||state.world.moonPhase) + (state.world.daysToFull>0 ? ' · full in '+state.world.daysToFull+'d' : '');
+}
+function renderPackStrip(){
+  var el = $('pack-strip'); el.innerHTML='';
+  if (state.pack.length < 2) { el.innerHTML=''; return; }
+  state.pack.forEach(function(w,i){
+    var b = document.createElement('button');
+    b.className = 'pack-chip' + (i===state.selectedWolf?' active':'');
+    b.textContent = w.name + ' Lv' + w.level;
+    b.addEventListener('click', function(){ state.selectedWolf = i; render(); });
+    el.appendChild(b);
+  });
+}
+function renderWolfCard(){
+  var w = state.pack[state.selectedWolf] || state.pack[0];
+  var el = $('wolf-card');
+  if (!w){ el.innerHTML = '<p>No wolves left. The pack has ended.</p>'; return; }
+  var tod = state.world.timeOfDay;
+  var weatherImg = state.world.weather==='rain' ? 'rain.png' : state.world.weather==='snow' ? 'snow.png' : '';
+  var busyBanner = '';
+  if (w.busy){
+    var secLeft = Math.max(0, Math.ceil((w.busyUntil-state.simNow)/1000));
+    busyBanner = '<div class="busy-banner">' + (w.busy==='train'?'Training':'Exploring') + '… ' + secLeft + 's</div>';
+  }
+  var html = '';
+  html += '<div class="wolf-scene">';
+  html += '<div class="scene-bg" style="background-image:url(' + V + sceneBgFor(tod, state.threat) + ')"></div>';
+  if (weatherImg) html += '<div class="scene-weather" style="background-image:url(' + V + weatherImg + ')"></div>';
+  html += '<img class="scene-sprite" src="' + V + wolfSprite(w.form) + '" onerror="this.style.display=\'none\'">';
+  html += busyBanner;
+  html += '</div>';
+  html += '<div class="wolf-head"><span><span class="name">' + w.name + '</span><span class="form-tag form-' + w.form + '">' + w.form + '</span></span><span style="font-size:0.85em; color:var(--muted);">Lv ' + w.level + '</span></div>';
+  function bar(label, val, max, cls){
+    var pct = clamp((val/(max||100))*100,0,100);
+    return '<div class="bar-row"><div class="bar-label"><span>' + label + '</span><span>' + Math.round(val) + (max&&max!==100?'/'+Math.round(max):'') + '</span></div><div class="bar-track"><div class="bar-fill ' + cls + '" style="width:' + pct + '%"></div></div></div>';
+  }
+  html += bar('HP', w.hp, w.maxHp, 'bar-hp');
+  html += bar('Stamina', w.stamina, w.maxStamina, 'bar-stamina');
+  html += bar('Hunger', w.hunger, 100, 'bar-hunger');
+  html += bar('Thirst', w.thirst, 100, 'bar-thirst');
+  html += bar('Bond', w.bond, 100, 'bar-bond');
+  html += bar('Fear', w.fear, 100, 'bar-fear');
+  html += bar('XP', w.xp, w.xpToNext, 'bar-xp');
+  html += '<div style="font-size:0.82em; color:var(--muted); margin-top:4px;">STR ' + w.str + ' · SPD ' + w.spd + ' · END ' + w.end + '</div>';
+  var busy = !!w.busy;
+  html += '<div class="wolf-actions">';
+  html += '<button class="btn btn-good" id="btn-feed" ' + (busy?'':'') + '>Feed</button>';
+  html += '<button class="btn" id="btn-train" ' + (busy||w.stamina<CONFIG.TRAIN_STAMINA?'disabled':'') + '>Train</button>';
+  html += '<button class="btn" id="btn-explore" ' + (busy||w.stamina<CONFIG.EXPLORE_STAMINA?'disabled':'') + '>Explore</button>';
+  html += '<button class="btn" id="btn-rename">Rename</button>';
+  html += '</div>';
+  el.innerHTML = html;
+  $('btn-feed').addEventListener('click', ()=>feedWolf(w));
+  $('btn-train').addEventListener('click', ()=>startTrain(w,false));
+  $('btn-explore').addEventListener('click', ()=>startExplore(w,false));
+  $('btn-rename').addEventListener('click', function(){
+    var n = prompt('Rename ' + w.name + ' to:', w.name);
+    if (n && n.trim()){ w.name = n.trim().slice(0,18); render(); }
+  });
+
+  var ach = $('achievements-strip');
+  var count = Object.keys(state.achievements).length;
+  ach.textContent = 'Achievements: ' + count + ' / ' + ACHIEVEMENTS.length;
+}
+function renderVillage(){
+  var grid = $('buildings-grid'); grid.innerHTML='';
+  ['farm','well','quarry','watchtower','den'].forEach(function(key){
+    var def = BUILDINGS[key], b = state.buildings[key];
+    var card = document.createElement('div'); card.className='b-card';
+    var head = '<div class="b-head"><img class="icon" src="' + V + def.icon + '" onerror="this.style.display=\'none\'"><div><div class="b-name">' + def.name + '</div><div class="b-sub">' + (b.built ? 'Level ' + b.level : 'Not built') + '</div></div></div>';
+    var body = '<div class="b-desc">' + def.desc + '</div>';
+    var btnRow = '';
+    if (key==='den'){
+      var cost = scaledCost(def.upCost, def.upMult, b.level-1);
+      btnRow = '<div class="b-sub">Pack capacity: ' + maxPack() + ' / ' + CONFIG.MAX_PACK + '</div><button class="btn" id="b-up-den" ' + (maxPack()>=CONFIG.MAX_PACK||!canAfford(cost)?'disabled':'') + '>Upgrade (' + costText(cost) + ')</button>';
+    } else if (!b.built){
+      btnRow = '<button class="btn btn-good" id="b-build-' + key + '" ' + (canAfford(def.buildCost)?'':'disabled') + '>Build (' + costText(def.buildCost) + ')</button>';
+    } else {
+      var upCost = scaledCost(def.upCost, def.upMult, b.level-1);
+      var rateLine = def.res ? ('<div class="b-sub">+' + (def.baseRate+def.rateStep*(b.level-1)).toFixed(2) + ' ' + def.res + '/s · tap yields ' + Math.round(def.clickYield+def.clickStep*(b.level-1)) + '</div>') : '';
+      btnRow = rateLine + '<div style="display:flex; gap:6px; flex-wrap:wrap;">' +
+        (def.res ? '<button class="btn btn-good" id="b-click-' + key + '">Gather</button>' : '') +
+        '<button class="btn" id="b-up-' + key + '" ' + (canAfford(upCost)?'':'disabled') + '>Upgrade (' + costText(upCost) + ')</button></div>';
+    }
+    card.innerHTML = head + body + btnRow;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('[id^="b-build-"]').forEach(btn=>btn.addEventListener('click', ()=>buildBuilding(btn.id.replace('b-build-',''))));
+  grid.querySelectorAll('[id^="b-up-"]').forEach(btn=>{
+    if (btn.id==='b-up-den') { btn.addEventListener('click', ()=>upgradeBuilding('den')); return; }
+    btn.addEventListener('click', ()=>upgradeBuilding(btn.id.replace('b-up-','')));
+  });
+  grid.querySelectorAll('[id^="b-click-"]').forEach(btn=>btn.addEventListener('click', function(){
+    var key = btn.id.replace('b-click-','');
+    var def = BUILDINGS[key], b = state.buildings[key];
+    state.resources[def.res] += def.clickYield + def.clickStep*(b.level-1);
+    render();
+  }));
+
+  // hutch card
+  var hc = $('hutch-card'); hc.innerHTML='';
+  var hcard = document.createElement('div'); hcard.className='b-card';
+  if (!hutchBuilt()){
+    hcard.innerHTML = '<div class="b-head"><img class="icon" src="' + V + 'empty_rabbit_cage.PNG" onerror="this.style.display=\'none\'"><div><div class="b-name">Rabbit Hutch</div><div class="b-sub">Not built</div></div></div><div class="b-desc">Rabbits breed on their own. The more you have, the faster they multiply. Harvest the surplus for food.</div><button class="btn btn-good" id="hutch-build" ' + (canAfford({materials:15})?'':'disabled') + '>Build (15 materials)</button>';
+  } else {
+    var cap = hutchCapacity();
+    var pct = clamp((state.rabbits.count/cap)*100,0,100);
+    var upCost = { materials: Math.ceil(15*Math.pow(1.6, hutchLevel()-1)) };
+    hcard.innerHTML = '<div class="b-head"><img class="icon" src="' + V + 'rabbit_in_cage.PNG" onerror="this.style.display=\'none\'"><div><div class="b-name">Rabbit Hutch</div><div class="b-sub">Level ' + hutchLevel() + '</div></div></div>' +
+      '<div class="b-sub">' + Math.floor(state.rabbits.count) + ' / ' + cap + ' rabbits</div><div class="meter"><div style="width:' + pct + '%"></div></div>' +
+      '<div style="display:flex; gap:6px; flex-wrap:wrap;"><button class="btn btn-good" id="hutch-harvest" ' + (Math.floor(state.rabbits.count)<=2?'disabled':'') + '>Harvest meat</button><button class="btn" id="hutch-up" ' + (canAfford(upCost)?'':'disabled') + '>Upgrade (' + costText(upCost) + ')</button></div>';
+  }
+  hc.appendChild(hcard);
+  if ($('hutch-build')) $('hutch-build').addEventListener('click', buildHutch);
+  if ($('hutch-harvest')) $('hutch-harvest').addEventListener('click', function(){ var f = harvestRabbits(); if (f) addStory('Harvested rabbits for +' + f + ' food.', 'good'); render(); });
+  if ($('hutch-up')) $('hutch-up').addEventListener('click', upgradeHutch);
+
+  // threat
+  $('threat-fill').style.width = state.threat + '%';
+  $('threat-fill').style.background = state.threat>60 ? 'var(--bad)' : state.threat>35 ? 'var(--warn)' : 'var(--accent-dim)';
+  $('threat-pct').textContent = Math.round(state.threat) + '%';
+
+  // hire row
+  var roleSel = $('hire-role');
+  if (!roleSel.options.length){
+    Object.keys(WORKER_ROLES).forEach(function(k){ var o=document.createElement('option'); o.value=k; o.textContent=WORKER_ROLES[k].name; roleSel.appendChild(o); });
+  }
+  var hc2 = hireCost();
+  $('hire-cost').textContent = 'Cost: ' + costText(hc2);
+  $('btn-hire').disabled = !canAfford(hc2) || state.workers.length>=CONFIG.MAX_WORKERS;
+
+  var list = $('workers-list'); list.innerHTML='';
+  if (!state.workers.length) list.innerHTML = '<p style="color:var(--muted); font-size:0.9em;">No workers hired yet.</p>';
+  state.workers.forEach(function(w){
+    var role = WORKER_ROLES[w.role];
+    var div = document.createElement('div'); div.className='worker-card';
+    var timing = '';
+    if (!role.passive){
+      var secs = Math.max(0, Math.ceil((w.nextActionAt-state.simNow)/1000));
+      timing = 'next in ' + secs + 's';
+    } else timing = 'on guard';
+    var upCost = workerUpgradeCost(w);
+    div.innerHTML = '<img src="' + V + role.portrait + '" onerror="this.style.display=\'none\'">' +
+      '<div class="worker-meta"><div class="wname">' + role.name + ' · Lv ' + w.level + '</div><div class="wrole">' + timing + '</div></div>' +
+      '<button class="btn" data-up="' + w.id + '" ' + (w.level>=5||!canAfford(upCost)?'disabled':'') + '>Upgrade (' + costText(upCost) + ')</button>' +
+      '<button class="btn btn-bad" data-dismiss="' + w.id + '">Dismiss</button>';
+    list.appendChild(div);
+  });
+  list.querySelectorAll('[data-up]').forEach(b=>b.addEventListener('click', ()=>upgradeWorker(b.getAttribute('data-up'))));
+  list.querySelectorAll('[data-dismiss]').forEach(b=>b.addEventListener('click', ()=>dismissWorker(b.getAttribute('data-dismiss'))));
+}
+function renderBattle(){
+  $('arena-rank').textContent = state.battle.rank;
+  $('arena-record').textContent = state.battle.wins + 'W / ' + state.battle.losses + 'L';
+  var sel = $('arena-fighter');
+  var prevVal = sel.value;
+  sel.innerHTML = state.pack.map((w,i)=>'<option value="'+i+'">'+w.name+' (Lv'+w.level+')</option>').join('');
+  if (prevVal) sel.value = prevVal;
+  if (arenaEnemy){
+    $('arena-vs').classList.remove('hidden');
+    $('arena-fight-row').classList.remove('hidden');
+    var w = fighterWolf();
+    $('arena-player-img').src = V + wolfSprite(w?w.form:'human');
+    $('arena-player-name').textContent = w ? w.name : '';
+    $('arena-player-power').style.width = clamp(wolfPower(w||{str:0,spd:0,end:0,level:1,form:'human',fear:0})/60*100,5,100)+'%';
+    $('arena-enemy-img').src = V + arenaEnemy.img;
+    $('arena-enemy-name').textContent = arenaEnemy.name;
+    $('arena-enemy-power').style.width = clamp(arenaEnemy.power/60*100,5,100)+'%';
+  } else {
+    $('arena-vs').classList.add('hidden');
+    $('arena-fight-row').classList.add('hidden');
+  }
+}
+function renderStory(){
+  $('story-feed').innerHTML = storyLog.map(function(e){
+    return '<div class="story-line ' + e.priority + '">' + String(e.text).replace(/</g,'&lt;') + '</div>';
+  }).join('');
+}
+function render(){
+  if (!state) return;
+  renderTopbar();
+  renderPackStrip();
+  renderWolfCard();
+  renderVillage();
+  renderBattle();
+  renderStory();
+}
+
+// ============================================================================
+// TABS
+// ============================================================================
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+    tab.classList.add('active');
+    $('tab-' + tab.getAttribute('data-tab')).classList.remove('hidden');
+  });
+});
+$('btn-find-opponent').addEventListener('click', findOpponent);
+$('btn-fight').addEventListener('click', arenaFight);
+$('btn-flee-arena').addEventListener('click', function(){ arenaEnemy=null; render(); });
+$('btn-hire').addEventListener('click', function(){ hireWorker($('hire-role').value); });
+
+// ============================================================================
+// GAME LOOP / START / MENU WIRING
+// ============================================================================
+var gameTickInterval = null, autoSaveInterval = null;
+function startGameLoop(){
+  if (gameTickInterval) clearInterval(gameTickInterval);
+  gameTickInterval = setInterval(function(){ tick(CONFIG.TICK_SEC); render(); }, CONFIG.TICK_SEC*1000);
+  if (autoSaveInterval) clearInterval(autoSaveInterval);
+  autoSaveInterval = setInterval(saveGame, 60000);
+}
+function showGame(){
+  $('title-screen').classList.add('hidden');
+  $('game-root').classList.remove('hidden');
+  startMusic();
+  render();
+  startGameLoop();
+  try { if (!localStorage.getItem('desolation_lite_tutorial_done')) setTimeout(startTutorial, 400); } catch(e){}
+}
+$('btn-new').addEventListener('click', function(){
+  if (hasSave() && !confirm('Start a new game? Your saved camp will be overwritten.')) return;
+  state = createState();
+  storyLog.length = 0;
+  addStory('You arrive at the ruins of an old research camp. One werewolf remains at your side. Build it back up.');
+  showGame();
+});
+$('btn-continue').addEventListener('click', function(){
+  if (!loadGame()){ alert('No saved game found.'); return; }
+  showGame();
+});
+$('btn-options').addEventListener('click', ()=>$('options-overlay').classList.remove('hidden'));
+$('opt-back').addEventListener('click', ()=>$('options-overlay').classList.add('hidden'));
+$('btn-settings').addEventListener('click', ()=>$('options-overlay').classList.remove('hidden'));
+$('btn-save').addEventListener('click', saveGame);
+$('btn-quit').addEventListener('click', function(){
+  if (!confirm('Return to the title screen? Your game will be saved first.')) return;
+  saveGame();
+  if (gameTickInterval) clearInterval(gameTickInterval);
+  if (autoSaveInterval) clearInterval(autoSaveInterval);
+  if (musicAudio) musicAudio.pause();
+  $('game-root').classList.add('hidden');
+  $('title-screen').classList.remove('hidden');
+  $('btn-continue').disabled = !hasSave();
+});
+$('opt-delete-save').addEventListener('click', function(){
+  if (confirm('Permanently delete the saved game?')){
+    localStorage.removeItem(SAVE_KEY);
+    alert('Save deleted.');
+    $('btn-continue').disabled = !hasSave();
+  }
+});
+$('opt-volume').addEventListener('input', function(){
+  $('opt-volume-val').textContent = this.value + '%';
+  if (musicAudio) musicAudio.volume = getVolume();
+});
+(function populateTracks(){
+  var names = ['afrobeats_track','basketball_track','beat_track','celtic_track','chillhop_track','drill_track','dub_track','dystopian_siren_track','ebunny-gothic_track','end_track','everywhere_track','flute_track','fusion_track','future_track','guitar_track','house_techno_track','house_track','lofidreams_track','meditation_track','motivation_track','outrebirth_track','rasta_track','reggae_track','survive_track','techno_track'];
+  var sel = $('opt-track');
+  names.forEach(function(n){ var o=document.createElement('option'); o.value=n+'.mp3'; o.textContent=n.replace(/_track$/,'').replace(/-/g,' '); sel.appendChild(o); });
+})();
+
+// ============================================================================
+// WALKTHROUGH TUTORIAL (skippable, spotlight tour)
+// ============================================================================
+var TUTORIAL_STEPS = [
+  { target:null, title:'Welcome to the camp', body:'You are rebuilding a werewolf sanctuary from almost nothing. Feed and train your wolf, send them exploring, build up the camp, and hire help so it keeps running while you are away.\n\nSkip any time — replay this from Options later.' },
+  { target:'#topbar', title:'Resources & the moon', body:'Food, Water, Materials and Essence across the top, with their passive income rate once buildings produce them.\n\nThe moon phase on the right matters: full moons raise Threat and your wolf leans toward wolf form.' },
+  { target:'#wolf-card', title:'Your werewolf', body:'HP, Stamina, Hunger, Thirst, Bond and Fear. Feed to calm hunger/thirst and raise Bond. Train (costs Stamina) to grow STR/SPD/END and XP. Explore sends them out for loot, with a chance of a fight or a new recruit.' },
+  { target:'#tab-village', title:'The Village tab', body:'Build a Farm, Rain Catcher and Scavenger Post — once built they produce resources on their own, and you can still tap "Gather" for a manual boost.\n\nBuild a Rabbit Hutch: rabbits breed on their own, faster the more you have, and you harvest the surplus into food.' },
+  { target:'#workers-list', title:'Hire workers', body:'Workers automate the busywork — a Farmer taps the farm for you, a Trainer trains an idle wolf, a Scout sends one exploring, a Rabbit Keeper harvests the hutch, a Guard lowers Threat.\n\nThey sometimes get scared off or dragged away, especially when Threat is high — hire more and build a Watchtower to keep it down.' },
+  { target:'#tab-battle', title:'The Arena', body:'Pick a fighter and find an opponent. Wins raise your Rank and pay Essence; losses cost nothing but pride. Multiplayer is coming soon — for now it is you against the camp\'s rivals.' },
+  { target:null, title:'What to watch out for', body:'• Keep Hunger/Thirst down — a starving, parched wolf trains and explores worse.\n• Watch Threat (Village tab) — it spikes on full moons and costs you workers.\n• Rabbits need at least 2 to keep breeding — never harvest them all.\n• Save often; closing the tab keeps your last save, and progress still runs while you are away (up to 8 hours).' },
+];
+var _tutIndex=0, _tutActive=false;
+function _tutPlaceBox(rect){
+  var box = $('tutorial-box');
+  if (!rect){ box.style.left='50%'; box.style.top='50%'; box.style.transform='translate(-50%,-50%)'; return; }
+  var bw = Math.min(360, window.innerWidth-32), bh = box.offsetHeight||220, margin=14;
+  var left = clamp(rect.left+rect.width/2-bw/2, 16, window.innerWidth-bw-16);
+  var top = (rect.bottom+margin+bh < window.innerHeight) ? rect.bottom+margin : (rect.top-margin-bh>0 ? rect.top-margin-bh : Math.max(16, window.innerHeight-bh-16));
+  box.style.left = left+'px'; box.style.top = top+'px'; box.style.transform = 'none';
+}
+function _tutRenderStep(){
+  var step = TUTORIAL_STEPS[_tutIndex];
+  if (!step){ endTutorial(); return; }
+  $('tutorial-title').textContent = step.title;
+  $('tutorial-body').textContent = step.body;
+  $('tutorial-progress').textContent = (_tutIndex+1) + ' / ' + TUTORIAL_STEPS.length;
+  $('tutorial-back').style.visibility = _tutIndex===0 ? 'hidden':'visible';
+  $('tutorial-next').textContent = _tutIndex===TUTORIAL_STEPS.length-1 ? 'Done':'Next';
+  var spot = $('tutorial-spot');
+  var el = step.target ? document.querySelector(step.target) : null;
+  var visible = el && el.offsetParent !== null;
+  if (visible){ var r = el.getBoundingClientRect(); if (r.width<2||r.height<2) visible=false; }
+  if (visible){
+    var r2 = el.getBoundingClientRect(), pad=6;
+    spot.style.left=(r2.left-pad)+'px'; spot.style.top=(r2.top-pad)+'px';
+    spot.style.width=(r2.width+pad*2)+'px'; spot.style.height=(r2.height+pad*2)+'px';
+    spot.classList.add('visible');
+    try { el.scrollIntoView({block:'nearest', behavior:'smooth'}); } catch(e){}
+    _tutPlaceBox(r2);
+  } else {
+    spot.classList.remove('visible'); spot.style.width='0px'; spot.style.height='0px';
+    _tutPlaceBox(null);
+  }
+}
+function startTutorial(){
+  if (_tutActive) return; _tutActive=true; _tutIndex=0;
+  $('tutorial-overlay').classList.remove('hidden'); _tutRenderStep();
+}
+function endTutorial(){
+  _tutActive=false; $('tutorial-overlay').classList.add('hidden');
+  try { localStorage.setItem('desolation_lite_tutorial_done','1'); } catch(e){}
+}
+$('tutorial-next').addEventListener('click', function(){ if (_tutIndex>=TUTORIAL_STEPS.length-1){ endTutorial(); return; } _tutIndex++; _tutRenderStep(); });
+$('tutorial-back').addEventListener('click', function(){ if (_tutIndex>0){ _tutIndex--; _tutRenderStep(); } });
+$('tutorial-skip').addEventListener('click', endTutorial);
+window.addEventListener('resize', function(){ if (_tutActive) _tutRenderStep(); });
+document.addEventListener('keydown', function(e){
+  if (!_tutActive) return;
+  if (e.key==='Escape') endTutorial();
+  else if (e.key==='ArrowRight'||e.key==='Enter') $('tutorial-next').click();
+  else if (e.key==='ArrowLeft') $('tutorial-back').click();
+});
+$('btn-howto').addEventListener('click', function(){ startTutorial(); });
+$('opt-howto').addEventListener('click', function(){ $('options-overlay').classList.add('hidden'); startTutorial(); });
+
+// Continue button only useful if a save exists
+(function init(){
+  $('btn-continue').disabled = !hasSave();
+})();
+</script>
+</body>
+</html>
